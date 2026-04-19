@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import com.cocode.claudeemailapp.mail.ImapMailFetcher
@@ -67,6 +68,14 @@ class EndToEndEnvelopeFlowTest {
         )
     }
 
+    private fun dismissKeyboard() {
+        try {
+            Espresso.closeSoftKeyboard()
+        } catch (_: Throwable) {
+            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack()
+        }
+    }
+
     private fun waitUntilTag(tag: String, timeoutMs: Long) {
         composeRule.waitUntil(timeoutMillis = timeoutMs) {
             composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
@@ -108,14 +117,15 @@ class EndToEndEnvelopeFlowTest {
         scrollComposeTo("compose_to")
         composeRule.onNodeWithTag("compose_to").performTextClearance()
         composeRule.onNodeWithTag("compose_to").performTextInput(c.serviceAddress)
-        Espresso.closeSoftKeyboard()
+        dismissKeyboard()
         scrollComposeTo("compose_project")
         composeRule.onNodeWithTag("compose_project").performTextInput("test-01")
-        Espresso.closeSoftKeyboard()
+        dismissKeyboard()
         scrollComposeTo("compose_body")
         composeRule.onNodeWithTag("compose_body").performTextInput(body)
-        Espresso.closeSoftKeyboard()
+        dismissKeyboard()
         scrollComposeTo("compose_send")
+        dismissKeyboard()
         composeRule.onNodeWithTag("compose_send").performClick()
 
         // Snackbar + auto-nav back to Home signals SMTP send completed.
@@ -125,15 +135,15 @@ class EndToEndEnvelopeFlowTest {
         val originalId = awaitOriginalMessageId(fetcher, c, identifier)
         println("E2E command sent: identifier=$identifier messageId=$originalId")
 
-        val ack = awaitReplyEnvelope(fetcher, c, originalId, Kinds.ACK, timeoutMs = 90_000)
-        assertNotNull("no ack envelope within 90s (messageId=$originalId)", ack)
+        val ack = awaitReplyEnvelope(fetcher, c, originalId, Kinds.ACK, timeoutMs = 180_000)
+        assertNotNull("no ack envelope within 180s (messageId=$originalId)", ack)
         val ackEnv = ack!!.envelope!!
         assertEquals(Kinds.ACK, ackEnv.kind)
         assertNotNull("ack should carry task_id", ackEnv.taskId)
         println("E2E ack: taskId=${ackEnv.taskId} body=${ackEnv.body}")
 
-        val result = awaitReplyEnvelope(fetcher, c, originalId, Kinds.RESULT, timeoutMs = 300_000)
-        assertNotNull("no result envelope within 300s (messageId=$originalId)", result)
+        val result = awaitReplyEnvelope(fetcher, c, originalId, Kinds.RESULT, timeoutMs = 120_000)
+        assertNotNull("no result envelope within 120s (messageId=$originalId)", result)
         val resultEnv = result!!.envelope!!
         assertEquals(Kinds.RESULT, resultEnv.kind)
         assertEquals("result should reference same task", ackEnv.taskId, resultEnv.taskId)
@@ -157,27 +167,35 @@ class EndToEndEnvelopeFlowTest {
         scrollSetupTo("setup_email")
         composeRule.onNodeWithTag("setup_email").performTextClearance()
         composeRule.onNodeWithTag("setup_email").performTextInput(c.emailAddress)
+        dismissKeyboard()
         scrollSetupTo("setup_password")
         composeRule.onNodeWithTag("setup_password").performTextInput(c.password)
+        dismissKeyboard()
         scrollSetupTo("setup_imap_host")
         composeRule.onNodeWithTag("setup_imap_host").performTextClearance()
         composeRule.onNodeWithTag("setup_imap_host").performTextInput(c.imapHost)
+        dismissKeyboard()
         scrollSetupTo("setup_imap_port")
         composeRule.onNodeWithTag("setup_imap_port").performTextClearance()
         composeRule.onNodeWithTag("setup_imap_port").performTextInput(c.imapPort.toString())
+        dismissKeyboard()
         scrollSetupTo("setup_smtp_host")
         composeRule.onNodeWithTag("setup_smtp_host").performTextClearance()
         composeRule.onNodeWithTag("setup_smtp_host").performTextInput(c.smtpHost)
+        dismissKeyboard()
         scrollSetupTo("setup_smtp_port")
         composeRule.onNodeWithTag("setup_smtp_port").performTextClearance()
         composeRule.onNodeWithTag("setup_smtp_port").performTextInput(c.smtpPort.toString())
+        dismissKeyboard()
         scrollSetupTo("setup_service_address")
         composeRule.onNodeWithTag("setup_service_address").performTextClearance()
         composeRule.onNodeWithTag("setup_service_address").performTextInput(c.serviceAddress)
+        dismissKeyboard()
         scrollSetupTo("setup_shared_secret")
         composeRule.onNodeWithTag("setup_shared_secret").performTextInput(c.sharedSecret)
-        Espresso.closeSoftKeyboard()
+        dismissKeyboard()
         scrollSetupTo("setup_submit")
+        dismissKeyboard()
         composeRule.onNodeWithTag("setup_submit").performClick()
     }
 
@@ -207,17 +225,32 @@ class EndToEndEnvelopeFlowTest {
         timeoutMs: Long
     ): FetchedMessage? {
         val deadline = System.currentTimeMillis() + timeoutMs
+        var pollCount = 0
         while (System.currentTimeMillis() < deadline) {
-            val hit: FetchedMessage? = runBlocking {
-                fetcher.fetchRecent(c, count = 40).firstOrNull { m ->
-                    val env = m.envelope ?: return@firstOrNull false
-                    env.kind == expectedKind &&
-                        (m.inReplyTo?.trim() == originalId ||
-                            m.references.any { it.trim() == originalId })
-                }
+            pollCount++
+            val fetched: List<FetchedMessage> = runBlocking { fetcher.fetchRecent(c, count = 40) }
+            val elapsedSec = (timeoutMs - (deadline - System.currentTimeMillis())) / 1000
+            val line = "poll#$pollCount kind=$expectedKind t=${elapsedSec}s fetched=${fetched.size} orig=$originalId"
+            println(line)
+            android.util.Log.d("E2ETest", line)
+            fetched.take(5).forEach { m ->
+                val detail = "  subj='${m.subject.take(50)}' inReplyTo=${m.inReplyTo} envKind=${m.envelope?.kind}"
+                println(detail)
+                android.util.Log.d("E2ETest", detail)
             }
-            if (hit != null) return hit
-            Thread.sleep(5_000)
+            val hit = fetched.firstOrNull { m ->
+                val env = m.envelope ?: return@firstOrNull false
+                env.kind == expectedKind &&
+                    (m.inReplyTo?.trim() == originalId ||
+                        m.references.any { it.trim() == originalId })
+            }
+            if (hit != null) {
+                val matchLine = "poll#$pollCount MATCH $expectedKind msgId=${hit.messageId}"
+                println(matchLine)
+                android.util.Log.d("E2ETest", matchLine)
+                return hit
+            }
+            Thread.sleep(2_000)
         }
         return null
     }
