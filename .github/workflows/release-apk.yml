@@ -48,7 +48,7 @@ jobs:
       - name: Compute next version
         id: version
         env:
-          BUMP: ${{ inputs.bump }}
+          BUMP: ${{ inputs.bump || 'patch' }}
         run: |
           LATEST=$(git tag --list 'v*' --sort=-version:refname | head -1)
           [ -z "$LATEST" ] && LATEST="v0.0.0"
@@ -64,6 +64,7 @@ jobs:
             major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
             minor) MINOR=$((MINOR+1)); PATCH=0 ;;
             patch) PATCH=$((PATCH+1)) ;;
+            *) echo "Unknown bump type: $BUMP" >&2; exit 1 ;;
           esac
           VERSION_NAME="$MAJOR.$MINOR.$PATCH"
           TAG="v$VERSION_NAME"
