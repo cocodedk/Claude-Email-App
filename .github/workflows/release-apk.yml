@@ -108,7 +108,7 @@ jobs:
           path: build/release/Claude-Email-App.apk
           if-no-files-found: error
 
-      - uses: softprops/action-gh-release@da05d552049eb17e14aa1b0b9c3f72e3f55d1d5f # v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
