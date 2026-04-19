@@ -1,0 +1,7 @@
+package com.cocode.claudeemailapp.mail
+
+import com.cocode.claudeemailapp.data.MailCredentials
+
+interface MailFetcher {
+    suspend fun fetchRecent(credentials: MailCredentials, count: Int = 50): List<FetchedMessage>
+}

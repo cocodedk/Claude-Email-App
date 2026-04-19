@@ -1,0 +1,210 @@
+package com.cocode.claudeemailapp.app
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cocode.claudeemailapp.mail.FetchedMessage
+import kotlinx.coroutines.launch
+
+enum class Screen { Home, Setup, Settings, Conversation, Compose }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory)) {
+    val credentials by viewModel.credentials.collectAsState()
+    val inbox by viewModel.inbox.collectAsState()
+    val probe by viewModel.probe.collectAsState()
+    val send by viewModel.send.collectAsState()
+    val pending by viewModel.pending.collectAsState()
+
+    var screen by rememberSaveable { mutableStateOf(if (credentials == null) Screen.Setup else Screen.Home) }
+    var editingCredentials by rememberSaveable { mutableStateOf(false) }
+    var selectedMessageId by rememberSaveable { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(credentials) {
+        if (credentials != null && screen == Screen.Setup && !editingCredentials) {
+            screen = Screen.Home
+        }
+        if (credentials == null) {
+            screen = Screen.Setup
+        }
+    }
+
+    DisposableEffect(credentials) {
+        if (credentials != null) viewModel.startInboxPolling()
+        onDispose { viewModel.stopInboxPolling() }
+    }
+
+    LaunchedEffect(probe.result) {
+        val result = probe.result
+        if (result is com.cocode.claudeemailapp.mail.ProbeResult.Success && editingCredentials) {
+            editingCredentials = false
+            screen = Screen.Settings
+            viewModel.clearProbeResult()
+        }
+    }
+
+    LaunchedEffect(send.justSentMessageId, send.lastError) {
+        send.justSentMessageId?.let {
+            scope.launch { snackbarHostState.showSnackbar("Message sent") }
+            viewModel.clearSendResult()
+            if (screen == Screen.Compose || screen == Screen.Conversation) {
+                screen = Screen.Home
+            }
+        }
+        send.lastError?.let {
+            scope.launch { snackbarHostState.showSnackbar("Send failed: $it") }
+        }
+    }
+
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets.safeDrawing,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = when (screen) {
+                            Screen.Setup -> if (editingCredentials) "Edit credentials" else "Setup"
+                            Screen.Home -> "Claude Email"
+                            Screen.Settings -> "Settings"
+                            Screen.Conversation -> "Conversation"
+                            Screen.Compose -> "New command"
+                        },
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                windowInsets = WindowInsets.statusBars
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
+                .padding(innerPadding)
+        ) {
+            when (screen) {
+                Screen.Setup -> SetupScreen(
+                    viewModel = viewModel,
+                    initial = if (editingCredentials) credentials else null
+                )
+                Screen.Home -> HomeScreen(
+                    state = inbox,
+                    pending = pending,
+                    onRefresh = { viewModel.refreshInbox() },
+                    onOpenMessage = { message ->
+                        selectedMessageId = message.messageId
+                        screen = Screen.Conversation
+                    },
+                    onCompose = { screen = Screen.Compose },
+                    onOpenSettings = { screen = Screen.Settings }
+                )
+                Screen.Settings -> credentials?.let {
+                    SettingsScreen(
+                        credentials = it,
+                        onBack = { screen = Screen.Home },
+                        onSignOut = {
+                            viewModel.signOut()
+                            screen = Screen.Setup
+                        },
+                        onEdit = {
+                            editingCredentials = true
+                            screen = Screen.Setup
+                        }
+                    )
+                }
+                Screen.Conversation -> {
+                    val message = inbox.messages.firstOrNull { it.messageId == selectedMessageId }
+                    if (message == null) {
+                        screen = Screen.Home
+                    } else {
+                        ConversationScreen(
+                            message = message,
+                            sending = send.sending,
+                            sendError = send.lastError,
+                            onBack = { screen = Screen.Home },
+                            onSendReply = { body ->
+                                viewModel.sendMessage(
+                                    to = replyTo(message, credentials?.emailAddress),
+                                    subject = replySubject(message.subject, credentials?.sharedSecret),
+                                    body = body,
+                                    inReplyTo = message.messageId.takeIf(String::isNotBlank),
+                                    references = buildReferences(message)
+                                )
+                            }
+                        )
+                    }
+                }
+                Screen.Compose -> ComposeMessageScreen(
+                    defaultTo = credentials?.serviceAddress.orEmpty(),
+                    defaultProject = "",
+                    sending = send.sending,
+                    sendError = send.lastError,
+                    onCancel = { screen = Screen.Home },
+                    onSend = { to, project, body ->
+                        viewModel.sendCommand(to = to, project = project, body = body)
+                    }
+                )
+            }
+        }
+    }
+}
+
+private fun replyTo(message: FetchedMessage, selfAddress: String?): String {
+    val from = message.from
+    if (from.isNotBlank() && !from.equals(selfAddress, ignoreCase = true)) return from
+    return message.to.firstOrNull { !it.equals(selfAddress, ignoreCase = true) } ?: from
+}
+
+private fun replySubject(original: String, sharedSecret: String?): String {
+    val base = if (original.trim().startsWith("Re:", ignoreCase = true)) original else "Re: $original"
+    return when {
+        sharedSecret.isNullOrBlank() -> base
+        base.contains("AUTH:") -> base
+        else -> "AUTH:$sharedSecret $base"
+    }
+}
+
+private fun buildReferences(message: FetchedMessage): List<String> {
+    val refs = message.references.toMutableList()
+    if (message.messageId.isNotBlank() && message.messageId !in refs) refs.add(message.messageId)
+    return refs
+}

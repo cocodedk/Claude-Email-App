@@ -1,0 +1,249 @@
+package com.cocode.claudeemailapp.app
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.cocode.claudeemailapp.data.CredentialsStore
+import com.cocode.claudeemailapp.data.MailCredentials
+import com.cocode.claudeemailapp.data.PendingCommand
+import com.cocode.claudeemailapp.data.PendingCommandStore
+import com.cocode.claudeemailapp.data.PendingStatus
+import com.cocode.claudeemailapp.mail.FetchedMessage
+import com.cocode.claudeemailapp.mail.ImapMailFetcher
+import com.cocode.claudeemailapp.mail.MailException
+import com.cocode.claudeemailapp.mail.MailFetcher
+import com.cocode.claudeemailapp.mail.MailProbe
+import com.cocode.claudeemailapp.mail.MailSender
+import com.cocode.claudeemailapp.mail.OutgoingMessage
+import com.cocode.claudeemailapp.mail.ProbeResult
+import com.cocode.claudeemailapp.mail.SmtpMailSender
+import com.cocode.claudeemailapp.protocol.Envelopes
+import com.cocode.claudeemailapp.protocol.envelope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+
+class AppViewModel(
+    application: Application,
+    private val credentialsStore: CredentialsStore,
+    private val mailSender: MailSender,
+    private val mailFetcher: MailFetcher,
+    private val mailProbe: MailProbe,
+    private val pendingStore: PendingCommandStore
+) : AndroidViewModel(application) {
+
+    data class InboxState(
+        val loading: Boolean = false,
+        val messages: List<FetchedMessage> = emptyList(),
+        val error: String? = null
+    )
+
+    data class ProbeState(
+        val running: Boolean = false,
+        val result: ProbeResult? = null
+    )
+
+    data class SendState(
+        val sending: Boolean = false,
+        val lastError: String? = null,
+        val justSentMessageId: String? = null
+    )
+
+    private val _credentials = MutableStateFlow(credentialsStore.load())
+    val credentials: StateFlow<MailCredentials?> = _credentials.asStateFlow()
+
+    private val _inbox = MutableStateFlow(InboxState())
+    val inbox: StateFlow<InboxState> = _inbox.asStateFlow()
+
+    private val _probe = MutableStateFlow(ProbeState())
+    val probe: StateFlow<ProbeState> = _probe.asStateFlow()
+
+    private val _send = MutableStateFlow(SendState())
+    val send: StateFlow<SendState> = _send.asStateFlow()
+
+    private val _pending = MutableStateFlow(pendingStore.all())
+    val pending: StateFlow<List<PendingCommand>> = _pending.asStateFlow()
+
+    private var pollingJob: Job? = null
+
+    init {
+        if (_credentials.value != null) refreshInbox()
+    }
+
+    fun startInboxPolling(intervalMs: Long = 45_000L) {
+        if (pollingJob?.isActive == true) return
+        pollingJob = viewModelScope.launch {
+            while (isActive) {
+                delay(intervalMs)
+                if (_credentials.value != null && !_inbox.value.loading) refreshInbox()
+            }
+        }
+    }
+
+    fun stopInboxPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
+
+    fun probeAndSave(credentials: MailCredentials) {
+        viewModelScope.launch {
+            _probe.value = ProbeState(running = true)
+            val result = mailProbe.probe(credentials)
+            _probe.value = ProbeState(running = false, result = result)
+            if (result is ProbeResult.Success) {
+                credentialsStore.save(credentials)
+                _credentials.value = credentials
+                refreshInbox()
+            }
+        }
+    }
+
+    fun clearProbeResult() {
+        _probe.value = ProbeState()
+    }
+
+    fun refreshInbox() {
+        val creds = _credentials.value ?: return
+        viewModelScope.launch {
+            _inbox.value = _inbox.value.copy(loading = true, error = null)
+            try {
+                val messages = mailFetcher.fetchRecent(creds, count = 50)
+                _inbox.value = InboxState(loading = false, messages = messages)
+                reconcilePending(messages)
+            } catch (e: MailException) {
+                _inbox.value = _inbox.value.copy(loading = false, error = e.message)
+            } catch (t: Throwable) {
+                _inbox.value = _inbox.value.copy(loading = false, error = t.message)
+            }
+        }
+    }
+
+    private fun reconcilePending(messages: List<FetchedMessage>) {
+        var touched = false
+        for (m in messages) {
+            val env = m.envelope ?: continue
+            val updated = pendingStore.applyInbound(env, m.inReplyTo)
+            if (updated != null) touched = true
+        }
+        if (touched) _pending.value = pendingStore.all()
+    }
+
+    fun sendMessage(
+        to: String,
+        subject: String,
+        body: String,
+        inReplyTo: String? = null,
+        references: List<String> = emptyList()
+    ) {
+        val creds = _credentials.value ?: return
+        viewModelScope.launch {
+            _send.value = SendState(sending = true)
+            try {
+                val result = mailSender.send(
+                    credentials = creds,
+                    message = OutgoingMessage(
+                        to = to,
+                        subject = subject,
+                        body = body,
+                        inReplyTo = inReplyTo,
+                        references = references
+                    )
+                )
+                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
+                refreshInbox()
+            } catch (e: MailException) {
+                _send.value = SendState(sending = false, lastError = e.message)
+            } catch (t: Throwable) {
+                _send.value = SendState(sending = false, lastError = t.message)
+            }
+        }
+    }
+
+    fun sendCommand(
+        to: String,
+        project: String,
+        body: String,
+        priority: Int? = null,
+        planFirst: Boolean? = null
+    ) {
+        val creds = _credentials.value ?: return
+        viewModelScope.launch {
+            _send.value = SendState(sending = true)
+            try {
+                val envelope = Envelopes.command(
+                    body = body,
+                    project = project,
+                    priority = priority,
+                    planFirst = planFirst,
+                    auth = creds.sharedSecret.takeIf(String::isNotBlank)
+                )
+                val subject = firstLineSummary(body)
+                val outgoing = OutgoingMessage.envelope(
+                    to = to,
+                    subject = subject,
+                    envelope = envelope
+                )
+                val result = mailSender.send(creds, outgoing)
+                if (result.messageId.isNotBlank()) {
+                    val pending = PendingCommand(
+                        messageId = result.messageId,
+                        sentAt = result.sentAt.time,
+                        to = to,
+                        subject = subject,
+                        kind = envelope.kind,
+                        bodyPreview = body.take(200)
+                    )
+                    pendingStore.add(pending)
+                    _pending.value = pendingStore.all()
+                }
+                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
+                refreshInbox()
+            } catch (e: MailException) {
+                _send.value = SendState(sending = false, lastError = e.message)
+            } catch (t: Throwable) {
+                _send.value = SendState(sending = false, lastError = t.message)
+            }
+        }
+    }
+
+    fun clearSendResult() {
+        _send.value = SendState()
+    }
+
+    fun signOut() {
+        stopInboxPolling()
+        credentialsStore.clear()
+        pendingStore.clear()
+        _credentials.value = null
+        _inbox.value = InboxState()
+        _pending.value = emptyList()
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
+                AppViewModel(
+                    application = app,
+                    credentialsStore = CredentialsStore(app),
+                    mailSender = SmtpMailSender(),
+                    mailFetcher = ImapMailFetcher(),
+                    mailProbe = MailProbe(),
+                    pendingStore = PendingCommandStore(app)
+                )
+            }
+        }
+    }
+}
+
+private fun firstLineSummary(body: String): String {
+    val first = body.lineSequence().firstOrNull()?.trim().orEmpty()
+    return first.take(80).ifBlank { "Command" }
+}
