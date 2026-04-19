@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#050506" />
+
+  <title>کلود ایمیل — کلاینت اندروید برای سرویس claude-email</title>
+  <meta name="description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email. IMAP/SMTP، ذخیره‌سازی رمزشده credential با Android Keystore، تجربه کاربری دستور و پاسخ برای ایجنت‌ها." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/fa/" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <link rel="alternate" hreflang="en"        href="https://cocodedk.github.io/Claude-Email-App/" />
+  <link rel="alternate" hreflang="fa"        href="https://cocodedk.github.io/Claude-Email-App/fa/" />
+  <link rel="alternate" hreflang="x-default" href="https://cocodedk.github.io/Claude-Email-App/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Claude Email" />
+  <meta property="og:title" content="کلود ایمیل — کلاینت اندروید برای سرویس claude-email" />
+  <meta property="og:description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email. IMAP/SMTP، credential رمزشده، تجربه دستور و پاسخ." />
+  <meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/fa/" />
+  <meta property="og:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="کلود ایمیل — کلاینت اندروید" />
+  <meta property="og:locale" content="fa_IR" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="کلود ایمیل — کلاینت اندروید برای سرویس claude-email" />
+  <meta name="twitter:description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email." />
+  <meta name="twitter:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta name="twitter:image:alt" content="کلود ایمیل — کلاینت اندروید" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "کلود ایمیل",
+    "inLanguage": "fa",
+    "description": "کلاینت ایمیل اندرویدی برای بک‌اند claude-email. IMAP/SMTP، ذخیره‌سازی رمزشده credential با Android Keystore، تجربه کاربری دستور و پاسخ.",
+    "url": "https://cocodedk.github.io/Claude-Email-App/fa/",
+    "downloadUrl": "https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk",
+    "applicationCategory": "CommunicationApplication",
+    "operatingSystem": "Android 7.0+",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": {
+      "@type": "Person",
+      "name": "بابک بندپی",
+      "url": "https://cocode.dk",
+      "sameAs": ["https://linkedin.com/in/babakbandpey", "https://github.com/cocodedk"]
+    },
+    "codeRepository": "https://github.com/cocodedk/Claude-Email-App"
+  }
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/Claude-Email-App/fa/" aria-label="کلود ایمیل — خانه">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+            <rect x="3" y="6" width="18" height="12"/>
+            <path d="M3 6l9 6 9-6"/>
+          </svg>
+        </span>
+        <span class="brand-name">claude-email</span><span class="brand-slash">/</span><span class="brand-suffix">app</span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn-ghost btn" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer" aria-label="مشاهده در گیت‌هاب">GitHub</a>
+        <a class="lang-switch" href="../" hreflang="en" lang="en">English</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow hero-eyebrow reveal d1">نسخه ۱ · اندروید · Apache-2.0</p>
+          <h1 class="hero-title reveal d2">
+            ایمیل، بازطراحی شده<br/>
+            برای <span class="accent">ایجنت‌ها</span>.
+          </h1>
+          <p class="hero-sub reveal d3">
+            یک کلاینت اندرویدی متمرکز برای بک‌اند claude-email. به جای پوشه و هدر، در قالب گفت‌وگو و دستور فکر کنید &mdash; با IMAP/SMTP در لایه‌ی زیرین و credential هایی که توسط Android Keystore مهر و موم می‌شوند.
+          </p>
+          <div class="hero-cta reveal d3">
+            <a class="btn btn-primary"
+               href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
+               rel="noreferrer">
+              دانلود APK
+              <span class="arrow" aria-hidden="true">↓</span>
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer">
+              مشاهده در گیت‌هاب
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="hero-meta reveal d4">
+            <span>Android 7.0+</span>
+            <span>نسخه‌ی امضاشده</span>
+            <span>IMAP · SMTP</span>
+          </div>
+        </div>
+
+        <aside class="hero-visual reveal d4" aria-hidden="true">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="terminal-dots">
+                <i class="terminal-dot is-amber"></i>
+                <i class="terminal-dot"></i>
+                <i class="terminal-dot"></i>
+              </span>
+              <span class="terminal-title">~/inbox &mdash; claude-email</span>
+              <span style="width:40px"></span>
+            </div>
+            <div class="terminal-body">
+              <div class="prompt-line" dir="ltr">
+                <span class="p-sym">→</span>
+                <span class="p-cmd">new command "refactor auth retry flow"</span>
+                <span class="cursor" aria-hidden="true"></span>
+              </div>
+
+              <article class="thread-card">
+                <span class="thread-dot" aria-label="خوانده‌نشده"></span>
+                <div>
+                  <h3 class="thread-title">بازنویسی جریان تلاش مجدد احراز هویت</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-fits</span>
+                    <span>در انتظار ایجنت · ۲ دقیقه پیش</span>
+                  </p>
+                </div>
+                <span class="thread-time">۲ د</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="خوانده‌شده"></span>
+                <div>
+                  <h3 class="thread-title">پیش‌نویس یادداشت‌های انتشار v0.4</h3>
+                  <p class="thread-meta">
+                    <span class="badge is-green">ارسال شد</span>
+                    <span>دیروز · ۱۸:۰۴</span>
+                  </p>
+                </div>
+                <span class="thread-time">۱ روز</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="خوانده‌شده"></span>
+                <div>
+                  <h3 class="thread-title">دسته‌بندی ورودی‌های ops@</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-ops</span>
+                    <span>بایگانی · سه‌شنبه</span>
+                  </p>
+                </div>
+                <span class="thread-time">سه‌شنبه</span>
+              </article>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">قابلیت‌ها</p>
+          <h2 class="section-title">ساخته شده برای کار دستور و پاسخ.</h2>
+          <p class="section-lede">
+            شش قابلیت سنجیده. بدون تزئین، بدون سربار سازمانی &mdash; دقیقاً همان چیزی که برای کار با ایجنت‌ها لازم دارید.
+          </p>
+        </header>
+
+        <div class="features">
+          <article class="feature">
+            <span class="feature-label">۰۱ · IMAP + SMTP</span>
+            <h3 class="feature-title">انتقال واقعی ایمیل.</h3>
+            <p class="feature-desc">در لایه‌ی زیرین، استاندارد. بدون قفل‌شدن در پروتکل اختصاصی و بدون حسابی که نتوانید ترک کنید.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">۰۲ · Android Keystore</span>
+            <h3 class="feature-title">Credential مهر و موم‌شده روی دستگاه.</h3>
+            <p class="feature-desc">رمزهای عبور با کلیدهای سخت‌افزاری رمزگذاری می‌شوند. همگام‌سازی نمی‌شوند و از دستگاه خارج نمی‌شوند.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">۰۳ · دستور و پاسخ</span>
+            <h3 class="feature-title">گفت‌وگو، نه رشته.</h3>
+            <p class="feature-desc">ایجنت و تسک شهروند درجه‌یک هستند. عنوان، نشان ایجنت و وضعیت &mdash; در یک نگاه خوانده می‌شوند.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">۰۴ · احراز با کلید مشترک</span>
+            <h3 class="feature-title">تأیید هویت بدون ذخیره‌ی رمز.</h3>
+            <p class="feature-desc">دستورها با یک کلید مشترک به سرویس claude-email هدایت می‌شوند. ایجنت‌ها محدود و قابل ابطال می‌مانند.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">۰۵ · صف آفلاین</span>
+            <h3 class="feature-title">الآن بنویس، بعد می‌رود.</h3>
+            <p class="feature-desc">دستورها آفلاین نوشته و محلی صف می‌شوند. لحظه‌ای که شبکه برگردد، ارسال می‌شوند.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">۰۶ · رابط کاربری تاریک</span>
+            <h3 class="feature-title">Material 3، تنظیم‌شده برای تمرکز.</h3>
+            <p class="feature-desc">آرام‌تر از Slack و خواناتر از Outlook. ساخته شده برای جلسات طولانی مطالعه، نه چت مصرفی.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture strip -->
+    <section class="arch" aria-label="ساخته شده با">
+      <div class="container">
+        <ul class="arch-list">
+          <li>Kotlin</li>
+          <li>Jetpack Compose</li>
+          <li>Material 3</li>
+          <li>Android Keystore</li>
+          <li>Angus Mail</li>
+          <li>Coroutines</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="section" id="install">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">نصب</p>
+          <h2 class="section-title">سه گام تا اولین دستور.</h2>
+          <p class="section-lede">
+            بدون نیاز به فروشگاه. بدون ساخت حساب. کلیدها دست شماست &mdash; اپ فقط از آن‌ها استفاده می‌کند.
+          </p>
+        </header>
+
+        <ol class="install-grid" role="list">
+          <li class="step">
+            <span class="step-number">۰۱ / دانلود</span>
+            <h3 class="step-title">APK امضاشده را بگیرید.</h3>
+            <p class="step-body">جدیدترین نسخه را مستقیم از گیت‌هاب دانلود کنید. قابل بازتولید، امضاشده و دارای checksum.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">۰۲ / نصب</span>
+            <h3 class="step-title">روی Android 7.0+ نصب کنید.</h3>
+            <p class="step-body">یک‌بار اجازه‌ی «نصب برنامه‌های ناشناس» را برای مدیر فایل بدهید. اندروید بقیه را انجام می‌دهد.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">۰۳ / پیکربندی</span>
+            <h3 class="step-title">اطلاعات IMAP/SMTP را وارد کنید.</h3>
+            <p class="step-body">Credential ها توسط Keystore روی دستگاه رمز می‌شوند. هرگز دستگاه را ترک نمی‌کنند.</p>
+          </li>
+        </ol>
+
+        <div class="install-cta">
+          <p class="install-cta-text"><strong>آخرین انتشار &mdash; Claude-Email-App.apk</strong><br/>امضاشده · Android 7.0+ · Apache-2.0</p>
+          <a class="btn btn-primary"
+             href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
+             rel="noreferrer">
+            دانلود APK
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Apache-2.0 &nbsp;|&nbsp; © ۱۴۰۵ <a href="https://cocode.dk" target="_blank" rel="noreferrer">Cocode</a> &nbsp;|&nbsp; ساخته شده توسط <a href="https://linkedin.com/in/babakbandpey" target="_blank" rel="noreferrer">بابک بندپی</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

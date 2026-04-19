@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+# Fast smoke — build + unit tests + lint
+./gradlew buildSmoke --no-daemon --quiet
+
+# Optional signed release build when a release keystore is available locally
+if [ -n "${KEYSTORE_PATH:-}" ] && [ -n "${KEYSTORE_PASSWORD:-}" ] && \
+   [ -n "${KEY_ALIAS:-}" ] && [ -n "${KEY_PASSWORD:-}" ]; then
+  if [ -f "$KEYSTORE_PATH" ]; then
+    ./gradlew assembleRelease --no-daemon --quiet
+  else
+    echo "KEYSTORE_PATH is set but file does not exist: $KEYSTORE_PATH" >&2
+    exit 1
+  fi
+fi

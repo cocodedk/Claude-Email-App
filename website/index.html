@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#050506" />
+
+  <title>Claude Email &mdash; Android mail client for claude-email agents</title>
+  <meta name="description" content="Focused Android email client for the claude-email backend. IMAP/SMTP, Android Keystore credential storage, command-and-reply UX for agents and tasks." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <link rel="alternate" hreflang="en"        href="https://cocodedk.github.io/Claude-Email-App/" />
+  <link rel="alternate" hreflang="fa"        href="https://cocodedk.github.io/Claude-Email-App/fa/" />
+  <link rel="alternate" hreflang="x-default" href="https://cocodedk.github.io/Claude-Email-App/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Claude Email" />
+  <meta property="og:title" content="Claude Email — Android mail client for claude-email agents" />
+  <meta property="og:description" content="Focused Android email client for the claude-email backend. IMAP/SMTP, encrypted credential storage, command-and-reply UX." />
+  <meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/" />
+  <meta property="og:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Claude Email — Android client for the claude-email backend" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fa_IR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Claude Email — Android mail client for claude-email agents" />
+  <meta name="twitter:description" content="Focused Android email client for the claude-email backend." />
+  <meta name="twitter:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta name="twitter:image:alt" content="Claude Email — Android client" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Claude Email",
+    "description": "Android email client for the claude-email backend. IMAP/SMTP, Android Keystore credential storage, command-and-reply UX.",
+    "url": "https://cocodedk.github.io/Claude-Email-App/",
+    "downloadUrl": "https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk",
+    "applicationCategory": "CommunicationApplication",
+    "operatingSystem": "Android 7.0+",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": {
+      "@type": "Person",
+      "name": "Babak Bandpey",
+      "url": "https://cocode.dk",
+      "sameAs": ["https://linkedin.com/in/babakbandpey", "https://github.com/cocodedk"]
+    },
+    "codeRepository": "https://github.com/cocodedk/Claude-Email-App"
+  }
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/Claude-Email-App/" aria-label="Claude Email — home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+            <rect x="3" y="6" width="18" height="12"/>
+            <path d="M3 6l9 6 9-6"/>
+          </svg>
+        </span>
+        <span class="brand-name">claude-email</span><span class="brand-slash">/</span><span class="brand-suffix">app</span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn-ghost btn" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer" aria-label="View repository on GitHub">GitHub</a>
+        <a class="lang-switch" href="fa/" hreflang="fa" lang="fa">فارسی</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow hero-eyebrow reveal d1">v1 · Android · Apache-2.0</p>
+          <h1 class="hero-title reveal d2">
+            Email, reimagined<br/>
+            for <span class="accent">agents</span>.
+          </h1>
+          <p class="hero-sub reveal d3">
+            A focused Android client for the claude-email backend. Think in conversations and commands, not folders and headers &mdash; with IMAP/SMTP under the hood and credentials sealed by the Android Keystore.
+          </p>
+          <div class="hero-cta reveal d3">
+            <a class="btn btn-primary"
+               href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
+               rel="noreferrer">
+              Download APK
+              <span class="arrow" aria-hidden="true">↓</span>
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer">
+              View on GitHub
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="hero-meta reveal d4">
+            <span>Android 7.0+</span>
+            <span>Signed release</span>
+            <span>IMAP · SMTP</span>
+          </div>
+        </div>
+
+        <aside class="hero-visual reveal d4" aria-hidden="true">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="terminal-dots">
+                <i class="terminal-dot is-amber"></i>
+                <i class="terminal-dot"></i>
+                <i class="terminal-dot"></i>
+              </span>
+              <span class="terminal-title">~/inbox &mdash; claude-email</span>
+              <span style="width:40px"></span>
+            </div>
+            <div class="terminal-body">
+              <div class="prompt-line">
+                <span class="p-sym">→</span>
+                <span class="p-cmd">new command "refactor auth retry flow"</span>
+                <span class="cursor" aria-hidden="true"></span>
+              </div>
+
+              <article class="thread-card">
+                <span class="thread-dot" aria-label="unread"></span>
+                <div>
+                  <h3 class="thread-title">Refactor auth retry flow</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-fits</span>
+                    <span>waiting on agent · 2m ago</span>
+                  </p>
+                </div>
+                <span class="thread-time">2m</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="read"></span>
+                <div>
+                  <h3 class="thread-title">Draft release notes for v0.4</h3>
+                  <p class="thread-meta">
+                    <span class="badge is-green">sent</span>
+                    <span>yesterday · 18:04</span>
+                  </p>
+                </div>
+                <span class="thread-time">1d</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="read"></span>
+                <div>
+                  <h3 class="thread-title">Triage inbound from ops@</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-ops</span>
+                    <span>archived · Tue</span>
+                  </p>
+                </div>
+                <span class="thread-time">Tue</span>
+              </article>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">Features</p>
+          <h2 class="section-title">Built for command-and-reply work.</h2>
+          <p class="section-lede">
+            Six deliberate capabilities. Nothing decorative, nothing enterprise &mdash; the surface area a person working with agents actually needs.
+          </p>
+        </header>
+
+        <div class="features">
+          <article class="feature">
+            <span class="feature-label">01 · IMAP + SMTP</span>
+            <h3 class="feature-title">Real email transport.</h3>
+            <p class="feature-desc">Standards under the hood. No proprietary lock-in, no bespoke protocol, no account you can&rsquo;t leave.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">02 · Android Keystore</span>
+            <h3 class="feature-title">Credentials sealed to the device.</h3>
+            <p class="feature-desc">Passwords are encrypted by hardware-backed keys. They never sync and never leave the phone.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">03 · Command &amp; reply</span>
+            <h3 class="feature-title">Conversations, not threads.</h3>
+            <p class="feature-desc">Agents and tasks are first-class. Title, agent badge, state &mdash; readable in one glance.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">04 · Shared-secret auth</span>
+            <h3 class="feature-title">Authorize without passwords.</h3>
+            <p class="feature-desc">Route commands to the claude-email service with a shared secret. Agents stay scoped and revocable.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">05 · Offline queue</span>
+            <h3 class="feature-title">Send now, deliver when ready.</h3>
+            <p class="feature-desc">Commands compose offline and queue locally. They fire the moment the network returns.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">06 · Dark-first UI</span>
+            <h3 class="feature-title">Material 3, tuned for focus.</h3>
+            <p class="feature-desc">Calmer than Slack, more readable than Outlook. Built for long reading sessions, not consumer chat.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture strip -->
+    <section class="arch" aria-label="Built with">
+      <div class="container">
+        <ul class="arch-list">
+          <li>Kotlin</li>
+          <li>Jetpack Compose</li>
+          <li>Material 3</li>
+          <li>Android Keystore</li>
+          <li>Angus Mail</li>
+          <li>Coroutines</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="section" id="install">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">Install</p>
+          <h2 class="section-title">Three steps to first command.</h2>
+          <p class="section-lede">
+            No store listing. No account to create. You hold the keys &mdash; the app just uses them.
+          </p>
+        </header>
+
+        <ol class="install-grid" role="list">
+          <li class="step">
+            <span class="step-number">01 / Download</span>
+            <h3 class="step-title">Grab the signed APK.</h3>
+            <p class="step-body">Pull the latest release straight from GitHub. Reproducible, signed, and checksummed.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">02 / Install</span>
+            <h3 class="step-title">Install on Android 7.0+.</h3>
+            <p class="step-body">Allow &ldquo;install unknown apps&rdquo; for your file manager once. Android handles the rest.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">03 / Configure</span>
+            <h3 class="step-title">Enter IMAP/SMTP credentials.</h3>
+            <p class="step-body">Credentials are encrypted locally by the Keystore. They never leave the device.</p>
+          </li>
+        </ol>
+
+        <div class="install-cta">
+          <p class="install-cta-text"><strong>Latest release &mdash; Claude-Email-App.apk</strong><br/>Signed · Android 7.0+ · Apache-2.0</p>
+          <a class="btn btn-primary"
+             href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
+             rel="noreferrer">
+            Download APK
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Apache-2.0 &nbsp;|&nbsp; © 2026 <a href="https://cocode.dk" target="_blank" rel="noreferrer">Cocode</a> &nbsp;|&nbsp; Created by <a href="https://linkedin.com/in/babakbandpey" target="_blank" rel="noreferrer">Babak Bandpey</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
