@@ -31,6 +31,25 @@ val testMailConfig: Map<String, String> = run {
     }
 }
 
+val appVersionName = System.getenv("VERSION_NAME") ?: "0.0.1"
+val appSemverParts = appVersionName.split(".")
+val appMajor = appSemverParts.getOrNull(0)?.toIntOrNull() ?: 0
+val appMinor = appSemverParts.getOrNull(1)?.toIntOrNull() ?: 0
+val appPatch = appSemverParts.getOrNull(2)?.toIntOrNull() ?: 1
+val appVersionCode = appMajor * 1_000_000 + appMinor * 1_000 + appPatch
+
+val signingKeystorePath = System.getenv("KEYSTORE_PATH")?.takeIf { it.isNotBlank() }
+val signingKeystorePassword = System.getenv("KEYSTORE_PASSWORD")?.takeIf { it.isNotBlank() }
+val signingKeyAlias = System.getenv("KEY_ALIAS")?.takeIf { it.isNotBlank() }
+val signingKeyPassword = System.getenv("KEY_PASSWORD")?.takeIf { it.isNotBlank() }
+val signingKeystoreFile = signingKeystorePath
+    ?.let { rootProject.file(it).absoluteFile }
+    ?.takeIf { it.isFile }
+val hasReleaseSigningConfig = signingKeystoreFile != null &&
+    signingKeystorePassword != null &&
+    signingKeyAlias != null &&
+    signingKeyPassword != null
+
 android {
     namespace = "com.cocode.claudeemailapp"
     compileSdk {
@@ -43,12 +62,23 @@ android {
         applicationId = "com.cocode.claudeemailapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testMailConfig.forEach { (k, v) ->
             if (v.isNotBlank()) testInstrumentationRunnerArguments[k] = v
+        }
+    }
+
+    signingConfigs {
+        if (hasReleaseSigningConfig) {
+            create("release") {
+                storeFile = signingKeystoreFile!!
+                storePassword = signingKeystorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
+            }
         }
     }
 
@@ -58,6 +88,9 @@ android {
             enableAndroidTestCoverage = true
         }
         release {
+            if (hasReleaseSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -122,6 +155,7 @@ dependencies {
     testImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)

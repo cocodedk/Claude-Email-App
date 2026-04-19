@@ -1,0 +1,120 @@
+name: Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: false
+        default: 'patch'
+        type: choice
+        options: [patch, minor, major]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Check required secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          missing=""
+          [ -z "$KEYSTORE_BASE64" ]   && missing="$missing KEYSTORE_BASE64"
+          [ -z "$KEYSTORE_PASSWORD" ] && missing="$missing KEYSTORE_PASSWORD"
+          [ -z "$KEY_ALIAS" ]         && missing="$missing KEY_ALIAS"
+          [ -z "$KEY_PASSWORD" ]      && missing="$missing KEY_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "Missing required secrets:$missing" >&2
+            echo "Run scripts/setup-signing.sh to configure them." >&2
+            exit 1
+          fi
+
+      - name: Compute next version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          LATEST=$(git tag --list 'v*' --sort=-version:refname | head -1)
+          [ -z "$LATEST" ] && LATEST="v0.0.0"
+          VERSION="${LATEST#v}"
+          if ! [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Cannot parse latest tag: $LATEST" >&2
+            exit 1
+          fi
+          MAJOR="${BASH_REMATCH[1]}"
+          MINOR="${BASH_REMATCH[2]}"
+          PATCH="${BASH_REMATCH[3]}"
+          case "$BUMP" in
+            major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH+1)) ;;
+          esac
+          VERSION_NAME="$MAJOR.$MINOR.$PATCH"
+          TAG="v$VERSION_NAME"
+          echo "version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Tag and push
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          test -s release.keystore
+
+      - name: Build signed release APK
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.version }}
+          KEYSTORE_PATH: release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Stage APK with stable filename
+        run: |
+          mkdir -p build/release
+          cp app/build/outputs/apk/release/app-release.apk build/release/Claude-Email-App.apk
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Claude-Email-App-${{ steps.version.outputs.tag }}
+          path: build/release/Claude-Email-App.apk
+          if-no-files-found: error
+
+      - uses: softprops/action-gh-release@da05d552049eb17e14aa1b0b9c3f72e3f55d1d5f # v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: build/release/Claude-Email-App.apk
+
+      - name: Cleanup keystore
+        if: always()
+        run: rm -f release.keystore

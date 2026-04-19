@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+MSG=$(cat "$1")
+# Allow merge/revert auto-messages and fixup/squash
+case "$MSG" in
+  "Merge "*|"Revert "*|"fixup!"*|"squash!"*) exit 0 ;;
+esac
+if ! echo "$MSG" | grep -qE '^(feat|fix|chore|docs|style|refactor|test|ci|build|perf|revert)(\(.+\))?!?: .+'; then
+  echo "ERROR: Commit message must follow Conventional Commits." >&2
+  echo "  Example: feat: add user login" >&2
+  echo "  Types: feat|fix|chore|docs|style|refactor|test|ci|build|perf|revert" >&2
+  exit 1
+fi

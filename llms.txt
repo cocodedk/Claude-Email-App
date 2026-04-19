@@ -1,0 +1,22 @@
+# Claude-Email-App
+
+> Android email client for the `claude-email` backend service. IMAP/SMTP with Android Keystore credential storage, command-and-reply UX for agents and tasks.
+
+Single-mailbox mobile client built in Kotlin + Jetpack Compose. Calmer than Slack, more premium than a utility app, more readable than Outlook, more human than a terminal.
+
+## Source
+- [Repository](https://github.com/cocodedk/Claude-Email-App): Main repo
+- [LICENSE](https://github.com/cocodedk/Claude-Email-App/blob/master/LICENSE): Apache-2.0
+- [CONTRIBUTING](https://github.com/cocodedk/Claude-Email-App/blob/master/CONTRIBUTING.md): Setup, build commands, PR checklist
+- [CLAUDE.md](https://github.com/cocodedk/Claude-Email-App/blob/master/CLAUDE.md): Project conventions for AI assistants
+
+## Documentation
+- [Website (English)](https://cocodedk.github.io/Claude-Email-App/)
+- [Website (فارسی)](https://cocodedk.github.io/Claude-Email-App/fa/)
+- [Android app plan](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/android-app-plan.md): Product, architecture, delivery phases
+- [UX/UI spec](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/ux-ui-spec.md): Navigation, visual direction, accessibility
+- [Gap analysis](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/gap-analysis-vs-claude-email.md): App vs. claude-email backend
+
+## Downloads
+- [Latest APK](https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk): Signed release APK
+- [All releases](https://github.com/cocodedk/Claude-Email-App/releases): Tagged versions

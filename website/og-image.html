@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>OG — Claude Email</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --pitch-black: #050506;
+    --carbon: #0D0E11;
+    --graphite: #14161A;
+    --graphite-soft: #1B1E24;
+    --border-strong: #40444C;
+    --border-soft: #2A2E35;
+    --snow: #F6F7F9;
+    --snow-muted: #AEB4BE;
+    --signal-amber: #F0B35A;
+    --signal-green: #81C995;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --sans: "Inter", system-ui, sans-serif;
+  }
+  html, body { margin:0; padding:0; background: var(--pitch-black); }
+  body {
+    width: 1200px; height: 630px;
+    font-family: var(--sans);
+    color: var(--snow);
+    overflow: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  html { width: 1200px; height: 630px; overflow: hidden; margin: 0; padding: 0; }
+  body::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(700px 380px at 78% -10%, rgba(240,179,90,0.12), transparent 60%),
+      radial-gradient(800px 400px at -10% 110%, rgba(138,180,248,0.05), transparent 70%);
+    pointer-events: none;
+  }
+  .wrap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 586px;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    padding: 48px 64px 24px;
+    box-sizing: border-box;
+  }
+  .left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    padding-right: 48px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    color: var(--signal-amber);
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow::before { content: "→"; }
+  .title {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 104px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin: 0;
+    color: var(--snow);
+  }
+  .title .amp { color: var(--signal-amber); }
+  .tagline {
+    font-family: var(--sans);
+    font-size: 26px;
+    line-height: 1.4;
+    color: var(--snow-muted);
+    margin: 0;
+    max-width: 640px;
+    font-weight: 400;
+  }
+  .chips {
+    display: inline-flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--signal-amber);
+    padding: 10px 16px;
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  /* Phone bezel */
+  .phone {
+    width: 300px;
+    height: 440px;
+    border: 2px solid var(--border-strong);
+    border-radius: 36px;
+    background: var(--carbon);
+    padding: 18px;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow:
+      0 40px 80px -40px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(255,255,255,0.03);
+    transform: rotate(2deg);
+  }
+  .phone::before {
+    /* notch */
+    content: "";
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 90px; height: 18px;
+    background: var(--pitch-black);
+    border-radius: 12px;
+  }
+  .phone-inner {
+    width: 100%; height: 100%;
+    background: var(--pitch-black);
+    border-radius: 24px;
+    padding: 36px 14px 14px;
+    box-sizing: border-box;
+    display: grid;
+    gap: 10px;
+    grid-auto-rows: min-content;
+  }
+  .phone-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--snow-muted);
+    padding: 4px 4px 10px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .phone-head .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--signal-green); display: inline-block; margin-right: 6px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 10px 1fr auto;
+    gap: 10px;
+    align-items: start;
+    padding: 12px 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    background: var(--graphite);
+  }
+  .row .dot-unread {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--signal-amber);
+    margin-top: 4px;
+    box-shadow: 0 0 0 3px rgba(240,179,90,0.18);
+  }
+  .row .dot-read {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border-strong);
+    margin-top: 4px;
+  }
+  .row-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--snow);
+    margin: 0 0 3px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: var(--snow-muted);
+    text-transform: uppercase;
+  }
+  .row-time {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--snow-muted);
+    white-space: nowrap;
+  }
+
+  /* Bottom strip */
+  .strip {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 44px;
+    background: var(--graphite);
+    border-top: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--snow);
+    text-transform: uppercase;
+    z-index: 5;
+  }
+  .strip .label { color: var(--signal-amber); margin-right: 14px; }
+  .strip .sep { color: var(--border-strong); margin: 0 12px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <span class="eyebrow">v1 · Android</span>
+      <h1 class="title">CLAUDE<br/>EMAIL<span class="amp" style="color:#F0B35A">.</span></h1>
+      <p class="tagline">Android mail client for the claude-email backend. IMAP/SMTP under the hood, command-and-reply on the surface.</p>
+      <div class="chips">
+        <span class="chip">IMAP / SMTP</span>
+        <span class="chip">Android Keystore</span>
+        <span class="chip">Command &amp; Reply</span>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="phone-head">
+            <span><span class="dot"></span>inbox</span>
+            <span>~/claude-email</span>
+          </div>
+          <div class="row">
+            <span class="dot-unread"></span>
+            <div>
+              <h3 class="row-title">Refactor auth retry flow</h3>
+              <p class="row-meta">agent-fits · waiting</p>
+            </div>
+            <span class="row-time">2m</span>
+          </div>
+          <div class="row">
+            <span class="dot-read"></span>
+            <div>
+              <h3 class="row-title">Draft release notes v0.4</h3>
+              <p class="row-meta">agent-docs · sent</p>
+            </div>
+            <span class="row-time">1d</span>
+          </div>
+          <div class="row">
+            <span class="dot-read"></span>
+            <div>
+              <h3 class="row-title">Triage ops@ inbound</h3>
+              <p class="row-meta">agent-ops · archived</p>
+            </div>
+            <span class="row-time">Tue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <span class="label">Built by</span>
+    Babak Bandpey <span class="sep">·</span> cocode.dk <span class="sep">·</span> linkedin.com/in/babakbandpey
+  </div>
+</body>
+</html>
