@@ -98,6 +98,8 @@ class EndToEndEnvelopeFlowTest {
         val c = creds()
         assumeTrue("test.mail.* and SHARED_SECRET args required", c != null)
         c!!
+        println("[e2e-diag] runner-arg SHARED_SECRET length = ${c.sharedSecret.length}")
+        android.util.Log.d("E2ETest", "runner-arg SHARED_SECRET length = ${c.sharedSecret.length}")
 
         // Fresh state: if signed in from a prior run, sign out through the UI so we
         // exercise the Setup → probe → save path end-to-end.
@@ -108,8 +110,8 @@ class EndToEndEnvelopeFlowTest {
         // Probe hits real IMAP+SMTP then credentials save → AppRoot auto-navigates to Home.
         waitUntilTag("home_screen", 30_000)
 
-        val identifier = "e2e-ui-${System.currentTimeMillis()}"
-        val body = "$identifier\necho hello from instrumented UI and exit"
+        val identifier = "[e2e-2026-04-20-H]"
+        val body = "$identifier\necho \"wake-pipeline smoke ${java.time.Instant.now()}\" and exit"
 
         composeRule.onNodeWithTag("home_new_message_button").performClick()
         waitUntilTag("compose_screen", 5_000)
@@ -192,7 +194,16 @@ class EndToEndEnvelopeFlowTest {
         composeRule.onNodeWithTag("setup_service_address").performTextInput(c.serviceAddress)
         dismissKeyboard()
         scrollSetupTo("setup_shared_secret")
+        println("[e2e-diag] arg SHARED_SECRET len=${c.sharedSecret.length}")
+        android.util.Log.d("E2ETest", "arg SHARED_SECRET len=${c.sharedSecret.length}")
+        composeRule.onNodeWithTag("setup_shared_secret").performTextClearance()
         composeRule.onNodeWithTag("setup_shared_secret").performTextInput(c.sharedSecret)
+        val fieldLen = composeRule.onNodeWithTag("setup_shared_secret")
+            .fetchSemanticsNode().config
+            .firstOrNull { it.key.name == "EditableText" }
+            ?.value?.toString()?.length ?: -1
+        println("[e2e-diag] form shared_secret field length after input = $fieldLen")
+        android.util.Log.d("E2ETest", "form shared_secret field length after input = $fieldLen")
         dismissKeyboard()
         scrollSetupTo("setup_submit")
         dismissKeyboard()
