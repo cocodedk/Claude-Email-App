@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.security.KeyStore
+import javax.crypto.AEADBadTagException
 
 interface CredentialsStore {
     fun hasCredentials(): Boolean
@@ -69,17 +71,42 @@ internal class EncryptedCredentialsStore(private val prefs: SharedPreferences) :
         internal const val KEY_SHARED_SECRET = "shared_secret"
 
         fun create(context: Context): EncryptedCredentialsStore {
+            return try {
+                EncryptedCredentialsStore(openPrefs(context))
+            } catch (t: Throwable) {
+                if (!isKeystoreCorruption(t)) throw t
+                // Master key rotated or persisted metadata can't be decrypted — wipe both
+                // the prefs file and the keystore alias, then re-init from scratch. The
+                // user will simply see the Setup screen again on next launch.
+                context.deleteSharedPreferences(PREFS_NAME)
+                runCatching {
+                    KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+                        .deleteEntry(MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+                }
+                EncryptedCredentialsStore(openPrefs(context))
+            }
+        }
+
+        private fun openPrefs(context: Context): SharedPreferences {
             val masterKey = MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
-            val prefs = EncryptedSharedPreferences.create(
+            return EncryptedSharedPreferences.create(
                 context,
                 PREFS_NAME,
                 masterKey,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-            return EncryptedCredentialsStore(prefs)
+        }
+
+        private fun isKeystoreCorruption(t: Throwable): Boolean {
+            var c: Throwable? = t
+            while (c != null) {
+                if (c is AEADBadTagException) return true
+                c = c.cause
+            }
+            return false
         }
     }
 }
