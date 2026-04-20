@@ -25,10 +25,15 @@ val testMailConfigKeys = listOf(
 
 val testMailConfig: Map<String, String> = run {
     val props = Properties()
-    rootProject.file(".env").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
+    // .env.test takes precedence over .env for test credentials
+    val envFile = rootProject.file(".env.test").takeIf { it.exists() }
+        ?: rootProject.file(".env").takeIf { it.exists() }
+    envFile?.inputStream()?.use { props.load(it) }
     testMailConfigKeys.associateWith { key ->
         System.getenv(key.uppercase().replace('.', '_')) ?: props.getProperty(key, "")
     }
+}.also { cfg ->
+    println("[e2e-diag] SHARED_SECRET baked length = ${cfg["SHARED_SECRET"]?.length ?: 0}")
 }
 
 val appVersionName = System.getenv("VERSION_NAME") ?: "0.0.1"
