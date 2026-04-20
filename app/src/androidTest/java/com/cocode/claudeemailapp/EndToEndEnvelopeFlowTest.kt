@@ -111,7 +111,7 @@ class EndToEndEnvelopeFlowTest {
         // Probe hits real IMAP+SMTP then credentials save → AppRoot auto-navigates to Home.
         waitUntilTag("home_screen", 30_000)
 
-        val identifier = "[e2e-2026-04-20-Q]"
+        val identifier = "[e2e-2026-04-20-Q-${System.currentTimeMillis()}]"
         val body = "$identifier\necho \"wake-pipeline smoke ${java.time.Instant.now()}\" and exit"
 
         composeRule.onNodeWithTag("home_new_message_button").performClick()
