@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.cocode.claudeemailapp.data.MailCredentials
+import com.cocode.claudeemailapp.data.PendingCommandStore
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import com.cocode.claudeemailapp.mail.ImapMailFetcher
 import com.cocode.claudeemailapp.protocol.Kinds
@@ -110,7 +111,7 @@ class EndToEndEnvelopeFlowTest {
         // Probe hits real IMAP+SMTP then credentials save → AppRoot auto-navigates to Home.
         waitUntilTag("home_screen", 30_000)
 
-        val identifier = "[e2e-2026-04-20-H]"
+        val identifier = "[e2e-2026-04-20-N]"
         val body = "$identifier\necho \"wake-pipeline smoke ${java.time.Instant.now()}\" and exit"
 
         composeRule.onNodeWithTag("home_new_message_button").performClick()
@@ -134,7 +135,10 @@ class EndToEndEnvelopeFlowTest {
         waitUntilTag("home_screen", 30_000)
 
         val fetcher = ImapMailFetcher()
-        val originalId = awaitOriginalMessageId(fetcher, c, identifier)
+        // The sent email never lands in this mailbox's INBOX (sender != recipient), so
+        // read the real outbound Message-ID from PendingCommandStore (populated by
+        // SmtpMailSender after Transport.send).
+        val originalId = awaitOutboundMessageId(identifier)
         println("E2E command sent: identifier=$identifier messageId=$originalId")
 
         val ack = awaitReplyEnvelope(fetcher, c, originalId, Kinds.ACK, timeoutMs = 180_000)
@@ -210,22 +214,18 @@ class EndToEndEnvelopeFlowTest {
         composeRule.onNodeWithTag("setup_submit").performClick()
     }
 
-    private fun awaitOriginalMessageId(
-        fetcher: ImapMailFetcher,
-        c: MailCredentials,
-        identifier: String
-    ): String {
-        val deadline = System.currentTimeMillis() + 60_000
+    private fun awaitOutboundMessageId(identifier: String): String {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val store = PendingCommandStore(ctx)
+        val deadline = System.currentTimeMillis() + 30_000
         while (System.currentTimeMillis() < deadline) {
-            runBlocking {
-                fetcher.fetchRecent(c, count = 30)
-                    .firstOrNull { it.subject.contains(identifier) }
-                    ?.messageId
-                    ?.takeIf(String::isNotBlank)
-            }?.let { return it }
-            Thread.sleep(3_000)
+            val hit = store.all().firstOrNull { p ->
+                p.subject.contains(identifier) && p.messageId.isNotBlank()
+            }
+            if (hit != null) return hit.messageId
+            Thread.sleep(500)
         }
-        error("sent message with subject containing '$identifier' never appeared in INBOX within 60s")
+        error("PendingCommandStore never recorded a send for '$identifier' within 30s")
     }
 
     private fun awaitReplyEnvelope(
@@ -239,7 +239,7 @@ class EndToEndEnvelopeFlowTest {
         var pollCount = 0
         while (System.currentTimeMillis() < deadline) {
             pollCount++
-            val fetched: List<FetchedMessage> = runBlocking { fetcher.fetchRecent(c, count = 40) }
+            val fetched: List<FetchedMessage> = runBlocking { fetcher.fetchRecent(c, count = 200) }
             val elapsedSec = (timeoutMs - (deadline - System.currentTimeMillis())) / 1000
             val line = "poll#$pollCount kind=$expectedKind t=${elapsedSec}s fetched=${fetched.size} orig=$originalId"
             println(line)
