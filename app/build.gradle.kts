@@ -25,10 +25,9 @@ val testMailConfigKeys = listOf(
 
 val testMailConfig: Map<String, String> = run {
     val props = Properties()
-    // .env.test takes precedence over .env for test credentials
-    val envFile = rootProject.file(".env.test").takeIf { it.exists() }
-        ?: rootProject.file(".env").takeIf { it.exists() }
-    envFile?.inputStream()?.use { props.load(it) }
+    // Layer .env.test on top of .env so partial overrides don't blank base keys.
+    rootProject.file(".env").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
+    rootProject.file(".env.test").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
     testMailConfigKeys.associateWith { key ->
         System.getenv(key.uppercase().replace('.', '_')) ?: props.getProperty(key, "")
     }
