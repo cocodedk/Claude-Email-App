@@ -25,10 +25,14 @@ val testMailConfigKeys = listOf(
 
 val testMailConfig: Map<String, String> = run {
     val props = Properties()
+    // Layer .env.test on top of .env so partial overrides don't blank base keys.
     rootProject.file(".env").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
+    rootProject.file(".env.test").takeIf { it.exists() }?.inputStream()?.use { props.load(it) }
     testMailConfigKeys.associateWith { key ->
         System.getenv(key.uppercase().replace('.', '_')) ?: props.getProperty(key, "")
     }
+}.also { cfg ->
+    println("[e2e-diag] SHARED_SECRET baked length = ${cfg["SHARED_SECRET"]?.length ?: 0}")
 }
 
 val appVersionName = System.getenv("VERSION_NAME") ?: "0.0.1"
