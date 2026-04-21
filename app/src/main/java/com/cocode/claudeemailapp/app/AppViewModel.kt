@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.cocode.claudeemailapp.app.steering.SteeringIntent
+import com.cocode.claudeemailapp.app.steering.envelopeForSteering
 import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
@@ -204,6 +206,33 @@ class AppViewModel(
                     pendingStore.add(pending)
                     _pending.value = pendingStore.all()
                 }
+                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
+                refreshInbox()
+            } catch (e: MailException) {
+                _send.value = SendState(sending = false, lastError = e.message)
+            } catch (t: Throwable) {
+                _send.value = SendState(sending = false, lastError = t.message)
+            }
+        }
+    }
+
+    fun dispatchSteering(pending: PendingCommand, intent: SteeringIntent) {
+        val creds = _credentials.value ?: return
+        val envelope = envelopeForSteering(
+            pending = pending,
+            intent = intent,
+            auth = creds.sharedSecret.takeIf(String::isNotBlank)
+        ) ?: return
+        viewModelScope.launch {
+            _send.value = SendState(sending = true)
+            try {
+                val outgoing = OutgoingMessage.envelope(
+                    to = pending.to,
+                    subject = "Re: ${pending.subject}",
+                    envelope = envelope,
+                    inReplyTo = pending.messageId.takeIf(String::isNotBlank)
+                )
+                val result = mailSender.send(creds, outgoing)
                 _send.value = SendState(sending = false, justSentMessageId = result.messageId)
                 refreshInbox()
             } catch (e: MailException) {
