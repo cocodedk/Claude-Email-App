@@ -144,6 +144,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 }
                 Screen.Conversation -> {
                     val message = inbox.messages.firstOrNull { it.messageId == selectedMessageId }
+                    val matchedPending = pending.firstOrNull { it.messageId == selectedMessageId }
                     if (message == null) {
                         screen = Screen.Home
                     } else {
@@ -160,6 +161,10 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                                     inReplyTo = message.messageId.takeIf(String::isNotBlank),
                                     references = buildReferences(message)
                                 )
+                            },
+                            pending = matchedPending,
+                            onSteeringIntent = { intent ->
+                                matchedPending?.let { viewModel.dispatchSteering(it, intent) }
                             }
                         )
                     }
