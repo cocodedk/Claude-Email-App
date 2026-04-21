@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.steering.SteeringBar
 import com.cocode.claudeemailapp.app.steering.SteeringBarController
 import com.cocode.claudeemailapp.app.steering.SteeringBarState
+import com.cocode.claudeemailapp.app.steering.SteeringTemplateSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
@@ -31,6 +32,16 @@ class SteeringBarTest {
         composeRule.onNodeWithTag("steering_chip_status").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_chip_cancel").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_chip_more").assertIsDisplayed()
+    }
+
+    @Test
+    fun awaitingUser_showsThreeTemplates() {
+        composeRule.setContent {
+            SteeringTemplateSheet(askId = "7", onTemplateTap = {})
+        }
+        composeRule.onNodeWithTag("steering_template_continue").assertIsDisplayed()
+        composeRule.onNodeWithTag("steering_template_abort").assertIsDisplayed()
+        composeRule.onNodeWithTag("steering_template_explain").assertIsDisplayed()
     }
 
     @Test
