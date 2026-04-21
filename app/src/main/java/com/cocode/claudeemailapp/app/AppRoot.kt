@@ -194,6 +194,14 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                             pending = matchedPending,
                             onSteeringIntent = { intent ->
                                 matchedPending?.let { viewModel.dispatchSteering(it, intent) }
+                            },
+                            onDeleteMessage = {
+                                viewModel.messageMutation.scheduleDelete(message.messageId)
+                                screen = Screen.Home
+                            },
+                            onArchiveMessage = {
+                                viewModel.messageMutation.scheduleArchive(message.messageId)
+                                screen = Screen.Home
                             }
                         )
                     }

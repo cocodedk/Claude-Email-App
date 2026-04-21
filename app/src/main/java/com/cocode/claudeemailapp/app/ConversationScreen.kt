@@ -31,10 +31,13 @@ import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.app.steering.SteeringBar
 import com.cocode.claudeemailapp.app.steering.SteeringBarController
 import com.cocode.claudeemailapp.app.steering.SteeringBarState
+import com.cocode.claudeemailapp.app.steering.SteeringChip
+import com.cocode.claudeemailapp.app.steering.SteeringChipVariant
 import com.cocode.claudeemailapp.app.steering.SteeringIntent
 import com.cocode.claudeemailapp.app.steering.SteeringTemplateSheet
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.mail.FetchedMessage
+import kotlinx.coroutines.delay
 
 @Composable
 fun ConversationScreen(
@@ -44,7 +47,9 @@ fun ConversationScreen(
     onBack: () -> Unit,
     onSendReply: (body: String) -> Unit,
     pending: PendingCommand? = null,
-    onSteeringIntent: (SteeringIntent) -> Unit = {}
+    onSteeringIntent: (SteeringIntent) -> Unit = {},
+    onDeleteMessage: () -> Unit = {},
+    onArchiveMessage: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val latestIntent by rememberUpdatedState(onSteeringIntent)
@@ -73,7 +78,14 @@ fun ConversationScreen(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item(key = "header") { HeaderCard(message = message, onBack = onBack) }
+            item(key = "header") {
+                HeaderCard(
+                    message = message,
+                    onBack = onBack,
+                    onDelete = onDeleteMessage,
+                    onArchive = onArchiveMessage
+                )
+            }
             item(key = "body") { BodyCard(message = message) }
             sendError?.let {
                 item(key = "error") { ErrorCard(message = it) }
@@ -108,7 +120,19 @@ fun ConversationScreen(
 }
 
 @Composable
-private fun HeaderCard(message: FetchedMessage, onBack: () -> Unit) {
+private fun HeaderCard(
+    message: FetchedMessage,
+    onBack: () -> Unit,
+    onDelete: () -> Unit,
+    onArchive: () -> Unit
+) {
+    var deleteArmed by rememberSaveable(message.messageId) { mutableStateOf(false) }
+    LaunchedEffect(deleteArmed) {
+        if (deleteArmed) {
+            delay(3_000)
+            deleteArmed = false
+        }
+    }
     ElevatedCard(
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -160,6 +184,30 @@ private fun HeaderCard(message: FetchedMessage, onBack: () -> Unit) {
                         color = MaterialTheme.colorScheme.error
                     )
                 }
+            }
+            Row(
+                modifier = Modifier.padding(top = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SteeringChip(
+                    label = "Archive",
+                    onClick = onArchive,
+                    variant = SteeringChipVariant.Default,
+                    modifier = Modifier.testTag("conversation_archive")
+                )
+                SteeringChip(
+                    label = if (deleteArmed) "Delete · confirm" else "Delete",
+                    onClick = {
+                        if (deleteArmed) {
+                            onDelete()
+                            deleteArmed = false
+                        } else {
+                            deleteArmed = true
+                        }
+                    },
+                    variant = if (deleteArmed) SteeringChipVariant.DangerArmed else SteeringChipVariant.Danger,
+                    modifier = Modifier.testTag("conversation_delete")
+                )
             }
         }
     }
