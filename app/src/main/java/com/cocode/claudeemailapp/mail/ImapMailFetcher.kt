@@ -4,6 +4,7 @@ import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.protocol.Envelope
 import com.cocode.claudeemailapp.protocol.EnvelopeJson
 import jakarta.mail.Address
+import jakarta.mail.FetchProfile
 import jakarta.mail.Flags
 import jakarta.mail.Folder
 import jakarta.mail.Message
@@ -40,6 +41,10 @@ class ImapMailFetcher(
                 if (total == 0) return@withContext emptyList()
                 val start = maxOf(1, total - count + 1)
                 val messages = inbox.getMessages(start, total)
+                // Bulk-prefetch everything toFetched() needs except the body.
+                // Without this each field access (subject, from, headers, …)
+                // round-trips to the server, so 50 messages ≈ 300 round-trips.
+                inbox.fetch(messages, InboxFetchProfile)
                 messages.reversed().map { it.toFetched() }
             } finally {
                 if (inbox.isOpen) inbox.close(false)
@@ -154,6 +159,15 @@ class ImapMailFetcher(
             html.replace(Regex("<[^>]+>"), "")
                 .replace(Regex("\\s+"), " ")
                 .trim()
+
+        private val InboxFetchProfile: FetchProfile = FetchProfile().apply {
+            add(FetchProfile.Item.ENVELOPE)
+            add(FetchProfile.Item.FLAGS)
+            add(FetchProfile.Item.CONTENT_INFO)
+            add("Message-ID")
+            add("In-Reply-To")
+            add("References")
+        }
 
         private val DefaultSessionFactory: (Properties) -> Session = { Session.getInstance(it) }
         private val DefaultStoreConnector: (Session, MailCredentials) -> Store = { session, c ->
