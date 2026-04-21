@@ -276,6 +276,19 @@ class AppViewModelTest {
     }
 
     @Test
+    fun sendCommand_storesProjectOnPending() = runTest(dispatcher) {
+        val sender = mockk<MailSender>()
+        coEvery { sender.send(any(), any()) } returns SendResult("<mid@x>", Date())
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns emptyList()
+        val vm = buildVm(initialCreds = creds(), sender = sender, fetcher = fetcher)
+        advanceUntilIdle()
+        vm.sendCommand(to = "svc@x", project = "proj-x", body = "hello")
+        advanceUntilIdle()
+        assertEquals("proj-x", vm.pending.value.single().project)
+    }
+
+    @Test
     fun signOut_clearsCredentialsAndInbox() = runTest(dispatcher) {
         val fetcher = mockk<MailFetcher>()
         coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(fakeMessage("<a@b>", "t"))

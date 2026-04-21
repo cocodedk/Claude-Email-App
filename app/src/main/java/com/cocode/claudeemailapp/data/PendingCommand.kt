@@ -30,7 +30,9 @@ data class PendingCommand(
     @SerialName("last_updated_at") val lastUpdatedAt: Long = sentAt,
     val lastError: String? = null,
     /** Set when the backend asks a question (kind=question); echo back as meta.ask_id on reply. */
-    val askId: String? = null
+    val askId: String? = null,
+    /** Originating project name, captured from the outbound command; needed for cancel/reset steering intents. */
+    val project: String? = null
 )
 
 object PendingStatus {

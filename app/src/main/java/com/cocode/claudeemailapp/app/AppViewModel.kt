@@ -198,7 +198,8 @@ class AppViewModel(
                         to = to,
                         subject = subject,
                         kind = envelope.kind,
-                        bodyPreview = body.take(200)
+                        bodyPreview = body.take(200),
+                        project = project
                     )
                     pendingStore.add(pending)
                     _pending.value = pendingStore.all()
