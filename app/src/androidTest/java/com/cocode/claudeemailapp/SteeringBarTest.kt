@@ -37,7 +37,7 @@ class SteeringBarTest {
     @Test
     fun awaitingUser_showsThreeTemplates() {
         composeRule.setContent {
-            SteeringTemplateSheet(askId = "7", onTemplateTap = {})
+            SteeringTemplateSheet(onTemplateTap = {})
         }
         composeRule.onNodeWithTag("steering_template_continue").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_template_abort").assertIsDisplayed()

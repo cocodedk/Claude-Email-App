@@ -82,7 +82,6 @@ fun ConversationScreen(
         when (steering) {
             SteeringBarState.Idle -> SteeringBar(state = steering, controller = controller)
             is SteeringBarState.AwaitingUser -> SteeringTemplateSheet(
-                askId = steering.askId,
                 onTemplateTap = { template ->
                     reply = if (reply.isBlank()) template else "$reply\n$template"
                 }

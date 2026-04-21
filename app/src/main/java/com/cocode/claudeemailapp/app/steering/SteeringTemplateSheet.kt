@@ -17,11 +17,11 @@ import com.cocode.claudeemailapp.R
 /**
  * Template sheet shown above the composer when the pending task is
  * awaiting a user reply. Tapping a template appends its text to the
- * composer; the user still presses Send.
+ * composer; the user still presses Send. Routing the resulting reply
+ * back to the right question (meta.ask_id) is the caller's job.
  */
 @Composable
 fun SteeringTemplateSheet(
-    @Suppress("UNUSED_PARAMETER") askId: String,
     onTemplateTap: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
