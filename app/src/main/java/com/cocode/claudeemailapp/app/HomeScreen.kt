@@ -45,8 +45,12 @@ fun HomeScreen(
     onRefresh: () -> Unit,
     onOpenMessage: (FetchedMessage) -> Unit,
     onCompose: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    pendingMutationIds: Set<String> = emptySet(),
+    onSwipeDelete: (String) -> Unit = {},
+    onSwipeArchive: (String) -> Unit = {}
 ) {
+    val visibleMessages = state.messages.filter { it.messageId !in pendingMutationIds }
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag("home_screen"),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -55,7 +59,7 @@ fun HomeScreen(
         item {
             HeroCard(
                 loading = state.loading,
-                messageCount = state.messages.size,
+                messageCount = visibleMessages.size,
                 onCompose = onCompose,
                 onRefresh = onRefresh,
                 onOpenSettings = onOpenSettings
@@ -67,11 +71,16 @@ fun HomeScreen(
         if (pending.isNotEmpty()) {
             item { PendingSummary(pending = pending) }
         }
-        if (state.messages.isEmpty() && !state.loading && state.error == null) {
+        if (visibleMessages.isEmpty() && !state.loading && state.error == null) {
             item { EmptyCard() }
         }
-        items(state.messages, key = { it.messageId.ifBlank { it.subject + it.sentAt?.time } }) { message ->
-            MessageCard(message = message, onClick = { onOpenMessage(message) })
+        items(visibleMessages, key = { it.messageId.ifBlank { it.subject + it.sentAt?.time } }) { message ->
+            SwipeableMessageCard(
+                message = message,
+                onOpen = { onOpenMessage(message) },
+                onSwipeDelete = { onSwipeDelete(message.messageId) },
+                onSwipeArchive = { onSwipeArchive(message.messageId) }
+            )
         }
     }
 }
@@ -156,7 +165,7 @@ private fun PendingSummary(pending: List<PendingCommand>) {
 }
 
 @Composable
-private fun MessageCard(
+internal fun MessageCard(
     message: FetchedMessage,
     onClick: () -> Unit
 ) {

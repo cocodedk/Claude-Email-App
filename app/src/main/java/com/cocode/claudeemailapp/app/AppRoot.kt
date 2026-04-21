@@ -41,6 +41,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
     val probe by viewModel.probe.collectAsState()
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
+    val mutation by viewModel.messageMutation.state.collectAsState()
 
     var screen by rememberSaveable { mutableStateOf(if (credentials == null) Screen.Setup else Screen.Home) }
     var editingCredentials by rememberSaveable { mutableStateOf(false) }
@@ -81,6 +82,31 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
         }
         send.lastError?.let {
             scope.launch { snackbarHostState.showSnackbar("Send failed: $it") }
+        }
+    }
+
+    LaunchedEffect(mutation.lastScheduled) {
+        val s = mutation.lastScheduled ?: return@LaunchedEffect
+        val label = when (s.action) {
+            MessageMutationController.Action.DELETE -> "Message deleted"
+            MessageMutationController.Action.ARCHIVE -> "Message archived"
+        }
+        val result = snackbarHostState.showSnackbar(
+            message = label,
+            actionLabel = "Undo",
+            duration = androidx.compose.material3.SnackbarDuration.Short
+        )
+        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+            viewModel.messageMutation.undo(s.messageId)
+        } else {
+            viewModel.messageMutation.consumeLastScheduled()
+        }
+    }
+
+    LaunchedEffect(mutation.lastError) {
+        mutation.lastError?.let {
+            scope.launch { snackbarHostState.showSnackbar("Server error: $it") }
+            viewModel.messageMutation.clearError()
         }
     }
 
@@ -126,7 +152,10 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                         screen = Screen.Conversation
                     },
                     onCompose = { screen = Screen.Compose },
-                    onOpenSettings = { screen = Screen.Settings }
+                    onOpenSettings = { screen = Screen.Settings },
+                    pendingMutationIds = mutation.pendingIds,
+                    onSwipeDelete = { viewModel.messageMutation.scheduleDelete(it) },
+                    onSwipeArchive = { viewModel.messageMutation.scheduleArchive(it) }
                 )
                 Screen.Settings -> credentials?.let {
                     SettingsScreen(
