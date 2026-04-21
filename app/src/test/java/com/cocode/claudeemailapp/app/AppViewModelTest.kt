@@ -1,6 +1,7 @@
 package com.cocode.claudeemailapp.app
 
 import android.app.Application
+import com.cocode.claudeemailapp.app.steering.SteeringIntent
 import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
@@ -273,6 +274,52 @@ class AppViewModelTest {
         assertNull(vm.send.value.justSentMessageId)
         assertNull(vm.send.value.lastError)
         assertFalse(vm.send.value.sending)
+    }
+
+    @Test
+    fun dispatchSteering_status_sendsStatusEnvelope() = runTest(dispatcher) {
+        val sender = mockk<MailSender>()
+        val captured = slot<OutgoingMessage>()
+        coEvery { sender.send(any(), capture(captured)) } returns SendResult("<reply@x>", Date())
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns emptyList()
+
+        val vm = buildVm(initialCreds = creds(), sender = sender, fetcher = fetcher)
+        advanceUntilIdle()
+        val pending = PendingCommand(
+            messageId = "<m1@x>", sentAt = 0L, to = "svc@x", subject = "s",
+            kind = "command", bodyPreview = "", taskId = 42L, project = "proj-x"
+        )
+        vm.dispatchSteering(pending, SteeringIntent.Status)
+        advanceUntilIdle()
+
+        val body = captured.captured.body
+        assertTrue("expected status kind, got: $body", body.contains("\"kind\":\"status\""))
+        assertTrue("expected task_id 42, got: $body", body.contains("\"task_id\":42"))
+        assertEquals("Re: s", captured.captured.subject)
+        assertEquals("<m1@x>", captured.captured.inReplyTo)
+    }
+
+    @Test
+    fun dispatchSteering_reply_doesNotRequireProject() = runTest(dispatcher) {
+        val sender = mockk<MailSender>()
+        val captured = slot<OutgoingMessage>()
+        coEvery { sender.send(any(), capture(captured)) } returns SendResult("<reply@x>", Date())
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns emptyList()
+
+        val vm = buildVm(initialCreds = creds(), sender = sender, fetcher = fetcher)
+        advanceUntilIdle()
+        val pending = PendingCommand(
+            messageId = "<m1@x>", sentAt = 0L, to = "svc@x", subject = "s",
+            kind = "command", bodyPreview = "", taskId = 7L, project = null, askId = "9"
+        )
+        vm.dispatchSteering(pending, SteeringIntent.Reply(askId = "9", body = "yes"))
+        advanceUntilIdle()
+
+        val body = captured.captured.body
+        assertTrue("expected reply kind, got: $body", body.contains("\"kind\":\"reply\""))
+        assertTrue("expected body echoed, got: $body", body.contains("\"body\":\"yes\""))
     }
 
     @Test
