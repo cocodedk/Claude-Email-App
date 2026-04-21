@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Claude Email App</string>
+
+    <string name="steering_chip_status">Status</string>
+    <string name="steering_chip_cancel">Cancel</string>
+    <string name="steering_chip_cancel_confirm">Cancel · confirm</string>
+    <string name="steering_chip_cancel_drain">Cancel + drain queue</string>
+    <string name="steering_chip_reset">Reset</string>
+    <string name="steering_chip_more">More</string>
+    <string name="steering_chip_sending">Sending…</string>
+
+    <string name="steering_armed_hint">Tap Cancel again to confirm · %1$ss</string>
+    <string name="steering_undo_snackbar">Cancelling task #%1$d · Undo</string>
+
+    <string name="steering_templates_heading">Reply templates</string>
+    <string name="steering_advanced_heading">advanced</string>
+    <string name="template_continue">Looks good, continue</string>
+    <string name="template_abort">Abort and retry</string>
+    <string name="template_explain">Explain the tradeoff in more detail</string>
 </resources>
