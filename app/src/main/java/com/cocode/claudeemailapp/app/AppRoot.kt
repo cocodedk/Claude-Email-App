@@ -144,7 +144,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 }
                 Screen.Conversation -> {
                     val message = inbox.messages.firstOrNull { it.messageId == selectedMessageId }
-                    val matchedPending = pending.firstOrNull { it.messageId == selectedMessageId }
+                    val matchedPending = message?.let { matchPendingForMessage(it, pending) }
                     if (message == null) {
                         screen = Screen.Home
                     } else {
@@ -182,6 +182,37 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
             }
         }
     }
+}
+
+/**
+ * Resolve which PendingCommand a given fetched message belongs to. We accept
+ * multiple matches because RFC 5322 threading varies: some backends reply to
+ * the original outgoing command, others thread against the ack and use the
+ * References header for the full chain. Falling back to taskId catches
+ * hand-crafted messages that carry an envelope but skip threading entirely.
+ */
+internal fun matchPendingForMessage(
+    message: FetchedMessage,
+    pendings: List<com.cocode.claudeemailapp.data.PendingCommand>
+): com.cocode.claudeemailapp.data.PendingCommand? {
+    if (pendings.isEmpty()) return null
+    // The user opened their own outgoing command (rare — usually in Sent only).
+    pendings.firstOrNull { it.messageId == message.messageId }?.let { return it }
+    // Direct reply.
+    val inReplyTo = message.inReplyTo
+    if (!inReplyTo.isNullOrBlank()) {
+        pendings.firstOrNull { it.messageId == inReplyTo }?.let { return it }
+    }
+    // Deeper in the thread — the original command sits in References.
+    if (message.references.isNotEmpty()) {
+        pendings.firstOrNull { it.messageId in message.references }?.let { return it }
+    }
+    // Last resort: match by task id carried on the envelope.
+    val taskId = message.envelope?.taskId
+    if (taskId != null) {
+        pendings.firstOrNull { it.taskId == taskId }?.let { return it }
+    }
+    return null
 }
 
 private fun replyTo(message: FetchedMessage, selfAddress: String?): String {
