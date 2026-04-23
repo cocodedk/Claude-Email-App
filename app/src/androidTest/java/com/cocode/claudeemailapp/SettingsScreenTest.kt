@@ -44,7 +44,8 @@ class SettingsScreenTest {
                 credentials = creds(),
                 onBack = {},
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithText("Display").assertIsDisplayed()
@@ -60,7 +61,8 @@ class SettingsScreenTest {
                 credentials = creds(displayName = ""),
                 onBack = {},
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithText("(not set)").assertIsDisplayed()
@@ -73,7 +75,8 @@ class SettingsScreenTest {
                 credentials = creds(sharedSecret = "", serviceAddress = ""),
                 onBack = {},
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         // both serviceAddress and sharedSecret empty → two "(not set)" entries
@@ -86,7 +89,8 @@ class SettingsScreenTest {
                 credentials = creds(sharedSecret = "secret-value"),
                 onBack = {},
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithText("••••••").assertIsDisplayed()
@@ -99,7 +103,8 @@ class SettingsScreenTest {
                 credentials = creds(startTls = true),
                 onBack = {},
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithText("STARTTLS").assertIsDisplayed()
@@ -113,7 +118,8 @@ class SettingsScreenTest {
                 credentials = creds(),
                 onBack = { backed = true },
                 onSignOut = {},
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithTag("settings_back").performClick()
@@ -128,7 +134,8 @@ class SettingsScreenTest {
                 credentials = creds(),
                 onBack = {},
                 onSignOut = {},
-                onEdit = { edited = true }
+                onEdit = { edited = true },
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithTag("settings_edit").performClick()
@@ -143,7 +150,8 @@ class SettingsScreenTest {
                 credentials = creds(),
                 onBack = {},
                 onSignOut = { signedOut = true },
-                onEdit = {}
+                onEdit = {},
+                onOpenDiagnostics = {}
             )
         }
         composeRule.onNodeWithTag("settings_signout").performClick()

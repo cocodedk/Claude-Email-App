@@ -28,7 +28,8 @@ fun SettingsScreen(
     credentials: MailCredentials,
     onBack: () -> Unit,
     onSignOut: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onOpenDiagnostics: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag("settings_screen"),
@@ -64,6 +65,9 @@ fun SettingsScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(onClick = onEdit, modifier = Modifier.testTag("settings_edit")) {
                     Text("Edit credentials")
+                }
+                OutlinedButton(onClick = onOpenDiagnostics, modifier = Modifier.testTag("settings_diagnostics")) {
+                    Text("Diagnostics")
                 }
                 TextButton(onClick = onSignOut, modifier = Modifier.testTag("settings_signout")) {
                     Text("Sign out")
