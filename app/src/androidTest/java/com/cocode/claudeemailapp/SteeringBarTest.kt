@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 @RunWith(AndroidJUnit4::class)
 class SteeringBarTest {
@@ -23,12 +24,12 @@ class SteeringBarTest {
 
     @Test
     fun idleState_showsStatusCancelMoreChips() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SteeringBar(
                 state = SteeringBarState.Idle,
                 controller = SteeringBarController(CoroutineScope(Dispatchers.Main))
             )
-        }
+        } }
         composeRule.onNodeWithTag("steering_chip_status").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_chip_cancel").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_chip_more").assertIsDisplayed()
@@ -36,9 +37,9 @@ class SteeringBarTest {
 
     @Test
     fun awaitingUser_showsThreeTemplates() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SteeringTemplateSheet(onTemplateTap = {})
-        }
+        } }
         composeRule.onNodeWithTag("steering_template_continue").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_template_abort").assertIsDisplayed()
         composeRule.onNodeWithTag("steering_template_explain").assertIsDisplayed()
@@ -46,12 +47,12 @@ class SteeringBarTest {
 
     @Test
     fun hiddenState_rendersNothing() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SteeringBar(
                 state = SteeringBarState.Hidden,
                 controller = SteeringBarController(CoroutineScope(Dispatchers.Main))
             )
-        }
+        } }
         composeRule.onNodeWithTag("steering_bar").assertDoesNotExist()
     }
 }

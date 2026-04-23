@@ -17,6 +17,7 @@ import com.cocode.claudeemailapp.app.ComposeMessageScreen
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 @RunWith(AndroidJUnit4::class)
 class ComposeMessageScreenTest {
@@ -30,7 +31,7 @@ class ComposeMessageScreenTest {
 
     @Test
     fun prefillsDefaultToAndProject() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "svc@ex",
                 defaultProject = "/path/to/project",
@@ -39,14 +40,14 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         composeRule.onNodeWithText("svc@ex").assertIsDisplayed()
         composeRule.onNodeWithText("/path/to/project").assertIsDisplayed()
     }
 
     @Test
     fun sendButton_disabledUntilAllRequiredFieldsFilled() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "",
                 defaultProject = "",
@@ -55,14 +56,14 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         scrollTo("compose_send")
         composeRule.onNodeWithTag("compose_send").assertIsNotEnabled()
     }
 
     @Test
     fun sendButton_enablesWhenToProjectBodyFilled() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "",
                 defaultProject = "",
@@ -71,7 +72,7 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         scrollTo("compose_to")
         composeRule.onNodeWithTag("compose_to").performTextInput("svc@ex")
         scrollTo("compose_project")
@@ -85,7 +86,7 @@ class ComposeMessageScreenTest {
     @Test
     fun send_invokesCallbackWithTrimmedFields() {
         var captured: Triple<String, String, String>? = null
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "svc@ex",
                 defaultProject = "/p",
@@ -94,7 +95,7 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { to, project, body -> captured = Triple(to, project, body) }
             )
-        }
+        } }
         scrollTo("compose_body")
         composeRule.onNodeWithTag("compose_body").performTextInput("command")
         Espresso.closeSoftKeyboard()
@@ -106,7 +107,7 @@ class ComposeMessageScreenTest {
     @Test
     fun cancelButton_callsOnCancel() {
         var cancelled = false
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "svc@ex",
                 defaultProject = "/p",
@@ -115,14 +116,14 @@ class ComposeMessageScreenTest {
                 onCancel = { cancelled = true },
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         composeRule.onNodeWithTag("compose_cancel").performClick()
         assert(cancelled)
     }
 
     @Test
     fun errorState_showsErrorCard() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "svc@ex",
                 defaultProject = "/p",
@@ -131,14 +132,14 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         composeRule.onNodeWithText("Send failed").assertIsDisplayed()
         composeRule.onNodeWithText("smtp down").assertIsDisplayed()
     }
 
     @Test
     fun sendingState_showsSendingLabel() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             ComposeMessageScreen(
                 defaultTo = "svc@ex",
                 defaultProject = "/p",
@@ -147,7 +148,7 @@ class ComposeMessageScreenTest {
                 onCancel = {},
                 onSend = { _, _, _ -> }
             )
-        }
+        } }
         scrollTo("compose_send")
         composeRule.onNodeWithText("Sending…").assertIsDisplayed()
     }

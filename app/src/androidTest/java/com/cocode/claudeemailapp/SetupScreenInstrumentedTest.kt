@@ -25,6 +25,7 @@ import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 @RunWith(AndroidJUnit4::class)
 class SetupScreenInstrumentedTest {
@@ -59,7 +60,12 @@ class SetupScreenInstrumentedTest {
             override fun clear() {}
             override fun applyInbound(envelope: com.cocode.claudeemailapp.protocol.Envelope, inReplyTo: String?) = null
         }
-        return AppViewModel(app, store, sender, fetcher, probe, pending)
+        val convState = object : com.cocode.claudeemailapp.data.ConversationStateStore {
+            private var ids: Set<String> = emptySet()
+            override fun loadArchivedIds(): Set<String> = ids
+            override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
+        }
+        return AppViewModel(app, store, sender, fetcher, probe, pending, convState)
     }
 
     private val sample = MailCredentials(
@@ -77,7 +83,7 @@ class SetupScreenInstrumentedTest {
 
     @Test
     fun firstLaunch_showsSetupScreen() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel()) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel()) } }
         composeRule.onNodeWithTag("setup_screen").assertIsDisplayed()
         scrollTo("setup_email"); composeRule.onNodeWithTag("setup_email").assertIsDisplayed()
         scrollTo("setup_password"); composeRule.onNodeWithTag("setup_password").assertIsDisplayed()
@@ -88,14 +94,14 @@ class SetupScreenInstrumentedTest {
 
     @Test
     fun submitButton_disabledWithEmptyInputs() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel()) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel()) } }
         scrollTo("setup_submit")
         composeRule.onNodeWithTag("setup_submit").assertIsNotEnabled()
     }
 
     @Test
     fun submitButton_enablesWhenRequiredFieldsFilled() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel()) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel()) } }
         scrollTo("setup_email")
         composeRule.onNodeWithTag("setup_email").performTextInput("user@example.com")
         scrollTo("setup_password")
@@ -110,7 +116,7 @@ class SetupScreenInstrumentedTest {
 
     @Test
     fun initialValues_prefillWhenProvided() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel(), initial = sample) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel(), initial = sample) } }
         composeRule.onNodeWithText("me@ex.com").assertIsDisplayed()
         composeRule.onNodeWithText("imap.ex").assertIsDisplayed()
         composeRule.onNodeWithText("smtp.ex").assertIsDisplayed()
@@ -118,7 +124,7 @@ class SetupScreenInstrumentedTest {
 
     @Test
     fun startTlsToggle_changesCopy() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel()) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel()) } }
         scrollTo("setup_smtp_starttls")
         composeRule.onNodeWithText("Implicit TLS (typical port 465)").assertIsDisplayed()
         composeRule.onNodeWithTag("setup_smtp_starttls").performClick()
@@ -128,7 +134,7 @@ class SetupScreenInstrumentedTest {
     @Test
     fun probeSuccess_rendersSuccessCard() {
         val vm = setupViewModel(probeResult = ProbeResult.Success)
-        composeRule.setContent { SetupScreen(viewModel = vm) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = vm) } }
         vm.probeAndSave(sample)
         composeRule.waitForIdle()
         scrollTo("setup_submit")
@@ -138,7 +144,7 @@ class SetupScreenInstrumentedTest {
     @Test
     fun probeFailure_rendersFailureCardWithMessage() {
         val vm = setupViewModel(probeResult = ProbeResult.Failure(ProbeResult.Stage.IMAP, "login denied"))
-        composeRule.setContent { SetupScreen(viewModel = vm) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = vm) } }
         vm.probeAndSave(sample)
         composeRule.waitForIdle()
         scrollTo("setup_submit")
@@ -149,7 +155,7 @@ class SetupScreenInstrumentedTest {
     @Test
     fun probeFailure_blankMessage_rendersUnknownError() {
         val vm = setupViewModel(probeResult = ProbeResult.Failure(ProbeResult.Stage.SMTP, ""))
-        composeRule.setContent { SetupScreen(viewModel = vm) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = vm) } }
         vm.probeAndSave(sample)
         composeRule.waitForIdle()
         scrollTo("setup_submit")
@@ -158,7 +164,7 @@ class SetupScreenInstrumentedTest {
 
     @Test
     fun invalidPort_keepsSubmitDisabled() {
-        composeRule.setContent { SetupScreen(viewModel = setupViewModel()) }
+        composeRule.setContent { ClaudeEmailAppTheme { SetupScreen(viewModel = setupViewModel()) } }
         scrollTo("setup_email")
         composeRule.onNodeWithTag("setup_email").performTextInput("u@e")
         scrollTo("setup_password")

@@ -12,6 +12,7 @@ import com.cocode.claudeemailapp.app.AppViewModel
 import com.cocode.claudeemailapp.app.HomeScreen
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.mail.FetchedMessage
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,16 +68,18 @@ class HomeScreenTest {
         onOpenSettings: () -> Unit = {}
     ) {
         composeRule.setContent {
-            HomeScreen(
-                state = state,
-                buckets = AppViewModel.HomeBuckets(active, waiting, archived),
-                pending = emptyList(),
-                onRefresh = onRefresh,
-                onOpenConversation = onOpenConversation,
-                onCompose = onCompose,
-                onOpenSettings = onOpenSettings,
-                onArchiveToggle = onArchiveToggle
-            )
+            ClaudeEmailAppTheme {
+                HomeScreen(
+                    state = state,
+                    buckets = AppViewModel.HomeBuckets(active, waiting, archived),
+                    pending = emptyList(),
+                    onRefresh = onRefresh,
+                    onOpenConversation = onOpenConversation,
+                    onCompose = onCompose,
+                    onOpenSettings = onOpenSettings,
+                    onArchiveToggle = onArchiveToggle
+                )
+            }
         }
     }
 
