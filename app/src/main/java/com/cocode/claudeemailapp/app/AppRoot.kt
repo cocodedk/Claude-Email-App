@@ -38,6 +38,7 @@ enum class Screen { Home, Setup, Settings, Conversation, Compose }
 fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory)) {
     val credentials by viewModel.credentials.collectAsState()
     val inbox by viewModel.inbox.collectAsState()
+    val conversations by viewModel.conversations.collectAsState()
     val probe by viewModel.probe.collectAsState()
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
@@ -145,17 +146,15 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 )
                 Screen.Home -> HomeScreen(
                     state = inbox,
+                    conversations = conversations,
                     pending = pending,
                     onRefresh = { viewModel.refreshInbox() },
-                    onOpenMessage = { message ->
-                        selectedMessageId = message.messageId
+                    onOpenConversation = { conversation ->
+                        selectedMessageId = conversation.lastMessage.messageId
                         screen = Screen.Conversation
                     },
                     onCompose = { screen = Screen.Compose },
-                    onOpenSettings = { screen = Screen.Settings },
-                    pendingMutationIds = mutation.pendingIds,
-                    onSwipeDelete = { viewModel.messageMutation.scheduleDelete(it) },
-                    onSwipeArchive = { viewModel.messageMutation.scheduleArchive(it) }
+                    onOpenSettings = { screen = Screen.Settings }
                 )
                 Screen.Settings -> credentials?.let {
                     SettingsScreen(

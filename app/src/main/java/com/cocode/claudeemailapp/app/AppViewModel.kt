@@ -8,6 +8,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.cocode.claudeemailapp.app.steering.SteeringIntent
 import com.cocode.claudeemailapp.app.steering.envelopeForSteering
+import com.cocode.claudeemailapp.data.Conversation
+import com.cocode.claudeemailapp.data.ConversationGrouper
 import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
@@ -29,8 +31,11 @@ import com.cocode.claudeemailapp.protocol.envelope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -75,6 +80,11 @@ class AppViewModel(
 
     private val _pending = MutableStateFlow(pendingStore.all())
     val pending: StateFlow<List<PendingCommand>> = _pending.asStateFlow()
+
+    val conversations: StateFlow<List<Conversation>> = combine(_inbox, _credentials) { inbox, creds ->
+        if (creds == null) emptyList()
+        else ConversationGrouper.group(inbox.messages, creds.emailAddress)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val messageMutation: MessageMutationController = MessageMutationController(
         scope = viewModelScope,
