@@ -65,7 +65,8 @@ class AppViewModel(
     data class InboxState(
         val loading: Boolean = false,
         val messages: List<FetchedMessage> = emptyList(),
-        val error: String? = null
+        val error: String? = null,
+        val lastFetchedAt: Long? = null
     )
 
     data class ProbeState(
@@ -164,7 +165,11 @@ class AppViewModel(
             _inbox.value = _inbox.value.copy(loading = true, error = null)
             try {
                 val messages = mailFetcher.fetchRecent(creds, count = 50)
-                _inbox.value = InboxState(loading = false, messages = messages)
+                _inbox.value = InboxState(
+                    loading = false,
+                    messages = messages,
+                    lastFetchedAt = System.currentTimeMillis()
+                )
                 reconcilePending(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)

@@ -32,7 +32,7 @@ import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
-enum class Screen { Home, Setup, Settings, Conversation, Compose }
+enum class Screen { Home, Setup, Settings, Conversation, Compose, Diagnostics }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,6 +130,7 @@ private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
                     Screen.Settings -> "Settings"
                     Screen.Conversation -> "Conversation"
                     Screen.Compose -> "New command"
+                    Screen.Diagnostics -> "Diagnostics"
                 },
                 style = MaterialTheme.typography.titleLarge
             )
@@ -186,9 +187,17 @@ private fun AppNavHost(
                 onEdit = {
                     onEditCredentials()
                     onScreenChange(Screen.Setup)
-                }
+                },
+                onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
             )
         }
+        Screen.Diagnostics -> DiagnosticsScreen(
+            credentials = credentials,
+            inbox = inbox,
+            sendError = send.lastError,
+            pending = pending,
+            onBack = { onScreenChange(Screen.Settings) }
+        )
         Screen.Conversation -> {
             val conversation = conversations.firstOrNull { it.id == selectedConversationId }
             val matchedPending = conversation?.let { matchPendingForConversation(it, pending) }
