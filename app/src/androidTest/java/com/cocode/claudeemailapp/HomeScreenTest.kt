@@ -55,73 +55,59 @@ class HomeScreenTest {
         messages = listOf(message)
     )
 
-    @Test
-    fun emptyState_showsEmptyCard() {
+    private fun render(
+        active: List<Conversation> = emptyList(),
+        waiting: List<Conversation> = emptyList(),
+        archived: List<Conversation> = emptyList(),
+        state: AppViewModel.InboxState = AppViewModel.InboxState(),
+        onOpenConversation: (Conversation) -> Unit = {},
+        onArchiveToggle: (Conversation) -> Unit = {},
+        onCompose: () -> Unit = {},
+        onRefresh: () -> Unit = {},
+        onOpenSettings: () -> Unit = {}
+    ) {
         composeRule.setContent {
             HomeScreen(
-                state = AppViewModel.InboxState(),
-                conversations = emptyList(),
+                state = state,
+                buckets = AppViewModel.HomeBuckets(active, waiting, archived),
                 pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = {},
-                onCompose = {},
-                onOpenSettings = {}
+                onRefresh = onRefresh,
+                onOpenConversation = onOpenConversation,
+                onCompose = onCompose,
+                onOpenSettings = onOpenSettings,
+                onArchiveToggle = onArchiveToggle
             )
         }
-        composeRule.onNodeWithText("Inbox is empty").assertIsDisplayed()
+    }
+
+    @Test
+    fun emptyActive_showsEmptyCopy() {
+        render()
+        composeRule.onNodeWithText("Nothing active").assertIsDisplayed()
         composeRule.onNodeWithTag("home_new_message_button").assertIsDisplayed()
     }
 
     @Test
     fun loadingState_disablesRefreshButton() {
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(loading = true),
-                conversations = emptyList(),
-                pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = {},
-                onCompose = {},
-                onOpenSettings = {}
-            )
-        }
+        render(state = AppViewModel.InboxState(loading = true))
         composeRule.onNodeWithTag("home_refresh_button").assertIsNotEnabled()
     }
 
     @Test
     fun errorState_showsErrorCard() {
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(error = "Bad creds"),
-                conversations = emptyList(),
-                pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = {},
-                onCompose = {},
-                onOpenSettings = {}
-            )
-        }
+        render(state = AppViewModel.InboxState(error = "Bad creds"))
         composeRule.onNodeWithText("Sync failed").assertIsDisplayed()
         composeRule.onNodeWithText("Bad creds").assertIsDisplayed()
     }
 
     @Test
-    fun populatedState_rendersConversations() {
-        val convs = listOf(
-            conv(message("<1>", subject = "First", fromName = "Alice")),
-            conv(message("<2>", subject = "Second", fromName = "Bob"))
-        )
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(),
-                conversations = convs,
-                pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = {},
-                onCompose = {},
-                onOpenSettings = {}
+    fun activeBucket_rendersConversations() {
+        render(
+            active = listOf(
+                conv(message("<1>", subject = "First", fromName = "Alice")),
+                conv(message("<2>", subject = "Second", fromName = "Bob"))
             )
-        }
+        )
         composeRule.onNodeWithText("First").assertIsDisplayed()
         composeRule.onNodeWithText("Second").assertIsDisplayed()
         composeRule.onNodeWithText("Alice").assertIsDisplayed()
@@ -132,17 +118,7 @@ class HomeScreenTest {
     fun clickingConversationCard_invokesCallback() {
         val c = conv(message("<1>", subject = "Click me"))
         var opened: Conversation? = null
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(),
-                conversations = listOf(c),
-                pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = { opened = it },
-                onCompose = {},
-                onOpenSettings = {}
-            )
-        }
+        render(active = listOf(c), onOpenConversation = { opened = it })
         composeRule.onNodeWithText("Click me").performClick()
         assert(opened == c)
     }
@@ -152,17 +128,11 @@ class HomeScreenTest {
         var composed = false
         var refreshed = false
         var settingsOpened = false
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(),
-                conversations = emptyList(),
-                pending = emptyList(),
-                onRefresh = { refreshed = true },
-                onOpenConversation = {},
-                onCompose = { composed = true },
-                onOpenSettings = { settingsOpened = true }
-            )
-        }
+        render(
+            onCompose = { composed = true },
+            onRefresh = { refreshed = true },
+            onOpenSettings = { settingsOpened = true }
+        )
         composeRule.onNodeWithTag("home_new_message_button").performClick()
         composeRule.onNodeWithTag("home_refresh_button").performClick()
         composeRule.onNodeWithTag("home_settings_button").performClick()
@@ -172,19 +142,18 @@ class HomeScreenTest {
     }
 
     @Test
-    fun unknownSender_rendersFallback() {
-        val c = conv(message("<1>", subject = "S", from = "", fromName = null))
-        composeRule.setContent {
-            HomeScreen(
-                state = AppViewModel.InboxState(),
-                conversations = listOf(c.copy(agentDisplay = "")),
-                pending = emptyList(),
-                onRefresh = {},
-                onOpenConversation = {},
-                onCompose = {},
-                onOpenSettings = {}
-            )
-        }
-        composeRule.onNodeWithText("(unknown sender)").assertIsDisplayed()
+    fun selectingArchivedTab_showsArchivedConversations() {
+        val arc = conv(message("<a>", subject = "Old thread"))
+        render(archived = listOf(arc))
+        composeRule.onNodeWithTag("home_filter_archived").performClick()
+        composeRule.onNodeWithText("Old thread").assertIsDisplayed()
+    }
+
+    @Test
+    fun selectingWaitingTab_showsWaitingConversations() {
+        val w = conv(message("<w>", subject = "Needs reply"))
+        render(waiting = listOf(w))
+        composeRule.onNodeWithTag("home_filter_waiting").performClick()
+        composeRule.onNodeWithText("Needs reply").assertIsDisplayed()
     }
 }

@@ -20,6 +20,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -32,13 +36,16 @@ import com.cocode.claudeemailapp.data.PendingStatus
 @Composable
 fun HomeScreen(
     state: AppViewModel.InboxState,
-    conversations: List<Conversation>,
+    buckets: AppViewModel.HomeBuckets,
     pending: List<PendingCommand>,
     onRefresh: () -> Unit,
     onOpenConversation: (Conversation) -> Unit,
     onCompose: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onArchiveToggle: (Conversation) -> Unit
 ) {
+    var filter by rememberSaveable { mutableStateOf(AppViewModel.HomeFilter.ACTIVE) }
+    val visible = buckets[filter]
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag("home_screen"),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -47,21 +54,27 @@ fun HomeScreen(
         item {
             HeroCard(
                 loading = state.loading,
-                conversationCount = conversations.size,
+                conversationCount = visible.size,
                 onCompose = onCompose,
                 onRefresh = onRefresh,
                 onOpenSettings = onOpenSettings
             )
         }
+        item { HomeFilterTabs(selected = filter, counts = buckets, onSelect = { filter = it }) }
         state.error?.let { item { ErrorCard(message = it) } }
-        if (pending.isNotEmpty()) {
+        if (filter == AppViewModel.HomeFilter.ACTIVE && pending.isNotEmpty()) {
             item { PendingSummary(pending = pending) }
         }
-        if (conversations.isEmpty() && !state.loading && state.error == null) {
-            item { EmptyCard() }
+        if (visible.isEmpty() && !state.loading && state.error == null) {
+            item { EmptyCard(filter = filter) }
         }
-        items(conversations, key = { it.id }) { c ->
-            ConversationCard(conversation = c, onClick = { onOpenConversation(c) })
+        items(visible, key = { "${filter.name}-${it.id}" }) { c ->
+            SwipeableConversationCard(
+                conversation = c,
+                inArchivedView = filter == AppViewModel.HomeFilter.ARCHIVED,
+                onOpen = { onOpenConversation(c) },
+                onArchiveToggle = { onArchiveToggle(c) }
+            )
         }
     }
 }
@@ -167,18 +180,16 @@ private fun ErrorCard(message: String) {
 }
 
 @Composable
-private fun EmptyCard() {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-        contentAlignment = Alignment.Center
-    ) {
+private fun EmptyCard(filter: AppViewModel.HomeFilter) {
+    val (heading, body) = when (filter) {
+        AppViewModel.HomeFilter.ACTIVE -> "Nothing active" to "Send a command to your claude-email service and the reply will land here."
+        AppViewModel.HomeFilter.WAITING -> "No conversations need a reply" to "When the agent asks a question, it will show up here."
+        AppViewModel.HomeFilter.ARCHIVED -> "Archive is empty" to "Swipe a conversation left to archive it."
+    }
+    Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Inbox is empty", style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = "Send a command to your claude-email service and the reply will land here.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text(heading, style = MaterialTheme.typography.titleMedium)
+            Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
