@@ -122,7 +122,7 @@ class SteeringLiveFlowTest {
         // not hasAnyDescendant (which finds nothing when descendants are
         // merged). The raw identifier also appears in the non-clickable
         // PendingSummary card; scoping by testTag excludes it.
-        val ackCard: SemanticsMatcher = hasTestTag("message_card") and
+        val ackCard: SemanticsMatcher = hasTestTag("conversation_card") and
             hasText(identifier, substring = true)
 
         // Try tapping Refresh every 5s until the card appears; give up to 3 minutes.
@@ -136,9 +136,9 @@ class SteeringLiveFlowTest {
         // subtree so we can see what the app actually has vs. what we're
         // looking for.
         if (composeRule.onAllNodes(ackCard).fetchSemanticsNodes().isEmpty()) {
-            val count = composeRule.onAllNodes(hasTestTag("message_card")).fetchSemanticsNodes().size
+            val count = composeRule.onAllNodes(hasTestTag("conversation_card")).fetchSemanticsNodes().size
             android.util.Log.d("SteeringLive", "ack card NOT found — $count message_card nodes")
-            composeRule.onAllNodes(hasTestTag("message_card"))
+            composeRule.onAllNodes(hasTestTag("conversation_card"))
                 .printToLog("SteeringLive", maxDepth = 3)
         }
         // The card may be below the fold — scroll the Home LazyColumn to it.

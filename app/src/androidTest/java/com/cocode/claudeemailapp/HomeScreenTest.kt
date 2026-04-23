@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.AppViewModel
 import com.cocode.claudeemailapp.app.HomeScreen
+import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import org.junit.Rule
 import org.junit.Test
@@ -22,29 +23,47 @@ class HomeScreenTest {
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun message(id: String, subject: String = "s", body: String = "b", fromName: String? = null) =
-        FetchedMessage(
-            messageId = id,
-            from = "a@b",
-            fromName = fromName,
-            to = listOf("me@c"),
-            subject = subject,
-            body = body,
-            sentAt = Date(),
-            receivedAt = Date(),
-            inReplyTo = null,
-            references = emptyList(),
-            isSeen = false
-        )
+    private fun message(
+        id: String,
+        subject: String = "s",
+        body: String = "b",
+        from: String = "agent@b",
+        fromName: String? = "Agent"
+    ) = FetchedMessage(
+        messageId = id,
+        from = from,
+        fromName = fromName,
+        to = listOf("me@c"),
+        subject = subject,
+        body = body,
+        sentAt = Date(),
+        receivedAt = Date(),
+        inReplyTo = null,
+        references = emptyList(),
+        isSeen = false
+    )
+
+    private fun conv(message: FetchedMessage, title: String = message.subject) = Conversation(
+        id = message.messageId,
+        title = title,
+        agentDisplay = message.fromName ?: message.from,
+        agentEmail = message.from,
+        latestAt = message.sentAt,
+        messageCount = 1,
+        unreadCount = if (message.isSeen) 0 else 1,
+        lastMessage = message,
+        messages = listOf(message)
+    )
 
     @Test
     fun emptyState_showsEmptyCard() {
         composeRule.setContent {
             HomeScreen(
-                pending = emptyList(),
                 state = AppViewModel.InboxState(),
+                conversations = emptyList(),
+                pending = emptyList(),
                 onRefresh = {},
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = {},
                 onOpenSettings = {}
             )
@@ -57,10 +76,11 @@ class HomeScreenTest {
     fun loadingState_disablesRefreshButton() {
         composeRule.setContent {
             HomeScreen(
-                pending = emptyList(),
                 state = AppViewModel.InboxState(loading = true),
+                conversations = emptyList(),
+                pending = emptyList(),
                 onRefresh = {},
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = {},
                 onOpenSettings = {}
             )
@@ -72,10 +92,11 @@ class HomeScreenTest {
     fun errorState_showsErrorCard() {
         composeRule.setContent {
             HomeScreen(
-                pending = emptyList(),
                 state = AppViewModel.InboxState(error = "Bad creds"),
+                conversations = emptyList(),
+                pending = emptyList(),
                 onRefresh = {},
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = {},
                 onOpenSettings = {}
             )
@@ -85,14 +106,18 @@ class HomeScreenTest {
     }
 
     @Test
-    fun populatedState_rendersMessages() {
-        val messages = listOf(message("<1>", subject = "First", fromName = "Alice"), message("<2>", subject = "Second"))
+    fun populatedState_rendersConversations() {
+        val convs = listOf(
+            conv(message("<1>", subject = "First", fromName = "Alice")),
+            conv(message("<2>", subject = "Second", fromName = "Bob"))
+        )
         composeRule.setContent {
             HomeScreen(
+                state = AppViewModel.InboxState(),
+                conversations = convs,
                 pending = emptyList(),
-                state = AppViewModel.InboxState(messages = messages),
                 onRefresh = {},
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = {},
                 onOpenSettings = {}
             )
@@ -100,24 +125,26 @@ class HomeScreenTest {
         composeRule.onNodeWithText("First").assertIsDisplayed()
         composeRule.onNodeWithText("Second").assertIsDisplayed()
         composeRule.onNodeWithText("Alice").assertIsDisplayed()
+        composeRule.onNodeWithText("Bob").assertIsDisplayed()
     }
 
     @Test
-    fun clickingMessageCard_invokesOpenMessage() {
-        val msg = message("<1>", subject = "Click me")
-        var opened: FetchedMessage? = null
+    fun clickingConversationCard_invokesCallback() {
+        val c = conv(message("<1>", subject = "Click me"))
+        var opened: Conversation? = null
         composeRule.setContent {
             HomeScreen(
+                state = AppViewModel.InboxState(),
+                conversations = listOf(c),
                 pending = emptyList(),
-                state = AppViewModel.InboxState(messages = listOf(msg)),
                 onRefresh = {},
-                onOpenMessage = { opened = it },
+                onOpenConversation = { opened = it },
                 onCompose = {},
                 onOpenSettings = {}
             )
         }
         composeRule.onNodeWithText("Click me").performClick()
-        assert(opened == msg)
+        assert(opened == c)
     }
 
     @Test
@@ -127,10 +154,11 @@ class HomeScreenTest {
         var settingsOpened = false
         composeRule.setContent {
             HomeScreen(
+                state = AppViewModel.InboxState(),
+                conversations = emptyList(),
                 pending = emptyList(),
-                state = AppViewModel.InboxState(messages = emptyList()),
                 onRefresh = { refreshed = true },
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = { composed = true },
                 onOpenSettings = { settingsOpened = true }
             )
@@ -144,34 +172,19 @@ class HomeScreenTest {
     }
 
     @Test
-    fun populatedState_unknownSender_rendersFallback() {
-        val msg = message("<1>", subject = "S").copy(from = "", fromName = null)
+    fun unknownSender_rendersFallback() {
+        val c = conv(message("<1>", subject = "S", from = "", fromName = null))
         composeRule.setContent {
             HomeScreen(
+                state = AppViewModel.InboxState(),
+                conversations = listOf(c.copy(agentDisplay = "")),
                 pending = emptyList(),
-                state = AppViewModel.InboxState(messages = listOf(msg)),
                 onRefresh = {},
-                onOpenMessage = {},
+                onOpenConversation = {},
                 onCompose = {},
                 onOpenSettings = {}
             )
         }
         composeRule.onNodeWithText("(unknown sender)").assertIsDisplayed()
-    }
-
-    @Test
-    fun populatedState_emptySubject_showsFallback() {
-        val msg = message("<1>", subject = "", body = "").copy(from = "a@b", fromName = null)
-        composeRule.setContent {
-            HomeScreen(
-                pending = emptyList(),
-                state = AppViewModel.InboxState(messages = listOf(msg)),
-                onRefresh = {},
-                onOpenMessage = {},
-                onCompose = {},
-                onOpenSettings = {}
-            )
-        }
-        composeRule.onNodeWithText("(no subject)").assertIsDisplayed()
     }
 }
