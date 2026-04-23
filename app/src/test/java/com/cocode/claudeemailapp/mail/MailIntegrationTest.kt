@@ -113,11 +113,18 @@ class MailIntegrationTest {
                 envelope = env
             )
         )
-        // IMAP sync is usually near-instant for self-addressed mail, but allow the server a beat.
-        Thread.sleep(2000)
-        val recent = fetcher.fetchRecent(creds, count = 20)
-        val match = recent.firstOrNull { it.subject.contains(identifier) }
-        assertNotNull("envelope email did not appear in inbox", match)
+        // IMAP sync is usually near-instant for self-addressed mail, but
+        // one.com sometimes takes up to ~10s during off-hours. Poll up to 30s
+        // before declaring it missing — a fixed sleep raced and produced
+        // intermittent flakes.
+        val deadline = System.currentTimeMillis() + 30_000L
+        var match: com.cocode.claudeemailapp.mail.FetchedMessage? = null
+        while (System.currentTimeMillis() < deadline && match == null) {
+            Thread.sleep(2000)
+            match = fetcher.fetchRecent(creds, count = 20)
+                .firstOrNull { it.subject.contains(identifier) }
+        }
+        assertNotNull("envelope email did not appear in inbox within 30s", match)
         println("Integration envelope: contentType=${match!!.contentType} bodyHead=${match.body.take(80)}")
         val parsed = match.envelope
         assertNotNull("inbound Content-Type sniff missed the JSON body; contentType=${match.contentType}", parsed)
