@@ -1,8 +1,10 @@
 package com.cocode.claudeemailapp
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -108,6 +110,9 @@ class ConversationActionsTest {
         composeRule.onNodeWithText("my first").assertIsDisplayed()
         composeRule.onNodeWithText("agent reply").assertIsDisplayed()
         composeRule.onNodeWithText("my followup").assertIsDisplayed()
-        composeRule.onNodeWithText("You").assertIsDisplayed()
+        // Two self-messages → "You" label appears twice; agent message uses
+        // its display name so it does not contribute.
+        composeRule.onAllNodesWithText("You").assertCountEquals(2)
+        composeRule.onNodeWithText("Agent").assertIsDisplayed()
     }
 }

@@ -12,6 +12,7 @@ import com.cocode.claudeemailapp.data.MailCredentials
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 @RunWith(AndroidJUnit4::class)
 class SettingsScreenTest {
@@ -39,7 +40,7 @@ class SettingsScreenTest {
 
     @Test
     fun showsSavedCredentialDetails() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(),
                 onBack = {},
@@ -47,7 +48,7 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithText("Display").assertIsDisplayed()
         composeRule.onNodeWithText("me@ex").assertIsDisplayed()
         composeRule.onNodeWithText("imap.ex").assertIsDisplayed()
@@ -56,7 +57,7 @@ class SettingsScreenTest {
 
     @Test
     fun emptyDisplayName_showsNotSet() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(displayName = ""),
                 onBack = {},
@@ -64,13 +65,13 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithText("(not set)").assertIsDisplayed()
     }
 
     @Test
     fun emptySharedSecret_showsNotSet() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(sharedSecret = "", serviceAddress = ""),
                 onBack = {},
@@ -78,13 +79,13 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         // both serviceAddress and sharedSecret empty → two "(not set)" entries
     }
 
     @Test
     fun sharedSecretSet_showsMasked() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(sharedSecret = "secret-value"),
                 onBack = {},
@@ -92,13 +93,13 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithText("••••••").assertIsDisplayed()
     }
 
     @Test
     fun startTls_showsStartTls() {
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(startTls = true),
                 onBack = {},
@@ -106,14 +107,14 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithText("STARTTLS").assertIsDisplayed()
     }
 
     @Test
     fun backButton_callsCallback() {
         var backed = false
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(),
                 onBack = { backed = true },
@@ -121,7 +122,7 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithTag("settings_back").performClick()
         assert(backed)
     }
@@ -129,7 +130,7 @@ class SettingsScreenTest {
     @Test
     fun editButton_callsCallback() {
         var edited = false
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(),
                 onBack = {},
@@ -137,7 +138,7 @@ class SettingsScreenTest {
                 onEdit = { edited = true },
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithTag("settings_edit").performClick()
         assert(edited)
     }
@@ -145,7 +146,7 @@ class SettingsScreenTest {
     @Test
     fun signOutButton_callsCallback() {
         var signedOut = false
-        composeRule.setContent {
+        composeRule.setContent { ClaudeEmailAppTheme {
             SettingsScreen(
                 credentials = creds(),
                 onBack = {},
@@ -153,7 +154,7 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {}
             )
-        }
+        } }
         composeRule.onNodeWithTag("settings_signout").performClick()
         assert(signedOut)
     }

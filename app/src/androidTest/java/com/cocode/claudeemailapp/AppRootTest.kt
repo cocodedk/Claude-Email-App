@@ -226,7 +226,10 @@ class AppRootTest {
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         composeRule.onNodeWithTag("conversation_send_button").performClick()
         composeRule.waitForIdle()
-        // After success, snack shows and we return to Home (via clearSendResult + screen = Home in LaunchedEffect)
-        composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
+        // High-UX behaviour: send from a conversation keeps the user on the
+        // conversation (snackbar confirms via SnackbarHost) instead of jumping
+        // back to Home, so the user can watch for the agent's reply in place.
+        composeRule.onNodeWithTag("conversation_screen").assertIsDisplayed()
+        io.mockk.coVerify { sender.send(any(), any()) }
     }
 }

@@ -11,7 +11,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.ConversationScreen
+import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.mail.FetchedMessage
+import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,32 +39,51 @@ class ConversationScreenTest {
         isSeen = false
     )
 
+    private fun conv(m: FetchedMessage) = Conversation(
+        id = m.messageId,
+        title = m.subject.ifBlank { "(no subject)" },
+        agentDisplay = m.fromName ?: m.from,
+        agentEmail = m.from,
+        latestAt = m.sentAt,
+        messageCount = 1,
+        unreadCount = if (m.isSeen) 0 else 1,
+        lastMessage = m,
+        messages = listOf(m)
+    )
+
+    private fun render(
+        m: FetchedMessage = message(),
+        sending: Boolean = false,
+        sendError: String? = null,
+        onBack: () -> Unit = {},
+        onSendReply: (String) -> Unit = {}
+    ) {
+        composeRule.setContent {
+            ClaudeEmailAppTheme {
+                ConversationScreen(
+                    conversation = conv(m),
+                    selfEmail = "me@x",
+                    isArchived = false,
+                    sending = sending,
+                    sendError = sendError,
+                    onBack = onBack,
+                    onSendReply = onSendReply,
+                    onArchiveToggle = {}
+                )
+            }
+        }
+    }
+
     @Test
     fun rendersSubjectAndBody() {
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(subject = "The subject", body = "The body"),
-                sending = false,
-                sendError = null,
-                onBack = {},
-                onSendReply = {}
-            )
-        }
+        render(m = message(subject = "The subject", body = "The body"))
         composeRule.onNodeWithTag("conversation_subject").assertIsDisplayed()
         composeRule.onNodeWithText("The body").assertIsDisplayed()
     }
 
     @Test
     fun emptySubjectAndBody_showFallbacks() {
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(subject = "", body = ""),
-                sending = false,
-                sendError = null,
-                onBack = {},
-                onSendReply = {}
-            )
-        }
+        render(m = message(subject = "", body = ""))
         composeRule.onNodeWithText("(no subject)").assertIsDisplayed()
         composeRule.onNodeWithText("(no text content)").assertIsDisplayed()
     }
@@ -70,30 +91,14 @@ class ConversationScreenTest {
     @Test
     fun backButton_invokesCallback() {
         var backed = false
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = false,
-                sendError = null,
-                onBack = { backed = true },
-                onSendReply = {}
-            )
-        }
+        render(onBack = { backed = true })
         composeRule.onNodeWithTag("conversation_back").performClick()
         assert(backed)
     }
 
     @Test
     fun sendButton_disabledUntilReplyTyped() {
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = false,
-                sendError = null,
-                onBack = {},
-                onSendReply = {}
-            )
-        }
+        render()
         composeRule.onNodeWithTag("conversation_send_button").assertIsNotEnabled()
         composeRule.onNodeWithTag("conversation_reply_field").performTextInput("Hi back")
         composeRule.onNodeWithTag("conversation_send_button").assertIsEnabled()
@@ -102,15 +107,7 @@ class ConversationScreenTest {
     @Test
     fun sendButton_invokesCallbackWithTrimmedBody() {
         var sent: String? = null
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = false,
-                sendError = null,
-                onBack = {},
-                onSendReply = { sent = it }
-            )
-        }
+        render(onSendReply = { sent = it })
         composeRule.onNodeWithTag("conversation_reply_field").performTextInput("  hello  ")
         composeRule.onNodeWithTag("conversation_send_button").performClick()
         assert(sent == "hello")
@@ -118,30 +115,14 @@ class ConversationScreenTest {
 
     @Test
     fun sendingState_disablesSendAndShowsLabel() {
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = true,
-                sendError = null,
-                onBack = {},
-                onSendReply = {}
-            )
-        }
+        render(sending = true)
         composeRule.onNodeWithTag("conversation_send_button").assertIsNotEnabled()
         composeRule.onNodeWithText("Sending…").assertIsDisplayed()
     }
 
     @Test
     fun errorState_showsErrorCard() {
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = false,
-                sendError = "smtp rejected",
-                onBack = {},
-                onSendReply = {}
-            )
-        }
+        render(sendError = "smtp rejected")
         composeRule.onNodeWithText("Send failed").assertIsDisplayed()
         composeRule.onNodeWithText("smtp rejected").assertIsDisplayed()
     }
@@ -149,16 +130,7 @@ class ConversationScreenTest {
     @Test
     fun sendingBlankWhitespace_doesNotTriggerCallback() {
         var sent: String? = null
-        composeRule.setContent {
-            ConversationScreen(
-                message = message(),
-                sending = false,
-                sendError = null,
-                onBack = {},
-                onSendReply = { sent = it }
-            )
-        }
-        // reply empty → send disabled, so nothing should happen
+        render(onSendReply = { sent = it })
         composeRule.onNodeWithTag("conversation_send_button").assertIsNotEnabled()
         assert(sent == null)
     }
