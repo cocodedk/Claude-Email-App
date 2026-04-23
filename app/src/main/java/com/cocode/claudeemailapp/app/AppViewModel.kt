@@ -18,10 +18,8 @@ import com.cocode.claudeemailapp.data.PendingCommandStore
 import com.cocode.claudeemailapp.data.PendingStatus
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import com.cocode.claudeemailapp.mail.ImapMailFetcher
-import com.cocode.claudeemailapp.mail.ImapMailMutator
 import com.cocode.claudeemailapp.mail.MailException
 import com.cocode.claudeemailapp.mail.MailFetcher
-import com.cocode.claudeemailapp.mail.MailMutator
 import com.cocode.claudeemailapp.mail.MailProbe
 import com.cocode.claudeemailapp.mail.MailSender
 import com.cocode.claudeemailapp.mail.OutgoingMessage
@@ -47,8 +45,7 @@ class AppViewModel(
     private val mailFetcher: MailFetcher,
     private val mailProbe: MailProbe,
     private val pendingStore: PendingCommandStore,
-    private val conversationStateStore: ConversationStateStore,
-    private val mailMutator: MailMutator = ImapMailMutator()
+    private val conversationStateStore: ConversationStateStore
 ) : AndroidViewModel(application) {
 
     enum class HomeFilter { ACTIVE, WAITING, ARCHIVED }
@@ -122,13 +119,6 @@ class AppViewModel(
         _archived.value = updated
         conversationStateStore.saveArchivedIds(updated)
     }
-
-    val messageMutation: MessageMutationController = MessageMutationController(
-        scope = viewModelScope,
-        credentials = _credentials,
-        mutator = mailMutator,
-        onAfterMutation = { refreshInbox() }
-    )
 
     private var pollingJob: Job? = null
 
