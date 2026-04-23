@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.ConversationScreen
@@ -141,7 +142,8 @@ class ConversationScreenTest {
         render(m = message(body = long))
         // The tail is hidden behind the truncation until expanded.
         composeRule.onNodeWithText("TAIL_MARKER", substring = true).assertDoesNotExist()
-        composeRule.onNodeWithTag("thread_message_expand_toggle").assertIsDisplayed().performClick()
-        composeRule.onNodeWithText("TAIL_MARKER", substring = true).assertIsDisplayed()
+        // Toggle exists at the bottom of the (long) card; scroll to it.
+        composeRule.onNodeWithTag("thread_message_expand_toggle").performScrollTo().performClick()
+        composeRule.onNodeWithText("TAIL_MARKER", substring = true).performScrollTo().assertIsDisplayed()
     }
 }
