@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cocode.claudeemailapp.ui.theme.BorderSoft
 import com.cocode.claudeemailapp.ui.theme.BorderStrong
-import com.cocode.claudeemailapp.ui.theme.SignalBlue
+import com.cocode.claudeemailapp.ui.theme.SignalCyan
 import com.cocode.claudeemailapp.ui.theme.SignalRed
 import com.cocode.claudeemailapp.ui.theme.Snow
 import com.cocode.claudeemailapp.ui.theme.SnowMuted
@@ -39,7 +39,7 @@ private fun colorsFor(variant: SteeringChipVariant): ChipColors = when (variant)
     SteeringChipVariant.Danger -> ChipColors(SignalRed.copy(alpha = 0.5f), SignalRed, Color.Transparent)
     SteeringChipVariant.DangerArmed -> ChipColors(SignalRed, SignalRed, SignalRed.copy(alpha = 0.12f))
     SteeringChipVariant.Ghost -> ChipColors(BorderSoft, SnowMuted, Color.Transparent)
-    SteeringChipVariant.Sending -> ChipColors(SignalBlue.copy(alpha = 0.45f), SignalBlue, Color.Transparent)
+    SteeringChipVariant.Sending -> ChipColors(SignalCyan.copy(alpha = 0.45f), SignalCyan, Color.Transparent)
 }
 
 private val ChipLabelStyle = TextStyle(
@@ -85,8 +85,8 @@ fun SteeringChip(
             CircularProgressIndicator(
                 modifier = Modifier.size(10.dp),
                 strokeWidth = 1.5.dp,
-                color = SignalBlue,
-                trackColor = SignalBlue.copy(alpha = 0.25f)
+                color = SignalCyan,
+                trackColor = SignalCyan.copy(alpha = 0.25f)
             )
         } else if (icon != null) {
             Text(text = icon, color = colors.label, style = IconStyle)
