@@ -38,7 +38,8 @@ enum class Screen { Home, Setup, Settings, Conversation, Compose }
 fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory)) {
     val credentials by viewModel.credentials.collectAsState()
     val inbox by viewModel.inbox.collectAsState()
-    val conversations by viewModel.conversations.collectAsState()
+    val homeBuckets by viewModel.homeBuckets.collectAsState()
+    val archived by viewModel.archived.collectAsState()
     val probe by viewModel.probe.collectAsState()
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
@@ -146,7 +147,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 )
                 Screen.Home -> HomeScreen(
                     state = inbox,
-                    conversations = conversations,
+                    buckets = homeBuckets,
                     pending = pending,
                     onRefresh = { viewModel.refreshInbox() },
                     onOpenConversation = { conversation ->
@@ -154,7 +155,22 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                         screen = Screen.Conversation
                     },
                     onCompose = { screen = Screen.Compose },
-                    onOpenSettings = { screen = Screen.Settings }
+                    onOpenSettings = { screen = Screen.Settings },
+                    onArchiveToggle = { conversation ->
+                        val wasArchived = conversation.id in archived
+                        viewModel.setConversationArchived(conversation.id, !wasArchived)
+                        scope.launch {
+                            val msg = if (wasArchived) "Unarchived" else "Archived"
+                            val result = snackbarHostState.showSnackbar(
+                                message = msg,
+                                actionLabel = "Undo",
+                                duration = androidx.compose.material3.SnackbarDuration.Short
+                            )
+                            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                viewModel.setConversationArchived(conversation.id, wasArchived)
+                            }
+                        }
+                    }
                 )
                 Screen.Settings -> credentials?.let {
                     SettingsScreen(

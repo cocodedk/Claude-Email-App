@@ -75,10 +75,17 @@ class AppRootTest {
             coEvery { fetchRecent(any(), any()) } returns emptyList()
         },
         probe: MailProbe = mockk(relaxed = true),
-        pending: com.cocode.claudeemailapp.data.PendingCommandStore = FakePending()
+        pending: com.cocode.claudeemailapp.data.PendingCommandStore = FakePending(),
+        conversationState: com.cocode.claudeemailapp.data.ConversationStateStore = FakeConvState()
     ): AppViewModel {
         val app = ApplicationProvider.getApplicationContext<android.app.Application>()
-        return AppViewModel(app, store, sender, fetcher, probe, pending)
+        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState)
+    }
+
+    private class FakeConvState : com.cocode.claudeemailapp.data.ConversationStateStore {
+        private var ids: Set<String> = emptySet()
+        override fun loadArchivedIds(): Set<String> = ids
+        override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
     }
 
     private class FakePending : com.cocode.claudeemailapp.data.PendingCommandStore {

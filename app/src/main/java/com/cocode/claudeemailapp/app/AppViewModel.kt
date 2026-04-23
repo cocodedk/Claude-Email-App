@@ -10,6 +10,7 @@ import com.cocode.claudeemailapp.app.steering.SteeringIntent
 import com.cocode.claudeemailapp.app.steering.envelopeForSteering
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.ConversationGrouper
+import com.cocode.claudeemailapp.data.ConversationStateStore
 import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
@@ -46,8 +47,23 @@ class AppViewModel(
     private val mailFetcher: MailFetcher,
     private val mailProbe: MailProbe,
     private val pendingStore: PendingCommandStore,
+    private val conversationStateStore: ConversationStateStore,
     private val mailMutator: MailMutator = ImapMailMutator()
 ) : AndroidViewModel(application) {
+
+    enum class HomeFilter { ACTIVE, WAITING, ARCHIVED }
+
+    data class HomeBuckets(
+        val active: List<Conversation> = emptyList(),
+        val waiting: List<Conversation> = emptyList(),
+        val archived: List<Conversation> = emptyList()
+    ) {
+        operator fun get(filter: HomeFilter): List<Conversation> = when (filter) {
+            HomeFilter.ACTIVE -> active
+            HomeFilter.WAITING -> waiting
+            HomeFilter.ARCHIVED -> archived
+        }
+    }
 
     data class InboxState(
         val loading: Boolean = false,
@@ -85,6 +101,27 @@ class AppViewModel(
         if (creds == null) emptyList()
         else ConversationGrouper.group(inbox.messages, creds.emailAddress)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    private val _archived = MutableStateFlow(conversationStateStore.loadArchivedIds())
+    val archived: StateFlow<Set<String>> = _archived.asStateFlow()
+
+    val homeBuckets: StateFlow<HomeBuckets> = combine(conversations, _pending, _archived) { convs, pend, arc ->
+        val (archivedC, liveC) = convs.partition { it.id in arc }
+        val askingIds = pend.filter { it.status == PendingStatus.AWAITING_USER }
+            .map { it.messageId }.toSet()
+        val (waiting, active) = liveC.partition { c ->
+            c.messages.any { it.messageId in askingIds }
+        }
+        HomeBuckets(active = active, waiting = waiting, archived = archivedC)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeBuckets())
+
+    fun setConversationArchived(conversationId: String, archived: Boolean) {
+        val current = _archived.value
+        val updated = if (archived) current + conversationId else current - conversationId
+        if (updated == current) return
+        _archived.value = updated
+        conversationStateStore.saveArchivedIds(updated)
+    }
 
     val messageMutation: MessageMutationController = MessageMutationController(
         scope = viewModelScope,
@@ -286,7 +323,8 @@ class AppViewModel(
                     mailSender = SmtpMailSender(),
                     mailFetcher = ImapMailFetcher(),
                     mailProbe = MailProbe(),
-                    pendingStore = PendingCommandStore(app)
+                    pendingStore = PendingCommandStore(app),
+                    conversationStateStore = ConversationStateStore(app)
                 )
             }
         }

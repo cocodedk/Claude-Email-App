@@ -71,10 +71,17 @@ class AppViewModelTest {
             coEvery { fetchRecent(any(), any()) } returns emptyList()
         },
         probe: MailProbe = mockk(relaxed = true),
-        pending: PendingCommandStore = FakePendingCommandStore()
+        pending: PendingCommandStore = FakePendingCommandStore(),
+        conversationState: com.cocode.claudeemailapp.data.ConversationStateStore = FakeConversationStateStore()
     ): AppViewModel {
         val app = mockk<Application>(relaxed = true)
-        return AppViewModel(app, store, sender, fetcher, probe, pending)
+        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState)
+    }
+
+    private class FakeConversationStateStore : com.cocode.claudeemailapp.data.ConversationStateStore {
+        private var ids: Set<String> = emptySet()
+        override fun loadArchivedIds(): Set<String> = ids
+        override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
     }
 
     private class FakeCredentialsStore(initial: MailCredentials? = null) : CredentialsStore {
