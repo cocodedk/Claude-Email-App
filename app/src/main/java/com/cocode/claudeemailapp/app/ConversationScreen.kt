@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -68,6 +69,13 @@ fun ConversationScreen(
     }
 
     var reply by rememberSaveable(conversation.id) { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    // Auto-scroll to the newest message when the conversation opens or grows.
+    // Index is messages.size because item 0 is the header card.
+    LaunchedEffect(conversation.id, conversation.messages.size) {
+        val target = conversation.messages.size
+        if (target > 0) listState.scrollToItem(target)
+    }
 
     Column(
         modifier = Modifier
@@ -76,6 +84,7 @@ fun ConversationScreen(
             .testTag("conversation_screen")
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
