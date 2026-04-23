@@ -66,9 +66,10 @@ internal fun ConversationCard(
 private fun HeaderRow(conversation: Conversation) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        AvatarChip(displayName = conversation.agentDisplay, email = conversation.agentEmail)
         Text(
             text = conversation.agentDisplay.takeIf(String::isNotBlank) ?: "(unknown sender)",
             style = MaterialTheme.typography.titleSmall,
@@ -78,7 +79,6 @@ private fun HeaderRow(conversation: Conversation) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        Spacer(Modifier.padding(start = 8.dp))
         Text(
             text = formatTimestamp(conversation.latestAt),
             style = MaterialTheme.typography.labelMedium,

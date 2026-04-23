@@ -81,13 +81,20 @@ internal fun ThreadMessageCard(message: FetchedMessage, isFromSelf: Boolean) {
 
 @Composable
 private fun HeaderRow(message: FetchedMessage, isFromSelf: Boolean) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
+    val name = if (isFromSelf) "You" else message.fromName?.takeIf(String::isNotBlank) ?: message.from
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AvatarChip(displayName = name, email = message.from, size = 28.dp)
         Text(
-            text = if (isFromSelf) "You" else message.fromName?.takeIf(String::isNotBlank) ?: message.from,
+            text = name,
             style = MaterialTheme.typography.titleSmall,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Medium,
-            color = if (isFromSelf) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary
+            color = if (isFromSelf) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.weight(1f)
         )
         Text(
             text = formatTimestamp(message.sentAt ?: message.receivedAt),
