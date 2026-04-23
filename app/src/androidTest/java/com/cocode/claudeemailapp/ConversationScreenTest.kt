@@ -134,4 +134,14 @@ class ConversationScreenTest {
         composeRule.onNodeWithTag("conversation_send_button").assertIsNotEnabled()
         assert(sent == null)
     }
+
+    @Test
+    fun longBody_showsExpandToggleAndRevealsRest() {
+        val long = "x".repeat(1600) + "TAIL_MARKER"
+        render(m = message(body = long))
+        // The tail is hidden behind the truncation until expanded.
+        composeRule.onNodeWithText("TAIL_MARKER", substring = true).assertDoesNotExist()
+        composeRule.onNodeWithTag("thread_message_expand_toggle").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("TAIL_MARKER", substring = true).assertIsDisplayed()
+    }
 }

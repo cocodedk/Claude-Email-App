@@ -89,7 +89,7 @@ fun ConversationScreen(
                 )
             }
             items(conversation.messages, key = { "msg-${it.messageId}" }) { msg ->
-                MessageCard(message = msg, isFromSelf = msg.from.equals(selfEmail, ignoreCase = true))
+                ThreadMessageCard(message = msg, isFromSelf = msg.from.equals(selfEmail, ignoreCase = true))
             }
             sendError?.let {
                 item(key = "error") { ErrorCard(message = it) }
@@ -162,46 +162,6 @@ private fun ConversationHeaderCard(
                     modifier = Modifier.testTag("conversation_archive")
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun MessageCard(message: FetchedMessage, isFromSelf: Boolean) {
-    val container = if (isFromSelf) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
-    ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = container),
-        modifier = Modifier.fillMaxWidth().testTag("thread_message_card")
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-                Text(
-                    text = if (isFromSelf) "You" else message.fromName?.takeIf(String::isNotBlank) ?: message.from,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Medium,
-                    color = if (isFromSelf) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary
-                )
-                Text(
-                    text = formatTimestamp(message.sentAt ?: message.receivedAt),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            message.envelope?.let { env ->
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    KindChip(kind = env.kind)
-                    env.taskId?.let { Text(text = "task #$it", style = MaterialTheme.typography.labelMedium) }
-                }
-            }
-            Text(
-                text = message.body.ifBlank { "(no text content)" },
-                style = MaterialTheme.typography.bodyLarge
-            )
         }
     }
 }
