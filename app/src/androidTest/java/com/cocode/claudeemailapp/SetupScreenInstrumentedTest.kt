@@ -62,8 +62,11 @@ class SetupScreenInstrumentedTest {
         }
         val convState = object : com.cocode.claudeemailapp.data.ConversationStateStore {
             private var ids: Set<String> = emptySet()
+            private var syncMs: Long = 60_000L
             override fun loadArchivedIds(): Set<String> = ids
             override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
+            override fun loadSyncIntervalMs(): Long = syncMs
+            override fun saveSyncIntervalMs(ms: Long) { syncMs = ms }
         }
         return AppViewModel(app, store, sender, fetcher, probe, pending, convState)
     }

@@ -103,6 +103,9 @@ class AppViewModel(
     private val _archived = MutableStateFlow(conversationStateStore.loadArchivedIds())
     val archived: StateFlow<Set<String>> = _archived.asStateFlow()
 
+    private val _syncIntervalMs = MutableStateFlow(conversationStateStore.loadSyncIntervalMs())
+    val syncIntervalMs: StateFlow<Long> = _syncIntervalMs.asStateFlow()
+
     val homeBuckets: StateFlow<HomeBuckets> = combine(conversations, _pending, _archived) { convs, pend, arc ->
         val (archivedC, liveC) = convs.partition { it.id in arc }
         val askingIds = pend.filter { it.status == PendingStatus.AWAITING_USER }
@@ -112,6 +115,14 @@ class AppViewModel(
         }
         HomeBuckets(active = active, waiting = waiting, archived = archivedC)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeBuckets())
+
+    fun setSyncIntervalMs(ms: Long) {
+        if (ms == _syncIntervalMs.value) return
+        _syncIntervalMs.value = ms
+        conversationStateStore.saveSyncIntervalMs(ms)
+        stopInboxPolling()
+        if (ms > 0) startInboxPolling(ms)
+    }
 
     fun setConversationArchived(conversationId: String, archived: Boolean) {
         val current = _archived.value
@@ -127,8 +138,9 @@ class AppViewModel(
         if (_credentials.value != null) refreshInbox()
     }
 
-    fun startInboxPolling(intervalMs: Long = 45_000L) {
+    fun startInboxPolling(intervalMs: Long = _syncIntervalMs.value) {
         if (pollingJob?.isActive == true) return
+        if (intervalMs <= 0) return
         pollingJob = viewModelScope.launch {
             while (isActive) {
                 delay(intervalMs)

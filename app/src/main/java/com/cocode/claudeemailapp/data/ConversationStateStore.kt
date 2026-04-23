@@ -12,10 +12,14 @@ import android.content.SharedPreferences
 interface ConversationStateStore {
     fun loadArchivedIds(): Set<String>
     fun saveArchivedIds(ids: Set<String>)
+    fun loadSyncIntervalMs(): Long
+    fun saveSyncIntervalMs(ms: Long)
 
     companion object {
         operator fun invoke(context: Context): ConversationStateStore =
             SharedPrefsConversationStateStore(context)
+
+        const val DEFAULT_SYNC_INTERVAL_MS = 60_000L
     }
 }
 
@@ -34,8 +38,16 @@ internal class SharedPrefsConversationStateStore(
         prefs.edit().putStringSet(KEY_ARCHIVED, ids.toHashSet()).apply()
     }
 
+    override fun loadSyncIntervalMs(): Long =
+        prefs.getLong(KEY_SYNC_INTERVAL, ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS)
+
+    override fun saveSyncIntervalMs(ms: Long) {
+        prefs.edit().putLong(KEY_SYNC_INTERVAL, ms).apply()
+    }
+
     companion object {
         internal const val PREFS_NAME = "conversation_state"
         private const val KEY_ARCHIVED = "archived_ids"
+        private const val KEY_SYNC_INTERVAL = "sync_interval_ms"
     }
 }
