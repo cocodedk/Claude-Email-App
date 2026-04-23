@@ -42,6 +42,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
     val conversations by viewModel.conversations.collectAsState()
     val homeBuckets by viewModel.homeBuckets.collectAsState()
     val archived by viewModel.archived.collectAsState()
+    val syncIntervalMs by viewModel.syncIntervalMs.collectAsState()
     val probe by viewModel.probe.collectAsState()
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
@@ -112,6 +113,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 selectedConversationId = selectedConversationId,
                 onSelectConversation = { selectedConversationId = it },
                 onArchiveToggle = ::toggleArchiveWithUndo,
+                syncIntervalMs = syncIntervalMs,
                 viewModel = viewModel
             )
         }
@@ -156,6 +158,7 @@ private fun AppNavHost(
     selectedConversationId: String?,
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
+    syncIntervalMs: Long,
     viewModel: AppViewModel
 ) {
     when (screen) {
@@ -179,6 +182,8 @@ private fun AppNavHost(
         Screen.Settings -> credentials?.let {
             SettingsScreen(
                 credentials = it,
+                syncIntervalMs = syncIntervalMs,
+                onSyncIntervalChange = { viewModel.setSyncIntervalMs(it) },
                 onBack = { onScreenChange(Screen.Home) },
                 onSignOut = {
                     viewModel.signOut()
@@ -196,6 +201,7 @@ private fun AppNavHost(
             inbox = inbox,
             sendError = send.lastError,
             pending = pending,
+            syncIntervalMs = syncIntervalMs,
             onBack = { onScreenChange(Screen.Settings) }
         )
         Screen.Conversation -> {

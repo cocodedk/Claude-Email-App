@@ -33,6 +33,7 @@ fun DiagnosticsScreen(
     inbox: AppViewModel.InboxState,
     sendError: String?,
     pending: List<PendingCommand>,
+    syncIntervalMs: Long,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -49,6 +50,7 @@ fun DiagnosticsScreen(
         item { DiagSection("Sync") {
             DiagRow("Last sync", formatTimestamp(inbox.lastFetchedAt?.let(::Date)).ifBlank { "never" })
             DiagRow("Status", if (inbox.loading) "syncing" else if (inbox.error != null) "stalled" else "idle")
+            DiagRow("Auto-refresh", if (syncIntervalMs <= 0) "manual only" else "every ${syncIntervalMs / 1000}s")
             inbox.error?.let { DiagRow("Sync error", it) }
             DiagRow("Messages cached", inbox.messages.size.toString())
         } }

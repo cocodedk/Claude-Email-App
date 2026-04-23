@@ -46,7 +46,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithText("Display").assertIsDisplayed()
@@ -63,7 +65,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithText("(not set)").assertIsDisplayed()
@@ -77,7 +81,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         // both serviceAddress and sharedSecret empty → two "(not set)" entries
@@ -91,7 +97,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithText("••••••").assertIsDisplayed()
@@ -105,7 +113,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithText("STARTTLS").assertIsDisplayed()
@@ -120,7 +130,9 @@ class SettingsScreenTest {
                 onBack = { backed = true },
                 onSignOut = {},
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_back").performClick()
@@ -136,7 +148,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = {},
                 onEdit = { edited = true },
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_edit").performClick()
@@ -152,7 +166,9 @@ class SettingsScreenTest {
                 onBack = {},
                 onSignOut = { signedOut = true },
                 onEdit = {},
-                onOpenDiagnostics = {}
+                onOpenDiagnostics = {},
+                syncIntervalMs = 60_000L,
+                onSyncIntervalChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_signout").performClick()
