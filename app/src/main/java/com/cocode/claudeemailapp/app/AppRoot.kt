@@ -50,6 +50,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
     val hasSeenOnboarding by viewModel.hasSeenOnboarding.collectAsState()
+    val recentProjects by viewModel.recentProjects.collectAsState()
 
     var screen by rememberSaveable {
         mutableStateOf(
@@ -148,6 +149,7 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 onSelectConversation = { selectedConversationId = it },
                 onArchiveToggle = ::toggleArchiveWithUndo,
                 syncIntervalMs = syncIntervalMs,
+                recentProjects = recentProjects,
                 viewModel = viewModel
             )
         }
@@ -194,6 +196,7 @@ private fun AppNavHost(
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
+    recentProjects: List<String>,
     viewModel: AppViewModel
 ) {
     when (screen) {
@@ -296,13 +299,14 @@ private fun AppNavHost(
         }
         Screen.Compose -> ComposeMessageScreen(
             defaultTo = credentials?.serviceAddress.orEmpty(),
-            defaultProject = "",
+            defaultProject = recentProjects.firstOrNull().orEmpty(),
             sending = send.sending,
             sendError = send.lastError,
             onCancel = { onScreenChange(Screen.Home) },
             onSend = { to, project, body ->
                 viewModel.sendCommand(to = to, project = project, body = body)
-            }
+            },
+            recentProjects = recentProjects
         )
     }
 }

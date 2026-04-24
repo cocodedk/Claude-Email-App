@@ -86,12 +86,19 @@ class AppRootTest {
         private var ids: Set<String> = emptySet()
         private var syncMs: Long = 60_000L
         private var onboardingSeen: Boolean = true
+        private var recent: List<String> = emptyList()
         override fun loadArchivedIds(): Set<String> = ids
         override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
         override fun loadSyncIntervalMs(): Long = syncMs
         override fun saveSyncIntervalMs(ms: Long) { syncMs = ms }
         override fun loadHasSeenOnboarding(): Boolean = onboardingSeen
         override fun markOnboardingSeen() { onboardingSeen = true }
+        override fun loadRecentProjects(): List<String> = recent
+        override fun pushRecentProject(project: String) {
+            val t = project.trim()
+            if (t.isBlank()) return
+            recent = (listOf(t) + recent.filter { it != t }).take(5)
+        }
     }
 
     private class FakePending : com.cocode.claudeemailapp.data.PendingCommandStore {
