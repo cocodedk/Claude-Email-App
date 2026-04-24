@@ -1,5 +1,8 @@
 package com.cocode.claudeemailapp.app
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -180,6 +183,54 @@ private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
 
 @Composable
 private fun AppNavHost(
+    screen: Screen,
+    onScreenChange: (Screen) -> Unit,
+    credentials: com.cocode.claudeemailapp.data.MailCredentials?,
+    inbox: AppViewModel.InboxState,
+    conversations: List<Conversation>,
+    homeBuckets: AppViewModel.HomeBuckets,
+    archived: Set<String>,
+    pending: List<com.cocode.claudeemailapp.data.PendingCommand>,
+    send: AppViewModel.SendState,
+    probe: AppViewModel.ProbeState,
+    editingCredentials: Boolean,
+    onEditCredentials: () -> Unit,
+    selectedConversationId: String?,
+    onSelectConversation: (String?) -> Unit,
+    onArchiveToggle: (Conversation) -> Unit,
+    syncIntervalMs: Long,
+    recentProjects: List<String>,
+    viewModel: AppViewModel
+) {
+    val reduceMotion = rememberReduceMotion()
+    Crossfade(
+        targetState = screen,
+        animationSpec = if (reduceMotion) snap() else tween(durationMillis = 220),
+        label = "screen"
+    ) { current -> AppScreenContent(
+        screen = current,
+        onScreenChange = onScreenChange,
+        credentials = credentials,
+        inbox = inbox,
+        conversations = conversations,
+        homeBuckets = homeBuckets,
+        archived = archived,
+        pending = pending,
+        send = send,
+        probe = probe,
+        editingCredentials = editingCredentials,
+        onEditCredentials = onEditCredentials,
+        selectedConversationId = selectedConversationId,
+        onSelectConversation = onSelectConversation,
+        onArchiveToggle = onArchiveToggle,
+        syncIntervalMs = syncIntervalMs,
+        recentProjects = recentProjects,
+        viewModel = viewModel
+    ) }
+}
+
+@Composable
+private fun AppScreenContent(
     screen: Screen,
     onScreenChange: (Screen) -> Unit,
     credentials: com.cocode.claudeemailapp.data.MailCredentials?,
