@@ -52,8 +52,11 @@ fun HomeScreen(
             if (filter == AppViewModel.HomeFilter.ACTIVE && pending.isNotEmpty()) {
                 item { PendingSummary(pending = pending) }
             }
+            if (visible.isEmpty() && state.loading && state.error == null) {
+                items(count = 3, key = { "skeleton-$it" }) { SkeletonConversationCard() }
+            }
             if (visible.isEmpty() && !state.loading && state.error == null) {
-                item { EmptyBucketCard(filter = filter) }
+                item { EmptyBucketCard(filter = filter, onCompose = onCompose) }
             }
             items(visible, key = { "${filter.name}-${it.id}" }) { c ->
                 SwipeableConversationCard(
