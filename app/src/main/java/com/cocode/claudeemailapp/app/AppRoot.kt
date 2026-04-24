@@ -256,7 +256,19 @@ private fun AppNavHost(
                     pending = matchedPending,
                     onSteeringIntent = { intent ->
                         matchedPending?.let { viewModel.dispatchSteering(it, intent) }
-                    }
+                    },
+                    onRetryCommand = {
+                        matchedPending?.let { p ->
+                            viewModel.sendCommand(
+                                to = p.to,
+                                project = p.project.orEmpty(),
+                                body = p.bodyPreview
+                            )
+                        }
+                    },
+                    onOpenSettings = { onScreenChange(Screen.Settings) },
+                    onEditCommand = { onScreenChange(Screen.Compose) },
+                    onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
                 )
             }
         }
