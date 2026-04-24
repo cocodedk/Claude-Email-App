@@ -99,7 +99,7 @@ fun ComposeMessageScreen(
         }
         item {
             Button(
-                onClick = { onSend(to, project, body) },
+                onClick = rememberHapticClick { onSend(to, project, body) },
                 enabled = canSend,
                 modifier = Modifier.fillMaxWidth().testTag("compose_send")
             ) {

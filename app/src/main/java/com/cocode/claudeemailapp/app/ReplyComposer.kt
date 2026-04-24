@@ -55,7 +55,7 @@ internal fun ReplyComposer(
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = onSend,
+                    onClick = rememberHapticClick(onSend),
                     enabled = reply.isNotBlank() && !sending,
                     modifier = Modifier.testTag("conversation_send_button")
                 ) {

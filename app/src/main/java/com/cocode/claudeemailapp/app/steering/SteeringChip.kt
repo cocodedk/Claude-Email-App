@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,13 +71,15 @@ fun SteeringChip(
         variant == SteeringChipVariant.Sending -> 0.85f
         else -> 1f
     }
+    val hapticClick = com.cocode.claudeemailapp.app.rememberHapticClick(onClick)
     Row(
         modifier = modifier
             .alpha(chipAlpha)
             .clip(shape)
             .background(colors.fill, shape)
             .border(BorderStroke(1.dp, colors.border), shape)
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = enabled, onClick = hapticClick)
+            .minimumInteractiveComponentSize()
             .padding(horizontal = 11.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
