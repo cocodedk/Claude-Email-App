@@ -78,13 +78,17 @@ class AppViewModelTest {
         return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState)
     }
 
-    private class FakeConversationStateStore : com.cocode.claudeemailapp.data.ConversationStateStore {
+    private class FakeConversationStateStore(
+        private var onboardingSeen: Boolean = false
+    ) : com.cocode.claudeemailapp.data.ConversationStateStore {
         private var ids: Set<String> = emptySet()
         private var syncMs: Long = 60_000L
         override fun loadArchivedIds(): Set<String> = ids
         override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
         override fun loadSyncIntervalMs(): Long = syncMs
         override fun saveSyncIntervalMs(ms: Long) { syncMs = ms }
+        override fun loadHasSeenOnboarding(): Boolean = onboardingSeen
+        override fun markOnboardingSeen() { onboardingSeen = true }
     }
 
     private class FakeCredentialsStore(initial: MailCredentials? = null) : CredentialsStore {
