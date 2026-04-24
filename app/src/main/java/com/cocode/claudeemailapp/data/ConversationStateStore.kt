@@ -16,12 +16,15 @@ interface ConversationStateStore {
     fun saveSyncIntervalMs(ms: Long)
     fun loadHasSeenOnboarding(): Boolean
     fun markOnboardingSeen()
+    fun loadRecentProjects(): List<String>
+    fun pushRecentProject(project: String)
 
     companion object {
         operator fun invoke(context: Context): ConversationStateStore =
             SharedPrefsConversationStateStore(context)
 
         const val DEFAULT_SYNC_INTERVAL_MS = 60_000L
+        const val RECENT_PROJECTS_CAP = 5
     }
 }
 
@@ -54,10 +57,26 @@ internal class SharedPrefsConversationStateStore(
         prefs.edit().putBoolean(KEY_ONBOARDING_SEEN, true).apply()
     }
 
+    override fun loadRecentProjects(): List<String> {
+        val raw = prefs.getString(KEY_RECENT_PROJECTS, null) ?: return emptyList()
+        return raw.split('').filter { it.isNotBlank() }
+    }
+
+    override fun pushRecentProject(project: String) {
+        val trimmed = project.trim()
+        if (trimmed.isBlank()) return
+        val existing = loadRecentProjects()
+        // Most-recent-first, de-duplicated, capped.
+        val next = (listOf(trimmed) + existing.filter { it != trimmed })
+            .take(ConversationStateStore.RECENT_PROJECTS_CAP)
+        prefs.edit().putString(KEY_RECENT_PROJECTS, next.joinToString("")).apply()
+    }
+
     companion object {
         internal const val PREFS_NAME = "conversation_state"
         private const val KEY_ARCHIVED = "archived_ids"
         private const val KEY_SYNC_INTERVAL = "sync_interval_ms"
         private const val KEY_ONBOARDING_SEEN = "onboarding_seen"
+        private const val KEY_RECENT_PROJECTS = "recent_projects"
     }
 }

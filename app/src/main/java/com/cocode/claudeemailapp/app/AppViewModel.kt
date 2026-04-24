@@ -111,6 +111,9 @@ class AppViewModel(
     private val _hasSeenOnboarding = MutableStateFlow(conversationStateStore.loadHasSeenOnboarding())
     val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding.asStateFlow()
 
+    private val _recentProjects = MutableStateFlow(conversationStateStore.loadRecentProjects())
+    val recentProjects: StateFlow<List<String>> = _recentProjects.asStateFlow()
+
     fun markOnboardingSeen() {
         if (_hasSeenOnboarding.value) return
         conversationStateStore.markOnboardingSeen()
@@ -298,6 +301,10 @@ class AppViewModel(
                     )
                     pendingStore.add(pending)
                     _pending.value = pendingStore.all()
+                    if (project.isNotBlank()) {
+                        conversationStateStore.pushRecentProject(project)
+                        _recentProjects.value = conversationStateStore.loadRecentProjects()
+                    }
                 }
                 _send.value = SendState(sending = false, justSentMessageId = result.messageId)
                 refreshInbox()
