@@ -55,7 +55,11 @@ fun ConversationScreen(
     onSendReply: (body: String) -> Unit,
     onArchiveToggle: () -> Unit,
     pending: PendingCommand? = null,
-    onSteeringIntent: (SteeringIntent) -> Unit = {}
+    onSteeringIntent: (SteeringIntent) -> Unit = {},
+    onRetryCommand: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onEditCommand: () -> Unit = {},
+    onOpenDiagnostics: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val latestIntent by rememberUpdatedState(onSteeringIntent)
@@ -98,7 +102,14 @@ fun ConversationScreen(
                 )
             }
             items(conversation.messages, key = { "msg-${it.messageId}" }) { msg ->
-                ThreadMessageCard(message = msg, isFromSelf = msg.from.equals(selfEmail, ignoreCase = true))
+                ThreadMessageCard(
+                    message = msg,
+                    isFromSelf = msg.from.equals(selfEmail, ignoreCase = true),
+                    onRetry = onRetryCommand,
+                    onOpenSettings = onOpenSettings,
+                    onEditCommand = onEditCommand,
+                    onOpenDiagnostics = onOpenDiagnostics
+                )
             }
             sendError?.let {
                 item(key = "error") { ErrorCard(message = it) }
