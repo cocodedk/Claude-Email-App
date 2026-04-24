@@ -75,10 +75,20 @@ class AppRootTest {
             coEvery { fetchRecent(any(), any()) } returns emptyList()
         },
         probe: MailProbe = mockk(relaxed = true),
-        pending: com.cocode.claudeemailapp.data.PendingCommandStore = FakePending()
+        pending: com.cocode.claudeemailapp.data.PendingCommandStore = FakePending(),
+        conversationState: com.cocode.claudeemailapp.data.ConversationStateStore = FakeConvState()
     ): AppViewModel {
         val app = ApplicationProvider.getApplicationContext<android.app.Application>()
-        return AppViewModel(app, store, sender, fetcher, probe, pending)
+        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState)
+    }
+
+    private class FakeConvState : com.cocode.claudeemailapp.data.ConversationStateStore {
+        private var ids: Set<String> = emptySet()
+        private var syncMs: Long = 60_000L
+        override fun loadArchivedIds(): Set<String> = ids
+        override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
+        override fun loadSyncIntervalMs(): Long = syncMs
+        override fun saveSyncIntervalMs(ms: Long) { syncMs = ms }
     }
 
     private class FakePending : com.cocode.claudeemailapp.data.PendingCommandStore {
@@ -219,7 +229,10 @@ class AppRootTest {
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         composeRule.onNodeWithTag("conversation_send_button").performClick()
         composeRule.waitForIdle()
-        // After success, snack shows and we return to Home (via clearSendResult + screen = Home in LaunchedEffect)
-        composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
+        // High-UX behaviour: send from a conversation keeps the user on the
+        // conversation (snackbar confirms via SnackbarHost) instead of jumping
+        // back to Home, so the user can watch for the agent's reply in place.
+        composeRule.onNodeWithTag("conversation_screen").assertIsDisplayed()
+        io.mockk.coVerify { sender.send(any(), any()) }
     }
 }

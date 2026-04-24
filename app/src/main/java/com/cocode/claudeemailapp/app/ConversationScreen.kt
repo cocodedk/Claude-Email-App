@@ -2,45 +2,80 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.app.steering.SteeringBar
+import com.cocode.claudeemailapp.app.steering.SteeringBarController
+import com.cocode.claudeemailapp.app.steering.SteeringBarState
+import com.cocode.claudeemailapp.app.steering.SteeringChip
+import com.cocode.claudeemailapp.app.steering.SteeringChipVariant
+import com.cocode.claudeemailapp.app.steering.SteeringIntent
+import com.cocode.claudeemailapp.app.steering.SteeringTemplateSheet
+import com.cocode.claudeemailapp.data.Conversation
+import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.mail.FetchedMessage
 
 @Composable
 fun ConversationScreen(
-    message: FetchedMessage,
+    conversation: Conversation,
+    selfEmail: String,
+    isArchived: Boolean,
     sending: Boolean,
     sendError: String?,
     onBack: () -> Unit,
-    onSendReply: (body: String) -> Unit
+    onSendReply: (body: String) -> Unit,
+    onArchiveToggle: () -> Unit,
+    pending: PendingCommand? = null,
+    onSteeringIntent: (SteeringIntent) -> Unit = {}
 ) {
-    var reply by rememberSaveable(message.messageId) { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val latestIntent by rememberUpdatedState(onSteeringIntent)
+    val controller = remember {
+        SteeringBarController(scope).also { it.onIntent = { latestIntent(it) } }
+    }
+    val steering = SteeringBarState.from(pending)
+
+    LaunchedEffect(pending?.messageId, pending?.lastUpdatedAt) {
+        controller.onAcked()
+    }
+
+    var reply by rememberSaveable(conversation.id) { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    // Auto-scroll to the newest message when the conversation opens or grows.
+    // Index is messages.size because item 0 is the header card.
+    LaunchedEffect(conversation.id, conversation.messages.size) {
+        val target = conversation.messages.size
+        if (target > 0) listState.scrollToItem(target)
+    }
 
     Column(
         modifier = Modifier
@@ -49,15 +84,34 @@ fun ConversationScreen(
             .testTag("conversation_screen")
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item(key = "header") { HeaderCard(message = message, onBack = onBack) }
-            item(key = "body") { BodyCard(message = message) }
+            item(key = "header") {
+                ConversationHeaderCard(
+                    conversation = conversation,
+                    isArchived = isArchived,
+                    onBack = onBack,
+                    onArchiveToggle = onArchiveToggle
+                )
+            }
+            items(conversation.messages, key = { "msg-${it.messageId}" }) { msg ->
+                ThreadMessageCard(message = msg, isFromSelf = msg.from.equals(selfEmail, ignoreCase = true))
+            }
             sendError?.let {
                 item(key = "error") { ErrorCard(message = it) }
             }
+        }
+        when (steering) {
+            SteeringBarState.Idle -> SteeringBar(state = steering, controller = controller)
+            is SteeringBarState.AwaitingUser -> SteeringTemplateSheet(
+                onTemplateTap = { template ->
+                    reply = if (reply.isBlank()) template else "$reply\n$template"
+                }
+            )
+            SteeringBarState.Hidden -> Unit
         }
         ReplyComposer(
             reply = reply,
@@ -66,7 +120,11 @@ fun ConversationScreen(
             onSend = {
                 val trimmed = reply.trim()
                 if (trimmed.isNotBlank()) {
-                    onSendReply(trimmed)
+                    if (steering is SteeringBarState.AwaitingUser) {
+                        onSteeringIntent(SteeringIntent.Reply(steering.askId, trimmed))
+                    } else {
+                        onSendReply(trimmed)
+                    }
                     reply = ""
                 }
             }
@@ -75,7 +133,12 @@ fun ConversationScreen(
 }
 
 @Composable
-private fun HeaderCard(message: FetchedMessage, onBack: () -> Unit) {
+private fun ConversationHeaderCard(
+    conversation: Conversation,
+    isArchived: Boolean,
+    onBack: () -> Unit,
+    onArchiveToggle: () -> Unit
+) {
     ElevatedCard(
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -87,7 +150,7 @@ private fun HeaderCard(message: FetchedMessage, onBack: () -> Unit) {
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = message.subject.ifBlank { "(no subject)" },
+                    text = conversation.title,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f).testTag("conversation_subject")
                 )
@@ -95,55 +158,20 @@ private fun HeaderCard(message: FetchedMessage, onBack: () -> Unit) {
                     Text("Back")
                 }
             }
-            val senderLabel = message.fromName?.takeIf(String::isNotBlank)?.let {
-                "$it <${message.from}>"
-            } ?: message.from
             Text(
-                text = "From: $senderLabel",
+                text = "${conversation.agentDisplay} · ${conversation.messageCount} ${if (conversation.messageCount == 1) "message" else "messages"}",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (message.to.isNotEmpty()) {
-                Text(
-                    text = "To: ${message.to.joinToString(", ")}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            Row(modifier = Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SteeringChip(
+                    label = if (isArchived) "Unarchive" else "Archive",
+                    onClick = onArchiveToggle,
+                    variant = SteeringChipVariant.Default,
+                    modifier = Modifier.testTag("conversation_archive")
                 )
             }
-            message.envelope?.let { env ->
-                androidx.compose.foundation.layout.FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    KindChip(kind = env.kind)
-                    env.taskId?.let {
-                        Text(text = "task #$it", style = MaterialTheme.typography.labelMedium)
-                    }
-                }
-                env.error?.let {
-                    Text(
-                        text = "${it.code}: ${it.message}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
         }
-    }
-}
-
-@Composable
-private fun BodyCard(message: FetchedMessage) {
-    ElevatedCard(
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = message.body.ifBlank { "(no text content)" },
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp)
-        )
     }
 }
 
@@ -160,51 +188,6 @@ private fun ErrorCard(message: String) {
         ) {
             Text("Send failed", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
             Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-        }
-    }
-}
-
-@Composable
-private fun ReplyComposer(
-    reply: String,
-    onReplyChange: (String) -> Unit,
-    sending: Boolean,
-    onSend: () -> Unit
-) {
-    ElevatedCard(
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            TextField(
-                value = reply,
-                onValueChange = onReplyChange,
-                label = { Text("Reply") },
-                modifier = Modifier.fillMaxWidth().height(110.dp).testTag("conversation_reply_field"),
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(
-                    onClick = onSend,
-                    enabled = reply.isNotBlank() && !sending,
-                    modifier = Modifier.testTag("conversation_send_button")
-                ) {
-                    Text(if (sending) "Sending…" else "Send reply")
-                }
-            }
         }
     }
 }
