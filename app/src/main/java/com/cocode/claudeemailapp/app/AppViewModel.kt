@@ -106,6 +106,15 @@ class AppViewModel(
     private val _syncIntervalMs = MutableStateFlow(conversationStateStore.loadSyncIntervalMs())
     val syncIntervalMs: StateFlow<Long> = _syncIntervalMs.asStateFlow()
 
+    private val _hasSeenOnboarding = MutableStateFlow(conversationStateStore.loadHasSeenOnboarding())
+    val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding.asStateFlow()
+
+    fun markOnboardingSeen() {
+        if (_hasSeenOnboarding.value) return
+        conversationStateStore.markOnboardingSeen()
+        _hasSeenOnboarding.value = true
+    }
+
     val homeBuckets: StateFlow<HomeBuckets> = combine(conversations, _pending, _archived) { convs, pend, arc ->
         val (archivedC, liveC) = convs.partition { it.id in arc }
         val askingIds = pend.filter { it.status == PendingStatus.AWAITING_USER }

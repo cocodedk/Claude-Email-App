@@ -11,4 +11,20 @@
     <string name="template_continue">Looks good, continue</string>
     <string name="template_abort">Abort and retry</string>
     <string name="template_explain">Explain the tradeoff in more detail</string>
+
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_cta_next">Next</string>
+    <string name="onboarding_cta_start">Get started</string>
+
+    <string name="onboarding_p1_eyebrow">01 · COMMAND</string>
+    <string name="onboarding_p1_title">Email Claude. It runs the task.</string>
+    <string name="onboarding_p1_body">Send a command to your claude-email service. It spawns an agent in the target project and replies when the work is done.</string>
+
+    <string name="onboarding_p2_eyebrow">02 · CONVERSATIONS</string>
+    <string name="onboarding_p2_title">Threads, not an inbox.</string>
+    <string name="onboarding_p2_body">Each task is a conversation. Active work up top, questions waiting for you next, finished tasks archived on a swipe.</string>
+
+    <string name="onboarding_p3_eyebrow">03 · ENCRYPTED</string>
+    <string name="onboarding_p3_title">Credentials stay on device.</string>
+    <string name="onboarding_p3_body">IMAP and SMTP passwords sit in the Android Keystore. Nothing leaves the phone except mail you explicitly send.</string>
 </resources>
