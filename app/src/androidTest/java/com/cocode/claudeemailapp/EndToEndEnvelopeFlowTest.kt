@@ -21,6 +21,7 @@ import com.cocode.claudeemailapp.protocol.Kinds
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -146,14 +147,26 @@ class EndToEndEnvelopeFlowTest {
         val ackEnv = ack!!.envelope!!
         assertEquals(Kinds.ACK, ackEnv.kind)
         assertNotNull("ack should carry task_id", ackEnv.taskId)
-        println("E2E ack: taskId=${ackEnv.taskId} body=${ackEnv.body}")
+        assertTrue(
+            "ack subject should echo the outbound identifier tag — got '${ack.subject}'",
+            ack.subject.contains(identifier)
+        )
+        println("E2E ack: taskId=${ackEnv.taskId} subj='${ack.subject}' body=${ackEnv.body}")
 
         val result = awaitReplyEnvelope(fetcher, c, originalId, Kinds.RESULT, timeoutMs = 120_000)
         assertNotNull("no result envelope within 120s (messageId=$originalId)", result)
         val resultEnv = result!!.envelope!!
         assertEquals(Kinds.RESULT, resultEnv.kind)
         assertEquals("result should reference same task", ackEnv.taskId, resultEnv.taskId)
-        println("E2E result: taskId=${resultEnv.taskId} data=${resultEnv.data} body=${resultEnv.body}")
+        // Subject-tag symmetry canary: the mailer must reuse the inbound
+        // subject tag on the RESULT path the same way it does on the ACK
+        // path. This assertion fails against backends that rebuild the
+        // RESULT subject from a project-slug template and drop the tag.
+        assertTrue(
+            "result subject should echo the outbound identifier tag (symmetry with ack) — got '${result.subject}'",
+            result.subject.contains(identifier)
+        )
+        println("E2E result: taskId=${resultEnv.taskId} subj='${result.subject}' data=${resultEnv.data} body=${resultEnv.body}")
     }
 
     private fun resetToSetupIfNeeded() {
