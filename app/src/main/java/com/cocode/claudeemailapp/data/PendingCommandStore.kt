@@ -105,6 +105,23 @@ internal class SharedPrefsPendingCommandStore(
                 lastUpdatedAt = now,
                 lastError = envelope.error?.let { "${it.code}: ${it.message}" } ?: matched.lastError
             )
+            Kinds.STATUS -> {
+                val reported = envelope.data.string("status")
+                // Locked two-state enum from backend. Unknown values leave status unchanged
+                // (forward-compat — future additions won't crash the UI).
+                val mapped = when (reported) {
+                    "stalled" -> PendingStatus.STALLED
+                    "waiting-on-peer" -> PendingStatus.WAITING_ON_PEER
+                    else -> matched.status
+                }
+                matched.copy(
+                    taskId = envelope.taskId ?: matched.taskId,
+                    status = mapped,
+                    lastUpdatedAt = now,
+                    reason = envelope.data.string("reason") ?: matched.reason,
+                    retryAfterSeconds = envelope.data.int("retry_after_seconds") ?: matched.retryAfterSeconds
+                )
+            }
             else -> matched
         }
         add(updated)
@@ -113,6 +130,10 @@ internal class SharedPrefsPendingCommandStore(
 
     private fun JsonObject?.string(key: String): String? = this?.get(key)?.let {
         runCatching { it.jsonPrimitive.content }.getOrNull()
+    }
+
+    private fun JsonObject?.int(key: String): Int? = this?.get(key)?.let {
+        runCatching { it.jsonPrimitive.content.toInt() }.getOrNull()
     }
 
     companion object {
