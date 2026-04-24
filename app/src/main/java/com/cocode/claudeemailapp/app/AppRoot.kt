@@ -32,7 +32,7 @@ import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
-enum class Screen { Home, Setup, Settings, Conversation, Compose, Diagnostics }
+enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,16 +46,30 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
     val probe by viewModel.probe.collectAsState()
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
+    val hasSeenOnboarding by viewModel.hasSeenOnboarding.collectAsState()
 
-    var screen by rememberSaveable { mutableStateOf(if (credentials == null) Screen.Setup else Screen.Home) }
+    var screen by rememberSaveable {
+        mutableStateOf(
+            when {
+                !hasSeenOnboarding -> Screen.Onboarding
+                credentials == null -> Screen.Setup
+                else -> Screen.Home
+            }
+        )
+    }
     var editingCredentials by rememberSaveable { mutableStateOf(false) }
     var selectedConversationId by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(credentials) {
+    LaunchedEffect(credentials, hasSeenOnboarding) {
+        if (!hasSeenOnboarding) {
+            screen = Screen.Onboarding
+            return@LaunchedEffect
+        }
         if (credentials != null && screen == Screen.Setup && !editingCredentials) screen = Screen.Home
-        if (credentials == null) screen = Screen.Setup
+        if (credentials == null && screen == Screen.Onboarding) screen = Screen.Setup
+        if (credentials == null && screen != Screen.Onboarding && screen != Screen.Setup) screen = Screen.Setup
     }
 
     DisposableEffect(credentials) {
@@ -94,7 +108,11 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { AppTopBar(screen = screen, editingCredentials = editingCredentials) }
+        topBar = {
+            if (screen != Screen.Onboarding) {
+                AppTopBar(screen = screen, editingCredentials = editingCredentials)
+            }
+        }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(innerPadding)) {
             AppNavHost(
@@ -127,6 +145,7 @@ private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
         title = {
             Text(
                 text = when (screen) {
+                    Screen.Onboarding -> ""
                     Screen.Setup -> if (editingCredentials) "Edit credentials" else "Setup"
                     Screen.Home -> "Claude Email"
                     Screen.Settings -> "Settings"
@@ -162,6 +181,12 @@ private fun AppNavHost(
     viewModel: AppViewModel
 ) {
     when (screen) {
+        Screen.Onboarding -> OnboardingScreen(
+            onFinish = {
+                viewModel.markOnboardingSeen()
+                onScreenChange(if (credentials == null) Screen.Setup else Screen.Home)
+            }
+        )
         Screen.Setup -> SetupScreen(
             viewModel = viewModel,
             initial = if (editingCredentials) credentials else null

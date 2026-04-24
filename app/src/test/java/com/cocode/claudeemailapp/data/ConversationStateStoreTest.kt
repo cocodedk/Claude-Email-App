@@ -47,4 +47,22 @@ class ConversationStateStoreTest {
         store.saveArchivedIds(setOf("<c>"))
         assertEquals(setOf("<c>"), store.loadArchivedIds())
     }
+
+    @Test
+    fun loadHasSeenOnboarding_falseByDefault() {
+        org.junit.Assert.assertFalse(store.loadHasSeenOnboarding())
+    }
+
+    @Test
+    fun markOnboardingSeen_persistsTrue() {
+        store.markOnboardingSeen()
+        org.junit.Assert.assertTrue(store.loadHasSeenOnboarding())
+    }
+
+    @Test
+    fun markOnboardingSeen_isIdempotent() {
+        store.markOnboardingSeen()
+        store.markOnboardingSeen()
+        org.junit.Assert.assertTrue(store.loadHasSeenOnboarding())
+    }
 }
