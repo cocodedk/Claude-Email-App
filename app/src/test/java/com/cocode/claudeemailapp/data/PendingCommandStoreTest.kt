@@ -176,6 +176,91 @@ class PendingCommandStoreTest {
     }
 
     @Test
+    fun applyInbound_status_stalled_setsStatusAndReasonAndRetryAfter() {
+        store.add(pending(id = "<m1@x>", taskId = 42, status = PendingStatus.RUNNING))
+        val env = Envelope(
+            kind = Kinds.STATUS,
+            taskId = 42,
+            data = buildJsonObject {
+                put("status", "stalled")
+                put("reason", "wake turn failed (3x)")
+                put("retry_after_seconds", 30)
+            }
+        )
+        val updated = store.applyInbound(env, "<m1@x>")!!
+        assertEquals(PendingStatus.STALLED, updated.status)
+        assertEquals("wake turn failed (3x)", updated.reason)
+        assertEquals(30, updated.retryAfterSeconds)
+        assertNull(updated.lastError)
+    }
+
+    @Test
+    fun applyInbound_status_waitingOnPeer_setsStatusAndReason_leavesLastErrorAlone() {
+        val priorError = "previous failure"
+        store.add(pending(id = "<m1@x>", taskId = 7, status = PendingStatus.RUNNING).copy(lastError = priorError))
+        val env = Envelope(
+            kind = Kinds.STATUS,
+            taskId = 7,
+            data = buildJsonObject {
+                put("status", "waiting-on-peer")
+                put("reason", "awaiting user answer")
+            }
+        )
+        val updated = store.applyInbound(env, "<m1@x>")!!
+        assertEquals(PendingStatus.WAITING_ON_PEER, updated.status)
+        assertEquals("awaiting user answer", updated.reason)
+        assertEquals(priorError, updated.lastError)
+    }
+
+    @Test
+    fun applyInbound_status_unknownValue_leavesStatusUnchanged() {
+        store.add(pending(id = "<m1@x>", taskId = 5, status = PendingStatus.RUNNING))
+        val env = Envelope(
+            kind = Kinds.STATUS,
+            taskId = 5,
+            data = buildJsonObject { put("status", "futuristic") }
+        )
+        val updated = store.applyInbound(env, "<m1@x>")!!
+        assertEquals(PendingStatus.RUNNING, updated.status)
+    }
+
+    @Test
+    fun applyInbound_status_preservesReasonWhenAbsent() {
+        store.add(
+            pending(id = "<m1@x>", taskId = 11, status = PendingStatus.STALLED)
+                .copy(reason = "old reason")
+        )
+        val env = Envelope(
+            kind = Kinds.STATUS,
+            taskId = 11,
+            data = buildJsonObject { put("status", "stalled") }
+        )
+        val updated = store.applyInbound(env, "<m1@x>")!!
+        assertEquals("old reason", updated.reason)
+    }
+
+    @Test
+    fun applyInbound_status_doesNotBlockDoneTransitionLater() {
+        store.add(pending(id = "<m1@x>", taskId = 99, status = PendingStatus.RUNNING))
+        val stalled = Envelope(
+            kind = Kinds.STATUS,
+            taskId = 99,
+            data = buildJsonObject {
+                put("status", "stalled")
+                put("reason", "wake turn failed (1x)")
+            }
+        )
+        store.applyInbound(stalled, "<m1@x>")
+        val result = Envelope(
+            kind = Kinds.RESULT,
+            taskId = 99,
+            data = buildJsonObject { put("status", "done") }
+        )
+        val afterResult = store.applyInbound(result, "<m1@x>")!!
+        assertEquals(PendingStatus.DONE, afterResult.status)
+    }
+
+    @Test
     fun defaultFactoryReturnsSharedPrefsImpl() {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
         val s = PendingCommandStore(ctx)

@@ -109,6 +109,16 @@ internal fun PendingSummary(
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
+                    pendingReasonLine(p.reason, p.retryAfterSeconds)?.let { line ->
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
                     PendingRowActions(p = p, onRetry = onRetry, onCancel = onCancel)
                 }
             }
@@ -120,7 +130,9 @@ internal val RETRYABLE_STATUSES = setOf(PendingStatus.FAILED, PendingStatus.ERRO
 internal val CANCELLABLE_STATUSES = setOf(
     PendingStatus.QUEUED,
     PendingStatus.RUNNING,
-    PendingStatus.AWAITING_USER
+    PendingStatus.AWAITING_USER,
+    PendingStatus.STALLED,
+    PendingStatus.WAITING_ON_PEER
 )
 
 internal fun isRetryable(p: PendingCommand): Boolean = p.status in RETRYABLE_STATUSES
@@ -198,3 +210,10 @@ internal fun EmptyBucketCard(
 
 private fun pluralize(n: Int, singular: String): String =
     if (n == 1) "1 $singular" else "$n ${singular}s"
+
+internal fun pendingReasonLine(reason: String?, retryAfterSeconds: Int?): String? {
+    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { "retry in ${it}s" }
+    return listOfNotNull(reason?.takeIf(String::isNotBlank), countdown)
+        .takeIf { it.isNotEmpty() }
+        ?.joinToString(" · ")
+}
