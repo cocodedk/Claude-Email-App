@@ -65,4 +65,41 @@ class ConversationStateStoreTest {
         store.markOnboardingSeen()
         org.junit.Assert.assertTrue(store.loadHasSeenOnboarding())
     }
+
+    @Test
+    fun loadRecentProjects_emptyByDefault() {
+        assertTrue(store.loadRecentProjects().isEmpty())
+    }
+
+    @Test
+    fun pushRecentProject_mostRecentFirst() {
+        store.pushRecentProject("alpha")
+        store.pushRecentProject("beta")
+        assertEquals(listOf("beta", "alpha"), store.loadRecentProjects())
+    }
+
+    @Test
+    fun pushRecentProject_deduplicatesByValue() {
+        store.pushRecentProject("alpha")
+        store.pushRecentProject("beta")
+        store.pushRecentProject("alpha")
+        assertEquals(listOf("alpha", "beta"), store.loadRecentProjects())
+    }
+
+    @Test
+    fun pushRecentProject_trimsAndIgnoresBlank() {
+        store.pushRecentProject("  alpha  ")
+        store.pushRecentProject("")
+        store.pushRecentProject("   ")
+        assertEquals(listOf("alpha"), store.loadRecentProjects())
+    }
+
+    @Test
+    fun pushRecentProject_capsAtFive() {
+        repeat(7) { store.pushRecentProject("p$it") }
+        assertEquals(
+            listOf("p6", "p5", "p4", "p3", "p2"),
+            store.loadRecentProjects()
+        )
+    }
 }
