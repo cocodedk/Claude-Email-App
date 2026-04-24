@@ -67,9 +67,15 @@ internal fun HeroCard(
 }
 
 @Composable
-internal fun PendingSummary(pending: List<PendingCommand>) {
-    val live = pending.filter { it.status !in setOf(PendingStatus.DONE, PendingStatus.FAILED, PendingStatus.ERROR) }
-    if (live.isEmpty()) return
+internal fun PendingSummary(
+    pending: List<PendingCommand>,
+    onRetry: (PendingCommand) -> Unit = {},
+    onCancel: (PendingCommand) -> Unit = {}
+) {
+    // Show in-flight AND recently-failed rows so the user can retry/cancel
+    // them without digging into Diagnostics.
+    val visible = pending.filter { it.status != PendingStatus.DONE }
+    if (visible.isEmpty()) return
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
@@ -80,12 +86,12 @@ internal fun PendingSummary(pending: List<PendingCommand>) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Pending — ${live.size}",
+                text = "Pending — ${visible.size}",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            for (p in live.take(3)) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            for (p in visible.take(3)) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         StatusChip(status = p.status)
                         p.taskId?.let {
@@ -113,8 +119,47 @@ internal fun PendingSummary(pending: List<PendingCommand>) {
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }
+                    PendingRowActions(p = p, onRetry = onRetry, onCancel = onCancel)
                 }
             }
+        }
+    }
+}
+
+internal val RETRYABLE_STATUSES = setOf(PendingStatus.FAILED, PendingStatus.ERROR)
+internal val CANCELLABLE_STATUSES = setOf(
+    PendingStatus.QUEUED,
+    PendingStatus.RUNNING,
+    PendingStatus.AWAITING_USER,
+    PendingStatus.STALLED,
+    PendingStatus.WAITING_ON_PEER
+)
+
+internal fun isRetryable(p: PendingCommand): Boolean = p.status in RETRYABLE_STATUSES
+internal fun isCancellable(p: PendingCommand): Boolean =
+    p.status in CANCELLABLE_STATUSES && p.taskId != null
+
+@Composable
+private fun PendingRowActions(
+    p: PendingCommand,
+    onRetry: (PendingCommand) -> Unit,
+    onCancel: (PendingCommand) -> Unit
+) {
+    val retry = isRetryable(p)
+    val cancel = isCancellable(p)
+    if (!retry && !cancel) return
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (retry) {
+            TextButton(
+                onClick = { onRetry(p) },
+                modifier = Modifier.testTag("pending_retry_${p.messageId}")
+            ) { Text("Retry") }
+        }
+        if (cancel) {
+            TextButton(
+                onClick = { onCancel(p) },
+                modifier = Modifier.testTag("pending_cancel_${p.messageId}")
+            ) { Text("Cancel") }
         }
     }
 }
