@@ -137,16 +137,28 @@ internal fun HomeErrorCard(message: String) {
 }
 
 @Composable
-internal fun EmptyBucketCard(filter: AppViewModel.HomeFilter) {
+internal fun EmptyBucketCard(
+    filter: AppViewModel.HomeFilter,
+    onCompose: () -> Unit = {}
+) {
     val (heading, body) = when (filter) {
         AppViewModel.HomeFilter.ACTIVE -> "Nothing active" to "Send a command to your claude-email service and the reply will land here."
         AppViewModel.HomeFilter.WAITING -> "No conversations need a reply" to "When the agent asks a question, it will show up here."
         AppViewModel.HomeFilter.ARCHIVED -> "Archive is empty" to "Swipe a conversation left to archive it."
     }
     Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
             Text(heading, style = MaterialTheme.typography.titleMedium)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (filter == AppViewModel.HomeFilter.ACTIVE) {
+                Button(
+                    onClick = onCompose,
+                    modifier = Modifier.testTag("empty_active_send_cta")
+                ) { Text("Send first command") }
+            }
         }
     }
 }
