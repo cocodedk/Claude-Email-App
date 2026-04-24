@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -45,7 +46,7 @@ internal fun ThreadMessageCard(
     onEditCommand: () -> Unit = {},
     onOpenDiagnostics: () -> Unit = {}
 ) {
-    val container = if (isFromSelf) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+    val container = if (isFromSelf) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     var expanded by remember(message.messageId) { mutableStateOf(false) }
@@ -53,44 +54,54 @@ internal fun ThreadMessageCard(
     val isLong = body.length > LONG_BODY_THRESHOLD
     val visible = if (isLong && !expanded) body.take(LONG_BODY_PREVIEW_CHARS) else body
     val envError = message.envelope?.error
+    // Asymmetric corner tail on the sending side — signals direction at a glance.
+    val shape = RoundedCornerShape(
+        topStart = 20.dp,
+        topEnd = 20.dp,
+        bottomStart = if (isFromSelf) 20.dp else 6.dp,
+        bottomEnd = if (isFromSelf) 6.dp else 20.dp
+    )
 
-    ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = container),
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("thread_message_card")
-            .combinedClickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {},
-                onLongClick = {
-                    clipboard.setText(AnnotatedString(message.body))
-                    Toast.makeText(context, "Copied message", Toast.LENGTH_SHORT).show()
-                }
-            )
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            HeaderRow(message, isFromSelf)
-            EnvelopeRow(message)
-            if (envError != null) {
-                EnvelopeErrorBanner(
-                    error = envError,
-                    onRetry = onRetry,
-                    onOpenSettings = onOpenSettings,
-                    onEditCommand = onEditCommand,
-                    onOpenDiagnostics = onOpenDiagnostics
+    Box(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(
+            shape = shape,
+            colors = CardDefaults.elevatedCardColors(containerColor = container),
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .align(if (isFromSelf) Alignment.CenterEnd else Alignment.CenterStart)
+                .testTag("thread_message_card")
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {},
+                    onLongClick = {
+                        clipboard.setText(AnnotatedString(message.body))
+                        Toast.makeText(context, "Copied message", Toast.LENGTH_SHORT).show()
+                    }
                 )
-            } else {
-                Text(text = visible, style = MaterialTheme.typography.bodyLarge)
-                if (isLong) {
-                    TextButton(
-                        onClick = { expanded = !expanded },
-                        modifier = Modifier.testTag("thread_message_expand_toggle")
-                    ) { Text(if (expanded) "Collapse" else "Expand · ${body.length - LONG_BODY_PREVIEW_CHARS} more chars") }
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                HeaderRow(message, isFromSelf)
+                EnvelopeRow(message)
+                if (envError != null) {
+                    EnvelopeErrorBanner(
+                        error = envError,
+                        onRetry = onRetry,
+                        onOpenSettings = onOpenSettings,
+                        onEditCommand = onEditCommand,
+                        onOpenDiagnostics = onOpenDiagnostics
+                    )
+                } else {
+                    Text(text = visible, style = MaterialTheme.typography.bodyLarge)
+                    if (isLong) {
+                        TextButton(
+                            onClick = { expanded = !expanded },
+                            modifier = Modifier.testTag("thread_message_expand_toggle")
+                        ) { Text(if (expanded) "Collapse" else "Expand · ${body.length - LONG_BODY_PREVIEW_CHARS} more chars") }
+                    }
                 }
             }
         }
