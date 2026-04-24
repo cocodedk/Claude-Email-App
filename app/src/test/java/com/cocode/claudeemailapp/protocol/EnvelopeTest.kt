@@ -113,13 +113,13 @@ class EnvelopeTest {
     }
 
     @Test
-    fun errorCodes_allDistinct() {
+    fun errorCodes_lockedEnum_isNineDistinctCodes() {
         val codes = listOf(
-            ErrorCodes.BAD_ENVELOPE, ErrorCodes.UNAUTHORIZED, ErrorCodes.UNKNOWN_KIND,
-            ErrorCodes.PROJECT_NOT_FOUND, ErrorCodes.TASK_NOT_FOUND, ErrorCodes.INVALID_STATE,
-            ErrorCodes.RATE_LIMITED, ErrorCodes.INTERNAL
+            ErrorCodes.BAD_ENVELOPE, ErrorCodes.UNKNOWN_KIND, ErrorCodes.UNAUTHORIZED,
+            ErrorCodes.FORBIDDEN, ErrorCodes.PROJECT_NOT_FOUND, ErrorCodes.INVALID_STATE,
+            ErrorCodes.NOT_IMPLEMENTED, ErrorCodes.RATE_LIMITED, ErrorCodes.INTERNAL
         )
-        assertEquals(codes.size, codes.toSet().size)
+        assertEquals(9, codes.toSet().size)
     }
 
     @Test

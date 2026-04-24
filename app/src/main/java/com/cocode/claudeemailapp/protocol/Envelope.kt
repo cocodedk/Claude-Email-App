@@ -53,16 +53,28 @@ data class EnvelopeMeta(
 @Serializable
 data class EnvelopeError(
     val code: String,
-    val message: String
+    val message: String,
+    /** Server signal: true = transient, retry may succeed; false = permanent. Null = unknown (legacy payloads). */
+    val retryable: Boolean? = null,
+    /** Optional next-step copy the client renders verbatim. */
+    val hint: String? = null,
+    /** Optional rate_limited backoff floor; client waits at least this long before retrying. */
+    @SerialName("retry_after_seconds") val retryAfterSeconds: Int? = null
 )
 
+/**
+ * Locked 9-code enum (claude-email JSON envelope v1). Unknown incoming codes
+ * are treated as [INTERNAL] by [classifyErrorCode]; emitting unknown codes is
+ * prevented server-side.
+ */
 object ErrorCodes {
     const val BAD_ENVELOPE = "bad_envelope"
-    const val UNAUTHORIZED = "unauthorized"
     const val UNKNOWN_KIND = "unknown_kind"
+    const val UNAUTHORIZED = "unauthorized"
+    const val FORBIDDEN = "forbidden"
     const val PROJECT_NOT_FOUND = "project_not_found"
-    const val TASK_NOT_FOUND = "task_not_found"
     const val INVALID_STATE = "invalid_state"
+    const val NOT_IMPLEMENTED = "not_implemented"
     const val RATE_LIMITED = "rate_limited"
     const val INTERNAL = "internal"
 }
