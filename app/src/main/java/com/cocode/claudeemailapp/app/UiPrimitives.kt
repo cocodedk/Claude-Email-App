@@ -40,6 +40,8 @@ fun StatusChip(status: String) {
         PendingStatus.QUEUED -> "queued" to MaterialTheme.colorScheme.tertiary
         PendingStatus.RUNNING -> "running" to MaterialTheme.colorScheme.primary
         PendingStatus.AWAITING_USER -> "needs reply" to MaterialTheme.colorScheme.secondary
+        PendingStatus.STALLED -> "stalled" to MaterialTheme.colorScheme.tertiary
+        PendingStatus.WAITING_ON_PEER -> "waiting on peer" to MaterialTheme.colorScheme.secondary
         PendingStatus.DONE -> "done" to MaterialTheme.colorScheme.primary
         PendingStatus.FAILED -> "failed" to MaterialTheme.colorScheme.error
         PendingStatus.ERROR -> "error" to MaterialTheme.colorScheme.error
