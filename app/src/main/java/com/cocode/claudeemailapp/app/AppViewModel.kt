@@ -6,6 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.cocode.claudeemailapp.app.steering.SteeringIntent
+import com.cocode.claudeemailapp.app.steering.envelopeForSteering
+import com.cocode.claudeemailapp.data.Conversation
+import com.cocode.claudeemailapp.data.ConversationGrouper
+import com.cocode.claudeemailapp.data.ConversationStateStore
 import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
@@ -25,8 +30,11 @@ import com.cocode.claudeemailapp.protocol.envelope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -36,13 +44,29 @@ class AppViewModel(
     private val mailSender: MailSender,
     private val mailFetcher: MailFetcher,
     private val mailProbe: MailProbe,
-    private val pendingStore: PendingCommandStore
+    private val pendingStore: PendingCommandStore,
+    private val conversationStateStore: ConversationStateStore
 ) : AndroidViewModel(application) {
+
+    enum class HomeFilter { ACTIVE, WAITING, ARCHIVED }
+
+    data class HomeBuckets(
+        val active: List<Conversation> = emptyList(),
+        val waiting: List<Conversation> = emptyList(),
+        val archived: List<Conversation> = emptyList()
+    ) {
+        operator fun get(filter: HomeFilter): List<Conversation> = when (filter) {
+            HomeFilter.ACTIVE -> active
+            HomeFilter.WAITING -> waiting
+            HomeFilter.ARCHIVED -> archived
+        }
+    }
 
     data class InboxState(
         val loading: Boolean = false,
         val messages: List<FetchedMessage> = emptyList(),
-        val error: String? = null
+        val error: String? = null,
+        val lastFetchedAt: Long? = null
     )
 
     data class ProbeState(
@@ -71,14 +95,52 @@ class AppViewModel(
     private val _pending = MutableStateFlow(pendingStore.all())
     val pending: StateFlow<List<PendingCommand>> = _pending.asStateFlow()
 
+    val conversations: StateFlow<List<Conversation>> = combine(_inbox, _credentials) { inbox, creds ->
+        if (creds == null) emptyList()
+        else ConversationGrouper.group(inbox.messages, creds.emailAddress)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    private val _archived = MutableStateFlow(conversationStateStore.loadArchivedIds())
+    val archived: StateFlow<Set<String>> = _archived.asStateFlow()
+
+    private val _syncIntervalMs = MutableStateFlow(conversationStateStore.loadSyncIntervalMs())
+    val syncIntervalMs: StateFlow<Long> = _syncIntervalMs.asStateFlow()
+
+    val homeBuckets: StateFlow<HomeBuckets> = combine(conversations, _pending, _archived) { convs, pend, arc ->
+        val (archivedC, liveC) = convs.partition { it.id in arc }
+        val askingIds = pend.filter { it.status == PendingStatus.AWAITING_USER }
+            .map { it.messageId }.toSet()
+        val (waiting, active) = liveC.partition { c ->
+            c.messages.any { it.messageId in askingIds }
+        }
+        HomeBuckets(active = active, waiting = waiting, archived = archivedC)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeBuckets())
+
+    fun setSyncIntervalMs(ms: Long) {
+        if (ms == _syncIntervalMs.value) return
+        _syncIntervalMs.value = ms
+        conversationStateStore.saveSyncIntervalMs(ms)
+        stopInboxPolling()
+        if (ms > 0) startInboxPolling(ms)
+    }
+
+    fun setConversationArchived(conversationId: String, archived: Boolean) {
+        val current = _archived.value
+        val updated = if (archived) current + conversationId else current - conversationId
+        if (updated == current) return
+        _archived.value = updated
+        conversationStateStore.saveArchivedIds(updated)
+    }
+
     private var pollingJob: Job? = null
 
     init {
         if (_credentials.value != null) refreshInbox()
     }
 
-    fun startInboxPolling(intervalMs: Long = 45_000L) {
+    fun startInboxPolling(intervalMs: Long = _syncIntervalMs.value) {
         if (pollingJob?.isActive == true) return
+        if (intervalMs <= 0) return
         pollingJob = viewModelScope.launch {
             while (isActive) {
                 delay(intervalMs)
@@ -115,7 +177,11 @@ class AppViewModel(
             _inbox.value = _inbox.value.copy(loading = true, error = null)
             try {
                 val messages = mailFetcher.fetchRecent(creds, count = 50)
-                _inbox.value = InboxState(loading = false, messages = messages)
+                _inbox.value = InboxState(
+                    loading = false,
+                    messages = messages,
+                    lastFetchedAt = System.currentTimeMillis()
+                )
                 reconcilePending(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)
@@ -198,11 +264,39 @@ class AppViewModel(
                         to = to,
                         subject = subject,
                         kind = envelope.kind,
-                        bodyPreview = body.take(200)
+                        bodyPreview = body.take(200),
+                        project = project
                     )
                     pendingStore.add(pending)
                     _pending.value = pendingStore.all()
                 }
+                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
+                refreshInbox()
+            } catch (e: MailException) {
+                _send.value = SendState(sending = false, lastError = e.message)
+            } catch (t: Throwable) {
+                _send.value = SendState(sending = false, lastError = t.message)
+            }
+        }
+    }
+
+    fun dispatchSteering(pending: PendingCommand, intent: SteeringIntent) {
+        val creds = _credentials.value ?: return
+        val envelope = envelopeForSteering(
+            pending = pending,
+            intent = intent,
+            auth = creds.sharedSecret.takeIf(String::isNotBlank)
+        ) ?: return
+        viewModelScope.launch {
+            _send.value = SendState(sending = true)
+            try {
+                val outgoing = OutgoingMessage.envelope(
+                    to = pending.to,
+                    subject = "Re: ${pending.subject}",
+                    envelope = envelope,
+                    inReplyTo = pending.messageId.takeIf(String::isNotBlank)
+                )
+                val result = mailSender.send(creds, outgoing)
                 _send.value = SendState(sending = false, justSentMessageId = result.messageId)
                 refreshInbox()
             } catch (e: MailException) {
@@ -236,7 +330,8 @@ class AppViewModel(
                     mailSender = SmtpMailSender(),
                     mailFetcher = ImapMailFetcher(),
                     mailProbe = MailProbe(),
-                    pendingStore = PendingCommandStore(app)
+                    pendingStore = PendingCommandStore(app),
+                    conversationStateStore = ConversationStateStore(app)
                 )
             }
         }

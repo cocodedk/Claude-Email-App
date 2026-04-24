@@ -11,6 +11,20 @@ Android email client for the claude-email backend service. Receives over IMAP, s
 
 ---
 
+## Backend Peer
+
+The claude-email backend is the SMTP/IMAP relay this app talks to. It runs as a systemd user service and has its own Claude agent for cross-repo coordination.
+
+- **Repo**: `/home/cocodedk/0-projects/claude-email` (Python)
+- **Service**: `claude-email.service` (user unit) — logs via `journalctl --user -u claude-email.service`
+- **Claude-chat agent**: `agent-claude-email` (I am `agent-Claude-Email-App`)
+- **Wire contract**: subject-tag identifiers (`[steer-<ms>]`, `[agent-<slug>]`) + RFC threading via Message-ID / In-Reply-To / References
+- **Split of concerns**: subject-rebuild/template logic lives in `src/mailer.py` on their side; envelope parsing + PendingCommandStore live in `mail/` + `data/` on ours
+
+Coordinate via `mcp__claude-chat__chat_message_agent` when a change spans both sides (e.g. protocol tweaks, regression captures, fix ownership). Peer agent tails journalctl and captures server-side timings on request.
+
+---
+
 ## Required Skills — ALWAYS Invoke These
 
 | Situation | Skill |

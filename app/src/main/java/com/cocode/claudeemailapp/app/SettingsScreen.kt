@@ -3,6 +3,7 @@ package com.cocode.claudeemailapp.app
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -23,12 +26,24 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.data.MailCredentials
 
+data class SyncOption(val ms: Long, val label: String)
+
+val SyncOptions = listOf(
+    SyncOption(0L, "Manual"),
+    SyncOption(30_000L, "30 sec"),
+    SyncOption(60_000L, "1 min"),
+    SyncOption(300_000L, "5 min")
+)
+
 @Composable
 fun SettingsScreen(
     credentials: MailCredentials,
+    syncIntervalMs: Long,
+    onSyncIntervalChange: (Long) -> Unit,
     onBack: () -> Unit,
     onSignOut: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onOpenDiagnostics: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag("settings_screen"),
@@ -60,10 +75,16 @@ fun SettingsScreen(
             Entry("Address", credentials.serviceAddress.ifBlank { "(not set)" })
             Entry("Shared secret", if (credentials.sharedSecret.isBlank()) "(not set)" else "••••••")
         } }
+        item { SectionCard("Sync") {
+            SyncIntervalPicker(selectedMs = syncIntervalMs, onSelect = onSyncIntervalChange)
+        } }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(onClick = onEdit, modifier = Modifier.testTag("settings_edit")) {
                     Text("Edit credentials")
+                }
+                OutlinedButton(onClick = onOpenDiagnostics, modifier = Modifier.testTag("settings_diagnostics")) {
+                    Text("Diagnostics")
                 }
                 TextButton(onClick = onSignOut, modifier = Modifier.testTag("settings_signout")) {
                     Text("Sign out")
@@ -96,4 +117,29 @@ private fun ColumnScope.Entry(label: String, value: String) {
         Text(text = label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
+}
+
+@Composable
+private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) -> Unit) {
+    Text(
+        text = "Auto-refresh inbox",
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SyncOptions.forEach { opt ->
+            FilterChip(
+                selected = opt.ms == selectedMs,
+                onClick = { onSelect(opt.ms) },
+                label = { Text(opt.label) },
+                colors = FilterChipDefaults.filterChipColors(),
+                modifier = Modifier.testTag("settings_sync_${opt.ms}")
+            )
+        }
+    }
+    Text(
+        text = "Pull-to-refresh on Home works regardless of this setting.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }

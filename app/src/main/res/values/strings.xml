@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Claude Email App</string>
+
+    <string name="steering_chip_status">Status</string>
+    <string name="steering_chip_cancel">Cancel</string>
+    <string name="steering_chip_cancel_confirm">Cancel · confirm</string>
+    <string name="steering_chip_more">More</string>
+    <string name="steering_chip_sending">Sending…</string>
+
+    <string name="steering_templates_heading">Reply templates</string>
+    <string name="template_continue">Looks good, continue</string>
+    <string name="template_abort">Abort and retry</string>
+    <string name="template_explain">Explain the tradeoff in more detail</string>
 </resources>
