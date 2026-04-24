@@ -32,7 +32,11 @@ data class PendingCommand(
     /** Set when the backend asks a question (kind=question); echo back as meta.ask_id on reply. */
     val askId: String? = null,
     /** Originating project name, captured from the outbound command; needed for cancel/reset steering intents. */
-    val project: String? = null
+    val project: String? = null,
+    /** Short backend-provided description of why we're stalled or waiting; set by kind=status. */
+    val reason: String? = null,
+    /** Stalled-only: ETA (seconds) before wake_watcher auto-fails the task. Set by kind=status. */
+    @SerialName("retry_after_seconds") val retryAfterSeconds: Int? = null
 )
 
 object PendingStatus {
@@ -40,6 +44,8 @@ object PendingStatus {
     const val QUEUED = "queued"
     const val RUNNING = "running"
     const val AWAITING_USER = "awaiting_user"
+    const val STALLED = "stalled"
+    const val WAITING_ON_PEER = "waiting-on-peer"
     const val DONE = "done"
     const val FAILED = "failed"
     const val ERROR = "error"

@@ -85,22 +85,34 @@ internal fun PendingSummary(pending: List<PendingCommand>) {
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             for (p in live.take(3)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    StatusChip(status = p.status)
-                    p.taskId?.let {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        StatusChip(status = p.status)
+                        p.taskId?.let {
+                            Text(
+                                text = "#$it",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
                         Text(
-                            text = "#$it",
-                            style = MaterialTheme.typography.labelMedium,
+                            text = p.bodyPreview.take(80).replace('\n', ' '),
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
-                    Text(
-                        text = p.bodyPreview.take(80).replace('\n', ' '),
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    pendingReasonLine(p.reason, p.retryAfterSeconds)?.let { line ->
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
                 }
             }
         }
@@ -141,3 +153,10 @@ internal fun EmptyBucketCard(filter: AppViewModel.HomeFilter) {
 
 private fun pluralize(n: Int, singular: String): String =
     if (n == 1) "1 $singular" else "$n ${singular}s"
+
+internal fun pendingReasonLine(reason: String?, retryAfterSeconds: Int?): String? {
+    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { "retry in ${it}s" }
+    return listOfNotNull(reason?.takeIf(String::isNotBlank), countdown)
+        .takeIf { it.isNotEmpty() }
+        ?.joinToString(" · ")
+}
