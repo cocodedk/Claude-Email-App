@@ -79,10 +79,11 @@ class AppViewModelTest {
     }
 
     private class FakeConversationStateStore(
+        initialSyncMs: Long = 60_000L,
         private var onboardingSeen: Boolean = false
     ) : com.cocode.claudeemailapp.data.ConversationStateStore {
         private var ids: Set<String> = emptySet()
-        private var syncMs: Long = 60_000L
+        private var syncMs: Long = initialSyncMs
         override fun loadArchivedIds(): Set<String> = ids
         override fun saveArchivedIds(ids: Set<String>) { this.ids = ids.toSet() }
         override fun loadSyncIntervalMs(): Long = syncMs
@@ -376,4 +377,42 @@ class AppViewModelTest {
         references = emptyList(),
         isSeen = false
     )
+
+    @Test
+    fun effectivePoll_foregroundWithUserPref_returnsFifteenSecondFloor() = runTest(dispatcher) {
+        val state = FakeConversationStateStore(initialSyncMs = 60_000L)
+        val vm = buildVm(conversationState = state)
+        advanceUntilIdle()
+        assertEquals(AppViewModel.FOREGROUND_POLL_INTERVAL_MS, vm.effectivePollIntervalMs())
+    }
+
+    @Test
+    fun effectivePoll_backgroundReturnsUserPref() = runTest(dispatcher) {
+        val state = FakeConversationStateStore(initialSyncMs = 300_000L)
+        val vm = buildVm(conversationState = state)
+        advanceUntilIdle()
+        vm.setForegroundActive(false)
+        assertEquals(300_000L, vm.effectivePollIntervalMs())
+    }
+
+    @Test
+    fun effectivePoll_manualUserPref_returnsZeroRegardlessOfState() = runTest(dispatcher) {
+        val state = FakeConversationStateStore(initialSyncMs = 0L)
+        val vm = buildVm(conversationState = state)
+        advanceUntilIdle()
+        assertEquals(0L, vm.effectivePollIntervalMs())
+        vm.setForegroundActive(false)
+        assertEquals(0L, vm.effectivePollIntervalMs())
+    }
+
+    @Test
+    fun setForegroundActive_flipFalseThenTrue_restoresForegroundInterval() = runTest(dispatcher) {
+        val state = FakeConversationStateStore(initialSyncMs = 60_000L)
+        val vm = buildVm(conversationState = state)
+        advanceUntilIdle()
+        vm.setForegroundActive(false)
+        assertEquals(60_000L, vm.effectivePollIntervalMs())
+        vm.setForegroundActive(true)
+        assertEquals(AppViewModel.FOREGROUND_POLL_INTERVAL_MS, vm.effectivePollIntervalMs())
+    }
 }
