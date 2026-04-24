@@ -37,7 +37,14 @@ private const val LONG_BODY_PREVIEW_CHARS = 1200
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun ThreadMessageCard(message: FetchedMessage, isFromSelf: Boolean) {
+internal fun ThreadMessageCard(
+    message: FetchedMessage,
+    isFromSelf: Boolean,
+    onRetry: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onEditCommand: () -> Unit = {},
+    onOpenDiagnostics: () -> Unit = {}
+) {
     val container = if (isFromSelf) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
@@ -45,6 +52,7 @@ internal fun ThreadMessageCard(message: FetchedMessage, isFromSelf: Boolean) {
     val body = message.body.ifBlank { "(no text content)" }
     val isLong = body.length > LONG_BODY_THRESHOLD
     val visible = if (isLong && !expanded) body.take(LONG_BODY_PREVIEW_CHARS) else body
+    val envError = message.envelope?.error
 
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -68,12 +76,22 @@ internal fun ThreadMessageCard(message: FetchedMessage, isFromSelf: Boolean) {
         ) {
             HeaderRow(message, isFromSelf)
             EnvelopeRow(message)
-            Text(text = visible, style = MaterialTheme.typography.bodyLarge)
-            if (isLong) {
-                TextButton(
-                    onClick = { expanded = !expanded },
-                    modifier = Modifier.testTag("thread_message_expand_toggle")
-                ) { Text(if (expanded) "Collapse" else "Expand · ${body.length - LONG_BODY_PREVIEW_CHARS} more chars") }
+            if (envError != null) {
+                EnvelopeErrorBanner(
+                    error = envError,
+                    onRetry = onRetry,
+                    onOpenSettings = onOpenSettings,
+                    onEditCommand = onEditCommand,
+                    onOpenDiagnostics = onOpenDiagnostics
+                )
+            } else {
+                Text(text = visible, style = MaterialTheme.typography.bodyLarge)
+                if (isLong) {
+                    TextButton(
+                        onClick = { expanded = !expanded },
+                        modifier = Modifier.testTag("thread_message_expand_toggle")
+                    ) { Text(if (expanded) "Collapse" else "Expand · ${body.length - LONG_BODY_PREVIEW_CHARS} more chars") }
+                }
             }
         }
     }
