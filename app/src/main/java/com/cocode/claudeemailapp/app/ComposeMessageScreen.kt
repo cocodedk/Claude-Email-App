@@ -2,6 +2,7 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -39,7 +42,8 @@ fun ComposeMessageScreen(
     sending: Boolean,
     sendError: String?,
     onCancel: () -> Unit,
-    onSend: (to: String, project: String, body: String) -> Unit
+    onSend: (to: String, project: String, body: String) -> Unit,
+    recentProjects: List<String> = emptyList()
 ) {
     var to by rememberSaveable { mutableStateOf(defaultTo) }
     var project by rememberSaveable { mutableStateOf(defaultProject) }
@@ -81,6 +85,9 @@ fun ComposeMessageScreen(
                 modifier = Modifier.fillMaxWidth().testTag("compose_project")
             )
         }
+        if (recentProjects.isNotEmpty()) {
+            item { RecentProjectChips(recentProjects, onPick = { project = it }) }
+        }
         item {
             TextField(
                 value = body,
@@ -104,6 +111,30 @@ fun ComposeMessageScreen(
                 modifier = Modifier.fillMaxWidth().testTag("compose_send")
             ) {
                 Text(if (sending) "Sending…" else "Send")
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecentProjectChips(projects: List<String>, onPick: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = "Recent projects",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.testTag("compose_recent_projects")
+        ) {
+            projects.forEach { p ->
+                AssistChip(
+                    onClick = { onPick(p) },
+                    label = { Text(p) },
+                    colors = AssistChipDefaults.assistChipColors()
+                )
             }
         }
     }
