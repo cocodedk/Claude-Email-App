@@ -218,7 +218,13 @@ private fun AppNavHost(
             },
             onCompose = { onScreenChange(Screen.Compose) },
             onOpenSettings = { onScreenChange(Screen.Settings) },
-            onArchiveToggle = onArchiveToggle
+            onArchiveToggle = onArchiveToggle,
+            onRetryPending = { p ->
+                viewModel.sendCommand(to = p.to, project = p.project.orEmpty(), body = p.bodyPreview)
+            },
+            onCancelPending = { p ->
+                viewModel.dispatchSteering(p, com.cocode.claudeemailapp.app.steering.SteeringIntent.Cancel)
+            }
         )
         Screen.Settings -> credentials?.let {
             SettingsScreen(

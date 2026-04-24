@@ -28,7 +28,9 @@ fun HomeScreen(
     onOpenConversation: (Conversation) -> Unit,
     onCompose: () -> Unit,
     onOpenSettings: () -> Unit,
-    onArchiveToggle: (Conversation) -> Unit
+    onArchiveToggle: (Conversation) -> Unit,
+    onRetryPending: (PendingCommand) -> Unit = {},
+    onCancelPending: (PendingCommand) -> Unit = {}
 ) {
     var filter by rememberSaveable { mutableStateOf(AppViewModel.HomeFilter.ACTIVE) }
     val visible = buckets[filter]
@@ -50,7 +52,13 @@ fun HomeScreen(
             item { HomeFilterTabs(selected = filter, counts = buckets, onSelect = { filter = it }) }
             state.error?.let { item { HomeErrorCard(message = it) } }
             if (filter == AppViewModel.HomeFilter.ACTIVE && pending.isNotEmpty()) {
-                item { PendingSummary(pending = pending) }
+                item {
+                    PendingSummary(
+                        pending = pending,
+                        onRetry = onRetryPending,
+                        onCancel = onCancelPending
+                    )
+                }
             }
             if (visible.isEmpty() && state.loading && state.error == null) {
                 items(count = 3, key = { "skeleton-$it" }) { SkeletonConversationCard() }
