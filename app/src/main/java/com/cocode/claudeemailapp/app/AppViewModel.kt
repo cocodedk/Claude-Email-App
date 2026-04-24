@@ -106,6 +106,8 @@ class AppViewModel(
     private val _syncIntervalMs = MutableStateFlow(conversationStateStore.loadSyncIntervalMs())
     val syncIntervalMs: StateFlow<Long> = _syncIntervalMs.asStateFlow()
 
+    private val _isForegroundActive = MutableStateFlow(true)
+
     private val _hasSeenOnboarding = MutableStateFlow(conversationStateStore.loadHasSeenOnboarding())
     val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding.asStateFlow()
 
@@ -113,6 +115,23 @@ class AppViewModel(
         if (_hasSeenOnboarding.value) return
         conversationStateStore.markOnboardingSeen()
         _hasSeenOnboarding.value = true
+    }
+
+    /** Effective poll interval given user preference + current fg/bg state. */
+    internal fun effectivePollIntervalMs(): Long {
+        val pref = _syncIntervalMs.value
+        if (pref <= 0L) return 0L
+        return if (_isForegroundActive.value) FOREGROUND_POLL_INTERVAL_MS else pref
+    }
+
+    /** Lifecycle hook — invoke on activity ON_START / ON_STOP. */
+    fun setForegroundActive(active: Boolean) {
+        if (_isForegroundActive.value == active) return
+        _isForegroundActive.value = active
+        if (_credentials.value == null) return
+        val interval = effectivePollIntervalMs()
+        stopInboxPolling()
+        if (interval > 0) startInboxPolling(interval)
     }
 
     val homeBuckets: StateFlow<HomeBuckets> = combine(conversations, _pending, _archived) { convs, pend, arc ->
@@ -130,7 +149,8 @@ class AppViewModel(
         _syncIntervalMs.value = ms
         conversationStateStore.saveSyncIntervalMs(ms)
         stopInboxPolling()
-        if (ms > 0) startInboxPolling(ms)
+        val effective = effectivePollIntervalMs()
+        if (effective > 0) startInboxPolling(effective)
     }
 
     fun setConversationArchived(conversationId: String, archived: Boolean) {
@@ -147,7 +167,7 @@ class AppViewModel(
         if (_credentials.value != null) refreshInbox()
     }
 
-    fun startInboxPolling(intervalMs: Long = _syncIntervalMs.value) {
+    fun startInboxPolling(intervalMs: Long = effectivePollIntervalMs()) {
         if (pollingJob?.isActive == true) return
         if (intervalMs <= 0) return
         pollingJob = viewModelScope.launch {
@@ -330,6 +350,13 @@ class AppViewModel(
     }
 
     companion object {
+        /**
+         * Inbox poll cadence while the activity is in the foreground. Background
+         * polling falls back to the user-selected [syncIntervalMs] to keep battery
+         * cost down; the picker in Settings configures that bg value.
+         */
+        const val FOREGROUND_POLL_INTERVAL_MS: Long = 15_000L
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
