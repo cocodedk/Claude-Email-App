@@ -122,7 +122,7 @@ private fun ColumnScope.Entry(label: String, value: String) {
 @Composable
 private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) -> Unit) {
     Text(
-        text = "Auto-refresh inbox",
+        text = "Background refresh",
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -138,7 +138,7 @@ private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) ->
         }
     }
     Text(
-        text = "Pull-to-refresh on Home works regardless of this setting.",
+        text = "Foreground refreshes every 15 s. Pull-to-refresh works regardless.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
