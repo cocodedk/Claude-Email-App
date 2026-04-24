@@ -43,7 +43,7 @@ fun HomeScreen(
             item {
                 HeroCard(
                     loading = state.loading,
-                    conversationCount = visible.size,
+                    buckets = buckets,
                     onCompose = onCompose,
                     onRefresh = onRefresh,
                     onOpenSettings = onOpenSettings

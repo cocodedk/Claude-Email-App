@@ -27,7 +27,7 @@ import com.cocode.claudeemailapp.data.PendingStatus
 @Composable
 internal fun HeroCard(
     loading: Boolean,
-    conversationCount: Int,
+    buckets: AppViewModel.HomeBuckets,
     onCompose: () -> Unit,
     onRefresh: () -> Unit,
     onOpenSettings: () -> Unit
@@ -41,11 +41,15 @@ internal fun HeroCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(text = "Inbox", style = MaterialTheme.typography.headlineSmall)
-            Text(
-                text = if (loading) "Syncing…" else pluralize(conversationCount, "conversation"),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (loading) {
+                Text(
+                    text = "Syncing…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                HeroCounters(buckets = buckets)
+            }
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -208,8 +212,33 @@ internal fun EmptyBucketCard(
     }
 }
 
-private fun pluralize(n: Int, singular: String): String =
-    if (n == 1) "1 $singular" else "$n ${singular}s"
+@Composable
+private fun HeroCounters(buckets: AppViewModel.HomeBuckets) {
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("home_counters"),
+        horizontalArrangement = Arrangement.spacedBy(18.dp)
+    ) {
+        HeroCounter(label = "Active", value = buckets.active.size, accent = MaterialTheme.colorScheme.primary)
+        HeroCounter(label = "Waiting", value = buckets.waiting.size, accent = MaterialTheme.colorScheme.secondary)
+        HeroCounter(label = "Archived", value = buckets.archived.size, accent = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun HeroCounter(label: String, value: Int, accent: androidx.compose.ui.graphics.Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.headlineSmall,
+            color = accent
+        )
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 
 internal fun pendingReasonLine(reason: String?, retryAfterSeconds: Int?): String? {
     val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { "retry in ${it}s" }
