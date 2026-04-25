@@ -70,13 +70,13 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(credentials, hasSeenOnboarding) {
-        if (!hasSeenOnboarding) {
-            screen = Screen.Onboarding
-            return@LaunchedEffect
+        val target = when {
+            !hasSeenOnboarding -> Screen.Onboarding
+            credentials == null && screen != Screen.Setup -> Screen.Setup
+            credentials != null && screen == Screen.Setup && !editingCredentials -> Screen.Home
+            else -> screen
         }
-        if (credentials != null && screen == Screen.Setup && !editingCredentials) screen = Screen.Home
-        if (credentials == null && screen == Screen.Onboarding) screen = Screen.Setup
-        if (credentials == null && screen != Screen.Onboarding && screen != Screen.Setup) screen = Screen.Setup
+        if (target != screen) screen = target
     }
 
     DisposableEffect(credentials) {

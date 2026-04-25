@@ -169,23 +169,6 @@ private fun PendingRowActions(
 }
 
 @Composable
-internal fun HomeErrorCard(message: String) {
-    ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(text = "Sync failed", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
-            Text(text = message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-        }
-    }
-}
-
-@Composable
 internal fun EmptyBucketCard(
     filter: AppViewModel.HomeFilter,
     onCompose: () -> Unit = {}

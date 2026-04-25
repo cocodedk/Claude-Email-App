@@ -2,9 +2,15 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.data.PendingStatus
 import com.cocode.claudeemailapp.protocol.Kinds
@@ -61,6 +68,35 @@ fun ChipPill(label: String, accent: Color) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = label, style = MaterialTheme.typography.labelSmall, color = accent)
+    }
+}
+
+/**
+ * Shared error/status card used by the home, conversation, and compose
+ * screens. The defaults match the in-thread "Send failed" / "Sync failed"
+ * sites; pass [cornerRadius] / [horizontalPadding] / [verticalPadding] to
+ * match the slightly chunkier home-screen variant.
+ */
+@Composable
+internal fun StatusCard(
+    title: String,
+    message: String,
+    cornerRadius: Dp = 18.dp,
+    horizontalPadding: Dp = 16.dp,
+    verticalPadding: Dp = 12.dp
+) {
+    ElevatedCard(
+        shape = RoundedCornerShape(cornerRadius),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = verticalPadding),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(text = title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text(text = message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+        }
     }
 }
 

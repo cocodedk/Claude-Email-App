@@ -50,7 +50,17 @@ fun HomeScreen(
                 )
             }
             item { HomeFilterTabs(selected = filter, counts = buckets, onSelect = { filter = it }) }
-            state.error?.let { item { HomeErrorCard(message = it) } }
+            state.error?.let {
+                item {
+                    StatusCard(
+                        title = "Sync failed",
+                        message = it,
+                        cornerRadius = 20.dp,
+                        horizontalPadding = 18.dp,
+                        verticalPadding = 14.dp
+                    )
+                }
+            }
             if (filter == AppViewModel.HomeFilter.ACTIVE && pending.isNotEmpty()) {
                 item {
                     PendingSummary(
