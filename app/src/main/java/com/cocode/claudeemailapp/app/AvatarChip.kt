@@ -55,11 +55,13 @@ internal fun initialsFor(displayName: String, email: String): String {
 
 @Composable
 private fun colorFor(email: String): Color {
+    // Identity tints only — colorScheme.error is reserved for destructive
+    // affordances and would otherwise paint ~1 in 5 senders red.
     val palette = listOf(
         MaterialTheme.colorScheme.secondary,
         MaterialTheme.colorScheme.tertiary,
         MaterialTheme.colorScheme.primary,
-        MaterialTheme.colorScheme.error,
+        MaterialTheme.colorScheme.inversePrimary,
         MaterialTheme.colorScheme.outline
     )
     val hash = email.lowercase().hashCode()

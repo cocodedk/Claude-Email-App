@@ -33,19 +33,29 @@ object ConversationGrouper {
             if (ra != rb) parent[rb] = ra
         }
 
-        for (m in messages) parent.putIfAbsent(m.messageId, m.messageId)
-        for (m in messages) {
+        // Messages with blank Message-IDs would otherwise collapse into a single
+        // "" bucket; mint a synthetic per-message key so each becomes its own thread.
+        fun keyFor(index: Int, m: FetchedMessage): String =
+            if (m.messageId.isBlank()) "__blank_$index" else m.messageId
+
+        for ((i, m) in messages.withIndex()) {
+            val k = keyFor(i, m)
+            parent.putIfAbsent(k, k)
+        }
+        for ((i, m) in messages.withIndex()) {
+            if (m.messageId.isBlank()) continue
+            val k = keyFor(i, m)
             val refs = m.references + listOfNotNull(m.inReplyTo)
             for (r in refs) {
                 if (r.isBlank()) continue
                 parent.putIfAbsent(r, r)
-                union(r, m.messageId)
+                union(r, k)
             }
         }
 
         val buckets = LinkedHashMap<String, MutableList<FetchedMessage>>()
-        for (m in messages) {
-            val root = find(m.messageId)
+        for ((i, m) in messages.withIndex()) {
+            val root = find(keyFor(i, m))
             buckets.getOrPut(root) { mutableListOf() }.add(m)
         }
 
@@ -69,16 +79,25 @@ object ConversationGrouper {
         }.sortedByDescending { it.latestAt ?: EPOCH }
     }
 
-    private val PREFIX = Regex("""^\s*(re|fwd?|aw|sv|wg|fw)\s*[:\]]\s*""", RegexOption.IGNORE_CASE)
+    private val PREFIX = Regex("""^\s*(re|fwd?|aw|sv|wg|fw)\s*:\s*""", RegexOption.IGNORE_CASE)
+    private val BRACKETED = Regex("""^\s*\[\s*(re|fwd?|aw|sv|wg|fw)\s*]\s*:?\s*""", RegexOption.IGNORE_CASE)
 
     fun stripReplyPrefix(subject: String): String {
         var s = subject.trim()
         var prev: String
         do {
             prev = s
+            s = BRACKETED.replace(s, "").trim()
             s = PREFIX.replace(s, "").trim()
         } while (s != prev)
         return s.ifBlank { "(no subject)" }
+    }
+
+    /** True when [subject] already begins with a reply-style prefix. */
+    fun hasReplyPrefix(subject: String): Boolean {
+        val t = subject.trim()
+        return PREFIX.containsMatchIn(t) && PREFIX.find(t)?.range?.first == 0 ||
+            BRACKETED.containsMatchIn(t) && BRACKETED.find(t)?.range?.first == 0
     }
 
     private val EPOCH = Date(0)

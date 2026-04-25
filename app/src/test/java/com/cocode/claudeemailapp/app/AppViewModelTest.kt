@@ -97,6 +97,11 @@ class AppViewModelTest {
             if (t.isBlank()) return
             recent = (listOf(t) + recent.filter { it != t }).take(5)
         }
+        override fun clear() {
+            ids = emptySet()
+            syncMs = com.cocode.claudeemailapp.data.ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS
+            recent = emptyList()
+        }
     }
 
     private class FakeCredentialsStore(initial: MailCredentials? = null) : CredentialsStore {
@@ -369,6 +374,28 @@ class AppViewModelTest {
         assertNull(vm.credentials.value)
         assertTrue(vm.inbox.value.messages.isEmpty())
         assertNull(store.load())
+    }
+
+    @Test
+    fun signOut_clearsArchivesIntervalAndRecents() = runTest(dispatcher) {
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns emptyList()
+        val state = FakeConversationStateStore(initialSyncMs = 30_000L)
+        state.saveArchivedIds(setOf("c-1"))
+        state.pushRecentProject("alpha")
+        val vm = buildVm(store = FakeCredentialsStore(creds()), fetcher = fetcher, conversationState = state)
+        advanceUntilIdle()
+
+        vm.signOut()
+
+        assertEquals(emptySet<String>(), vm.archived.value)
+        assertEquals(
+            com.cocode.claudeemailapp.data.ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS,
+            vm.syncIntervalMs.value
+        )
+        assertEquals(emptyList<String>(), vm.recentProjects.value)
+        assertEquals(emptySet<String>(), state.loadArchivedIds())
+        assertEquals(emptyList<String>(), state.loadRecentProjects())
     }
 
     private fun fakeMessage(id: String, subject: String) = FetchedMessage(

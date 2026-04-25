@@ -127,11 +127,19 @@ class AppViewModel(
         return if (_isForegroundActive.value) FOREGROUND_POLL_INTERVAL_MS else pref
     }
 
-    /** Lifecycle hook — invoke on activity ON_START / ON_STOP. */
+    /**
+     * Lifecycle hook — invoke on activity ON_START / ON_STOP. Always
+     * re-evaluates the polling cadence so the very first ON_START after
+     * process restart kicks polling off (the prior early-return-on-equal
+     * left polling stopped after a cold start with `_isForegroundActive`
+     * already `true`).
+     */
     fun setForegroundActive(active: Boolean) {
-        if (_isForegroundActive.value == active) return
         _isForegroundActive.value = active
-        if (_credentials.value == null) return
+        if (_credentials.value == null) {
+            stopInboxPolling()
+            return
+        }
         val interval = effectivePollIntervalMs()
         stopInboxPolling()
         if (interval > 0) startInboxPolling(interval)
@@ -167,6 +175,8 @@ class AppViewModel(
     private var pollingJob: Job? = null
 
     init {
+        // Polling is started by the activity's ON_START observer via
+        // setForegroundActive(true); init only kicks off a one-shot refresh.
         if (_credentials.value != null) refreshInbox()
     }
 
@@ -326,11 +336,16 @@ class AppViewModel(
         viewModelScope.launch {
             _send.value = SendState(sending = true)
             try {
+                val parentId = pending.messageId.takeIf(String::isNotBlank)
+                val replySubject =
+                    if (ConversationGrouper.hasReplyPrefix(pending.subject)) pending.subject
+                    else "Re: ${pending.subject}"
                 val outgoing = OutgoingMessage.envelope(
                     to = pending.to,
-                    subject = "Re: ${pending.subject}",
+                    subject = replySubject,
                     envelope = envelope,
-                    inReplyTo = pending.messageId.takeIf(String::isNotBlank)
+                    inReplyTo = parentId,
+                    references = listOfNotNull(parentId)
                 )
                 val result = mailSender.send(creds, outgoing)
                 _send.value = SendState(sending = false, justSentMessageId = result.messageId)
@@ -351,9 +366,13 @@ class AppViewModel(
         stopInboxPolling()
         credentialsStore.clear()
         pendingStore.clear()
+        conversationStateStore.clear()
         _credentials.value = null
         _inbox.value = InboxState()
         _pending.value = emptyList()
+        _archived.value = emptySet()
+        _syncIntervalMs.value = ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS
+        _recentProjects.value = emptyList()
     }
 
     companion object {

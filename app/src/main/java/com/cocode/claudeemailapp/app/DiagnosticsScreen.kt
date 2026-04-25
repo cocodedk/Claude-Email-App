@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingStatus
-import java.text.DateFormat
 import java.util.Date
 
 @Composable
@@ -106,6 +105,3 @@ private fun appVersion(context: Context): String = try {
     "?"
 }
 
-@Suppress("unused")
-private fun formatAbsolute(date: Date?): String =
-    date?.let { DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(it) } ?: ""
