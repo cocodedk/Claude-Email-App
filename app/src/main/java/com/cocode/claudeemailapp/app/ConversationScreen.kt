@@ -75,9 +75,9 @@ fun ConversationScreen(
     var reply by rememberSaveable(conversation.id) { mutableStateOf("") }
     val listState = rememberLazyListState()
     // Auto-scroll to the newest message when the conversation opens or grows.
-    // Index is messages.size because item 0 is the header card.
-    LaunchedEffect(conversation.id, conversation.messages.size) {
-        val target = conversation.messages.size
+    // Item 0 is the header; the optional sendError card sits below the messages.
+    LaunchedEffect(conversation.id, conversation.messages.size, sendError) {
+        val target = conversation.messages.size + if (sendError != null) 1 else 0
         if (target > 0) listState.scrollToItem(target)
     }
 

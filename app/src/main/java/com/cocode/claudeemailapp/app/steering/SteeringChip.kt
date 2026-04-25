@@ -72,13 +72,14 @@ fun SteeringChip(
         else -> 1f
     }
     val hapticClick = com.cocode.claudeemailapp.app.rememberHapticClick(onClick)
+    val clickable = enabled && variant != SteeringChipVariant.Sending
     Row(
         modifier = modifier
             .alpha(chipAlpha)
             .clip(shape)
             .background(colors.fill, shape)
             .border(BorderStroke(1.dp, colors.border), shape)
-            .clickable(enabled = enabled, onClick = hapticClick)
+            .clickable(enabled = clickable, onClick = hapticClick)
             .minimumInteractiveComponentSize()
             .padding(horizontal = 11.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
