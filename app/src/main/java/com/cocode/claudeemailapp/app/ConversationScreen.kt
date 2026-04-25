@@ -112,7 +112,7 @@ fun ConversationScreen(
                 )
             }
             sendError?.let {
-                item(key = "error") { ErrorCard(message = it) }
+                item(key = "error") { StatusCard(title = "Send failed", message = it) }
             }
         }
         when (steering) {
@@ -186,19 +186,3 @@ private fun ConversationHeaderCard(
     }
 }
 
-@Composable
-private fun ErrorCard(message: String) {
-    ElevatedCard(
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text("Send failed", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
-            Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-        }
-    }
-}
