@@ -68,8 +68,10 @@ fun SteeringBar(
         )
         SteeringChip(
             label = stringResource(R.string.steering_chip_more),
-            onClick = { /* More sheet deferred to a follow-up plan. */ },
-            enabled = chipsEnabled,
+            // Keep the chip visible for layout parity but non-interactive
+            // until the follow-up sheet lands.
+            onClick = {},
+            enabled = false,
             icon = "\u22EF",
             variant = SteeringChipVariant.Ghost,
             modifier = Modifier.testTag("steering_chip_more")

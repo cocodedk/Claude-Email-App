@@ -119,4 +119,21 @@ class ConversationGrouperTest {
         assertEquals(1, out.size)
         assertTrue(out[0].messageCount == 2)
     }
+
+    @Test
+    fun blankMessageIds_doNotCollapseIntoOneBucket() {
+        val a = msg("", subject = "first", sentAt = 1_000)
+        val b = msg("", subject = "second", sentAt = 2_000)
+        val out = ConversationGrouper.group(listOf(a, b), self)
+        assertEquals(2, out.size)
+    }
+
+    @Test
+    fun replyPrefix_bracketedFormIsStripped() {
+        val out = ConversationGrouper.group(
+            listOf(msg("<a>", subject = "[RE]: refactor")),
+            self
+        )
+        assertEquals("refactor", out[0].title)
+    }
 }

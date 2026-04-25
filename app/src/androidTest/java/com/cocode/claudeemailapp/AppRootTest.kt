@@ -99,6 +99,11 @@ class AppRootTest {
             if (t.isBlank()) return
             recent = (listOf(t) + recent.filter { it != t }).take(5)
         }
+        override fun clear() {
+            ids = emptySet()
+            syncMs = com.cocode.claudeemailapp.data.ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS
+            recent = emptyList()
+        }
     }
 
     private class FakePending : com.cocode.claudeemailapp.data.PendingCommandStore {

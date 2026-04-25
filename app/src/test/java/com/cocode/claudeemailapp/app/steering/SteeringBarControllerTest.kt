@@ -104,4 +104,18 @@ class SteeringBarControllerTest {
         assertEquals(listOf<SteeringIntent>(SteeringIntent.Cancel), undone)
         assertFalse(ctrl.uiState.value.undoAvailable)
     }
+
+    @Test
+    fun undo_afterStatus_isIgnored() = runTest {
+        val ctrl = SteeringBarController(TestScope(StandardTestDispatcher(testScheduler)))
+        val undone = mutableListOf<SteeringIntent>()
+        ctrl.onUndo = { undone += it }
+
+        ctrl.tapStatus()
+        // Status is not undo-eligible, so undo() must be a no-op even if called.
+        ctrl.undo()
+
+        assertTrue(undone.isEmpty())
+        assertFalse(ctrl.uiState.value.undoAvailable)
+    }
 }

@@ -19,6 +19,9 @@ interface ConversationStateStore {
     fun loadRecentProjects(): List<String>
     fun pushRecentProject(project: String)
 
+    /** Wipe all per-account UX state on sign-out so prefs do not leak across users. */
+    fun clear()
+
     companion object {
         operator fun invoke(context: Context): ConversationStateStore =
             SharedPrefsConversationStateStore(context)
@@ -70,6 +73,14 @@ internal class SharedPrefsConversationStateStore(
         val next = (listOf(trimmed) + existing.filter { it != trimmed })
             .take(ConversationStateStore.RECENT_PROJECTS_CAP)
         prefs.edit().putString(KEY_RECENT_PROJECTS, next.joinToString("")).apply()
+    }
+
+    override fun clear() {
+        prefs.edit()
+            .remove(KEY_ARCHIVED)
+            .remove(KEY_SYNC_INTERVAL)
+            .remove(KEY_RECENT_PROJECTS)
+            .apply()
     }
 
     companion object {

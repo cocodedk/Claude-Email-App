@@ -43,6 +43,7 @@ class SteeringBarController(private val scope: CoroutineScope) {
     fun tapReply(askId: String, body: String) = fire(SteeringIntent.Reply(askId, body))
 
     fun undo() {
+        if (!_ui.value.undoAvailable) return
         val fired = lastFired ?: return
         undoJob?.cancel()
         _ui.value = _ui.value.copy(undoAvailable = false)
@@ -69,14 +70,16 @@ class SteeringBarController(private val scope: CoroutineScope) {
         val undoEligible = intent is SteeringIntent.Cancel
         _ui.value = UiState(armed = false, sending = intent, undoAvailable = undoEligible)
         onIntent(intent)
-        lastFired = intent
         if (undoEligible) {
+            lastFired = intent
             undoJob?.cancel()
             undoJob = scope.launch {
                 delay(UNDO_WINDOW_MS)
                 _ui.value = _ui.value.copy(undoAvailable = false)
                 lastFired = null
             }
+        } else {
+            lastFired = null
         }
     }
 

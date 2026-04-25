@@ -102,4 +102,24 @@ class ConversationStateStoreTest {
             store.loadRecentProjects()
         )
     }
+
+    @Test
+    fun clear_resetsArchivesIntervalAndRecents() {
+        store.saveArchivedIds(setOf("a", "b"))
+        store.saveSyncIntervalMs(30_000L)
+        store.pushRecentProject("alpha")
+        store.markOnboardingSeen()
+
+        store.clear()
+
+        assertEquals(emptySet<String>(), store.loadArchivedIds())
+        assertEquals(
+            ConversationStateStore.DEFAULT_SYNC_INTERVAL_MS,
+            store.loadSyncIntervalMs()
+        )
+        assertEquals(emptyList<String>(), store.loadRecentProjects())
+        // Onboarding flag is intentionally preserved across sign-out so a
+        // returning user does not see the carousel again.
+        assertEquals(true, store.loadHasSeenOnboarding())
+    }
 }
