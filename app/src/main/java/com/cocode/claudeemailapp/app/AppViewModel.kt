@@ -24,6 +24,7 @@ import com.cocode.claudeemailapp.mail.MailProbe
 import com.cocode.claudeemailapp.mail.MailSender
 import com.cocode.claudeemailapp.mail.OutgoingMessage
 import com.cocode.claudeemailapp.mail.ProbeResult
+import com.cocode.claudeemailapp.mail.SendResult
 import com.cocode.claudeemailapp.mail.SmtpMailSender
 import com.cocode.claudeemailapp.protocol.Envelopes
 import com.cocode.claudeemailapp.protocol.envelope
@@ -251,26 +252,17 @@ class AppViewModel(
         references: List<String> = emptyList()
     ) {
         val creds = _credentials.value ?: return
-        viewModelScope.launch {
-            _send.value = SendState(sending = true)
-            try {
-                val result = mailSender.send(
-                    credentials = creds,
-                    message = OutgoingMessage(
-                        to = to,
-                        subject = subject,
-                        body = body,
-                        inReplyTo = inReplyTo,
-                        references = references
-                    )
+        runSend {
+            mailSender.send(
+                credentials = creds,
+                message = OutgoingMessage(
+                    to = to,
+                    subject = subject,
+                    body = body,
+                    inReplyTo = inReplyTo,
+                    references = references
                 )
-                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
-                refreshInbox()
-            } catch (e: MailException) {
-                _send.value = SendState(sending = false, lastError = e.message)
-            } catch (t: Throwable) {
-                _send.value = SendState(sending = false, lastError = t.message)
-            }
+            )
         }
     }
 
@@ -282,47 +274,37 @@ class AppViewModel(
         planFirst: Boolean? = null
     ) {
         val creds = _credentials.value ?: return
-        viewModelScope.launch {
-            _send.value = SendState(sending = true)
-            try {
-                val envelope = Envelopes.command(
-                    body = body,
-                    project = project,
-                    priority = priority,
-                    planFirst = planFirst,
-                    auth = creds.sharedSecret.takeIf(String::isNotBlank)
-                )
-                val subject = firstLineSummary(body)
-                val outgoing = OutgoingMessage.envelope(
+        runSend {
+            val envelope = Envelopes.command(
+                body = body,
+                project = project,
+                priority = priority,
+                planFirst = planFirst,
+                auth = creds.sharedSecret.takeIf(String::isNotBlank)
+            )
+            val subject = firstLineSummary(body)
+            val outgoing = OutgoingMessage.envelope(to = to, subject = subject, envelope = envelope)
+            val result = mailSender.send(creds, outgoing)
+            if (result.messageId.isNotBlank()) {
+                val pending = PendingCommand(
+                    messageId = result.messageId,
+                    sentAt = result.sentAt.time,
                     to = to,
                     subject = subject,
-                    envelope = envelope
+                    kind = envelope.kind,
+                    bodyPreview = body.take(200),
+                    project = project
                 )
-                val result = mailSender.send(creds, outgoing)
-                if (result.messageId.isNotBlank()) {
-                    val pending = PendingCommand(
-                        messageId = result.messageId,
-                        sentAt = result.sentAt.time,
-                        to = to,
-                        subject = subject,
-                        kind = envelope.kind,
-                        bodyPreview = body.take(200),
-                        project = project
-                    )
-                    pendingStore.add(pending)
-                    _pending.value = pendingStore.all()
-                    if (project.isNotBlank()) {
-                        conversationStateStore.pushRecentProject(project)
-                        _recentProjects.value = conversationStateStore.loadRecentProjects()
-                    }
+                pendingStore.add(pending)
+                _pending.value = pendingStore.all()
+                if (project.isNotBlank()) {
+                    conversationStateStore.pushRecentProject(project)
+                    // Mirror pushRecentProject's MRU-dedup-cap locally so we don't re-read storage.
+                    _recentProjects.value = (listOf(project) + _recentProjects.value.filter { it != project })
+                        .take(ConversationStateStore.RECENT_PROJECTS_CAP)
                 }
-                _send.value = SendState(sending = false, justSentMessageId = result.messageId)
-                refreshInbox()
-            } catch (e: MailException) {
-                _send.value = SendState(sending = false, lastError = e.message)
-            } catch (t: Throwable) {
-                _send.value = SendState(sending = false, lastError = t.message)
             }
+            result
         }
     }
 
@@ -333,21 +315,28 @@ class AppViewModel(
             intent = intent,
             auth = creds.sharedSecret.takeIf(String::isNotBlank)
         ) ?: return
+        runSend {
+            val parentId = pending.messageId.takeIf(String::isNotBlank)
+            val replySubject =
+                if (ConversationGrouper.hasReplyPrefix(pending.subject)) pending.subject
+                else "Re: ${pending.subject}"
+            val outgoing = OutgoingMessage.envelope(
+                to = pending.to,
+                subject = replySubject,
+                envelope = envelope,
+                inReplyTo = parentId,
+                references = listOfNotNull(parentId)
+            )
+            mailSender.send(creds, outgoing)
+        }
+    }
+
+    /** Wraps a send call with the SendState lifecycle + post-send refresh and uniform error mapping. */
+    private inline fun runSend(crossinline block: suspend () -> SendResult) {
         viewModelScope.launch {
             _send.value = SendState(sending = true)
             try {
-                val parentId = pending.messageId.takeIf(String::isNotBlank)
-                val replySubject =
-                    if (ConversationGrouper.hasReplyPrefix(pending.subject)) pending.subject
-                    else "Re: ${pending.subject}"
-                val outgoing = OutgoingMessage.envelope(
-                    to = pending.to,
-                    subject = replySubject,
-                    envelope = envelope,
-                    inReplyTo = parentId,
-                    references = listOfNotNull(parentId)
-                )
-                val result = mailSender.send(creds, outgoing)
+                val result = block()
                 _send.value = SendState(sending = false, justSentMessageId = result.messageId)
                 refreshInbox()
             } catch (e: MailException) {
