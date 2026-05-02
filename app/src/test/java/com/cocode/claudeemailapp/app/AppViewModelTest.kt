@@ -72,10 +72,11 @@ class AppViewModelTest {
         },
         probe: MailProbe = mockk(relaxed = true),
         pending: PendingCommandStore = FakePendingCommandStore(),
-        conversationState: com.cocode.claudeemailapp.data.ConversationStateStore = FakeConversationStateStore()
+        conversationState: com.cocode.claudeemailapp.data.ConversationStateStore = FakeConversationStateStore(),
+        notifier: InboxNotifier? = null
     ): AppViewModel {
         val app = mockk<Application>(relaxed = true)
-        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState)
+        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState, notifier, null)
     }
 
     private class FakeConversationStateStore(
@@ -411,6 +412,31 @@ class AppViewModelTest {
         references = emptyList(),
         isSeen = false
     )
+
+    @Test
+    fun notifier_suppressedOnFirstPoll_thenFiresForNewMessages() = runTest(dispatcher) {
+        val notifier = mockk<InboxNotifier>(relaxed = true)
+        val m1 = fakeMessage("<m1@x>", "first")
+        val m2 = fakeMessage("<m2@x>", "second")
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returnsMany listOf(
+            listOf(m1),
+            listOf(m2, m1),
+            listOf(m2, m1)
+        )
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher, notifier = notifier)
+        advanceUntilIdle()  // first poll (from init) — backlog suppressed
+        io.mockk.verify(exactly = 0) { notifier.handle(any()) }
+
+        vm.refreshInbox()
+        advanceUntilIdle()
+        io.mockk.verify(exactly = 1) { notifier.handle(eq(m2)) }
+
+        vm.refreshInbox()
+        advanceUntilIdle()
+        io.mockk.verify(exactly = 1) { notifier.handle(eq(m2)) }  // no new calls
+    }
 
     @Test
     fun effectivePoll_foregroundWithUserPref_returnsFifteenSecondFloor() = runTest(dispatcher) {
