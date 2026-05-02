@@ -64,8 +64,8 @@ class ImapMailFetcher(
             put("mail.imaps.port", credentials.imapPort.toString())
             put("mail.imaps.ssl.enable", "true")
             put("mail.imaps.ssl.checkserveridentity", "true")
-            put("mail.imaps.connectiontimeout", CONNECT_TIMEOUT_MS.toString())
-            put("mail.imaps.timeout", READ_TIMEOUT_MS.toString())
+            put("mail.imaps.connectiontimeout", MailTimeouts.CONNECT_MS.toString())
+            put("mail.imaps.timeout", MailTimeouts.READ_MS.toString())
         }
 
         internal fun Message.toFetched(): FetchedMessage {
@@ -175,8 +175,5 @@ class ImapMailFetcher(
                 it.connect(c.imapHost, c.imapPort, c.emailAddress, c.password)
             }
         }
-
-        private const val CONNECT_TIMEOUT_MS = 45_000
-        private const val READ_TIMEOUT_MS = 30_000
     }
 }
