@@ -22,7 +22,7 @@ import com.cocode.claudeemailapp.protocol.Kinds
  */
 class InboxNotifier(
     private val context: Context,
-    private val prefs: InboxNotificationPrefs,
+    val prefs: InboxNotificationPrefs,
     private val isForeground: () -> Boolean
 ) {
 

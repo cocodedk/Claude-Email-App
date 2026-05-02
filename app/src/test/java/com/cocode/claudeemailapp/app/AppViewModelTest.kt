@@ -76,7 +76,7 @@ class AppViewModelTest {
         notifier: InboxNotifier? = null
     ): AppViewModel {
         val app = mockk<Application>(relaxed = true)
-        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState, notifier, null)
+        return AppViewModel(app, store, sender, fetcher, probe, pending, conversationState, notifier)
     }
 
     private class FakeConversationStateStore(

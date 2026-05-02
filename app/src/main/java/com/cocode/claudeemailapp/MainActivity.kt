@@ -16,9 +16,7 @@ import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 class MainActivity : ComponentActivity() {
 
     private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            // Result is reflected in the OS state; areNotificationsEnabled() checks before each post.
-        }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

@@ -48,8 +48,7 @@ class AppViewModel(
     private val mailProbe: MailProbe,
     private val pendingStore: PendingCommandStore,
     private val conversationStateStore: ConversationStateStore,
-    private val inboxNotifier: InboxNotifier? = null,
-    private val notificationPrefs: InboxNotificationPrefs? = null
+    private val inboxNotifier: InboxNotifier? = null
 ) : AndroidViewModel(application) {
 
     enum class HomeFilter { ACTIVE, WAITING, ARCHIVED }
@@ -88,11 +87,11 @@ class AppViewModel(
     val credentials: StateFlow<MailCredentials?> = _credentials.asStateFlow()
 
     val notificationsEnabled: StateFlow<Boolean> =
-        notificationPrefs?.notificationsEnabled
+        inboxNotifier?.prefs?.notificationsEnabled
             ?: MutableStateFlow(true).asStateFlow()
 
     fun setNotificationsEnabled(enabled: Boolean) {
-        notificationPrefs?.setNotificationsEnabled(enabled)
+        inboxNotifier?.prefs?.setNotificationsEnabled(enabled)
     }
 
     private val _inbox = MutableStateFlow(InboxState())
@@ -225,14 +224,13 @@ class AppViewModel(
         _probe.value = ProbeState()
     }
 
-    private var firstPollDone = false
-
     fun refreshInbox() {
         val creds = _credentials.value ?: return
         viewModelScope.launch {
             _inbox.value = _inbox.value.copy(loading = true, error = null)
             try {
                 val messages = mailFetcher.fetchRecent(creds, count = 50)
+                val firstPoll = _inbox.value.lastFetchedAt == null
                 val previousIds = _inbox.value.messages
                     .mapNotNull { it.messageId.takeIf(String::isNotBlank) }
                     .toSet()
@@ -244,8 +242,7 @@ class AppViewModel(
                     messages = messages,
                     lastFetchedAt = System.currentTimeMillis()
                 )
-                if (firstPollDone) newOnes.forEach { inboxNotifier?.handle(it) }
-                firstPollDone = true
+                if (!firstPoll) newOnes.forEach { inboxNotifier?.handle(it) }
                 reconcilePending(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)
@@ -413,8 +410,7 @@ class AppViewModel(
                     mailProbe = MailProbe(),
                     pendingStore = PendingCommandStore(app),
                     conversationStateStore = ConversationStateStore(app),
-                    inboxNotifier = notifier,
-                    notificationPrefs = prefs
+                    inboxNotifier = notifier
                 )
             }
         }
