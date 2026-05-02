@@ -78,7 +78,7 @@ class SmtpMailSender(
 
         private val DefaultTransportSend: (MimeMessage) -> Unit = { Transport.send(it) }
 
-        private const val CONNECT_TIMEOUT_MS = 20_000
+        private const val CONNECT_TIMEOUT_MS = 45_000
         private const val READ_TIMEOUT_MS = 30_000
     }
 }

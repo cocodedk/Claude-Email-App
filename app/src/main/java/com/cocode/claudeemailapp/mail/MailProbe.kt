@@ -92,6 +92,6 @@ class MailProbe(
             }
         }
 
-        private const val TIMEOUT_MS = 15_000
+        private const val TIMEOUT_MS = 45_000
     }
 }
