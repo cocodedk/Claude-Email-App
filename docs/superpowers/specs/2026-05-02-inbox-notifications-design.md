@@ -1,8 +1,56 @@
 # Inbox notifications via process-lifetime IMAP IDLE
 
-**Status:** design — pending review
+**Status:** v0 in progress (slimmed scope — see "v0 scope" below); v1+ follow-ups deferred
 **Date:** 2026-05-02
 **Author:** agent-Claude-Email-App (with peer agent-claude-email)
+
+## v0 scope (what we're actually shipping first)
+
+The original design below is the long-term target. v0 ships the minimum that delivers the user goal ("buzz my pocketed phone when a reply arrives, stop when I close the app") and defers everything reactive/IDLE-shaped to v1+.
+
+**v0 reuses the existing 15s foreground poll** instead of adding IMAP IDLE. The activity-scoped polling job in `AppViewModel` runs while the activity is alive (which is "while the app is in recents" in practice). After each poll, we diff the new inbox snapshot against the previous one and post a notification per new non-ACK message, suppressed when the app is in foreground.
+
+### v0 in / v0 out
+
+| Item | v0? | Why |
+|---|---|---|
+| Notification on new non-ACK message | ✅ | Core goal |
+| Skip if foreground (`STARTED+`) | ✅ | Avoids buzzing while user is looking at the app |
+| Settings toggle (default ON) | ✅ | User must be able to disable |
+| `POST_NOTIFICATIONS` permission ask | ✅ (in `MainActivity.onCreate`) | Required on Android 13+ |
+| `replies` notification channel | ✅ | Required infra |
+| Tap notification → opens app | ✅ (default `MainActivity` launch) | Don't deep-link to specific conversation in v0 |
+| `ClaudeEmailApplication` subclass | ✅ | Channel registration + future hook |
+| In-memory diff against last inbox snapshot | ✅ | Tracked in `AppViewModel`; bounds spam by suppressing the historical backlog on first poll |
+| IMAP IDLE listener | ❌ defer | 15s poll is good enough; revisit only if latency complaints |
+| `InboxWatcher` reactive plumbing | ❌ defer | Existing polling lifecycle is sufficient |
+| `CredentialsBus` | ❌ defer | Single-account, infrequent change; existing flow handles it |
+| Persistent UID water mark + UIDVALIDITY | ❌ defer | In-memory `seenIds` set + first-poll suppression replaces it |
+| Persistent `conversationKey → Int` ID allocator | ❌ defer | Use `messageId.hashCode()`; collision risk on UUID@domain is negligible |
+| PROGRESS rate-limit | ❌ defer | Most commands emit ≤3 messages; revisit if noisy |
+| Network availability callback | ❌ defer | Polling already retries on next interval |
+| Deep-link to specific conversation | ❌ defer | v0 just opens the app |
+| `onTaskRemoved` cleanup | ❌ defer | Activity-scoped polling dies with the activity = "swipe = silence" for free |
+| Inline "permission denied" hint | ❌ defer | If denied, toggle silently no-ops |
+| `ImapSession` factory extraction | ❌ defer | Refactor only matters with a 2nd consumer |
+
+### v0 file deltas
+
+| File | Change |
+|---|---|
+| `app/ClaudeEmailApplication.kt` (new) | `Application` subclass; registers `replies` channel in `onCreate` |
+| `app/InboxNotifier.kt` (new) | Single-shot `handle(message)`: skip if disabled / ACK / foreground; otherwise post |
+| `data/InboxNotificationPrefs.kt` (new) | Just the `notificationsEnabled` toggle (StateFlow + setter) |
+| `app/AppViewModel.kt` (modify) | Inject `InboxNotifier` + prev-snapshot diff in `refreshInbox`; expose `notificationsEnabled` |
+| `app/SettingsScreen.kt` (modify) | "Notify on replies" Switch |
+| `MainActivity.kt` (modify) | Request `POST_NOTIFICATIONS` on Android 13+ in `onCreate` |
+| `AndroidManifest.xml` (modify) | Add `POST_NOTIFICATIONS` perm + `android:name=".app.ClaudeEmailApplication"` |
+
+---
+
+## (Below: original v1+ design, retained as roadmap)
+
+
 
 ## Goal
 
