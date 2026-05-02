@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.Properties
+import java.util.UUID
 
 class SmtpMailSender(
     private val sessionFactory: (Properties, Authenticator) -> Session = DefaultSessionFactory,
@@ -23,7 +24,7 @@ class SmtpMailSender(
         message: OutgoingMessage
     ): SendResult = withContext(Dispatchers.IO) {
         val session = sessionFactory(smtpProperties(credentials), authenticator(credentials))
-        val mime = MimeMessage(session).apply {
+        val mime = StableMessageIdMimeMessage(session, messageIdDomain(credentials)).apply {
             setFrom(InternetAddress(credentials.emailAddress, credentials.displayName.ifBlank { null }))
             setRecipients(Message.RecipientType.TO, InternetAddress.parse(message.to))
             subject = message.subject
@@ -77,5 +78,21 @@ class SmtpMailSender(
             { props, auth -> Session.getInstance(props, auth) }
 
         private val DefaultTransportSend: (MimeMessage) -> Unit = { Transport.send(it) }
+
+        // Jakarta Mail's default updateMessageID() falls back to "localhost" on Android
+        // because the device has no resolvable hostname; some SMTP relays then rewrite
+        // the unroutable Message-ID in transit, which silently breaks RFC threading
+        // (In-Reply-To/References stop matching). Generate a stable routable ID instead.
+        internal fun messageIdDomain(credentials: MailCredentials): String =
+            credentials.emailAddress.substringAfter('@', "").ifBlank { "android.local" }
+    }
+
+    private class StableMessageIdMimeMessage(
+        session: Session,
+        private val domain: String
+    ) : MimeMessage(session) {
+        override fun updateMessageID() {
+            setHeader("Message-ID", "<${UUID.randomUUID()}@$domain>")
+        }
     }
 }
