@@ -56,9 +56,9 @@ class SmtpMailSender(
             put("mail.smtp.host", credentials.smtpHost)
             put("mail.smtp.port", credentials.smtpPort.toString())
             put("mail.smtp.auth", "true")
-            put("mail.smtp.connectiontimeout", CONNECT_TIMEOUT_MS.toString())
-            put("mail.smtp.timeout", READ_TIMEOUT_MS.toString())
-            put("mail.smtp.writetimeout", READ_TIMEOUT_MS.toString())
+            put("mail.smtp.connectiontimeout", MailTimeouts.CONNECT_MS.toString())
+            put("mail.smtp.timeout", MailTimeouts.READ_MS.toString())
+            put("mail.smtp.writetimeout", MailTimeouts.READ_MS.toString())
             if (credentials.smtpUseStartTls) {
                 put("mail.smtp.starttls.enable", "true")
                 put("mail.smtp.starttls.required", "true")
@@ -77,8 +77,5 @@ class SmtpMailSender(
             { props, auth -> Session.getInstance(props, auth) }
 
         private val DefaultTransportSend: (MimeMessage) -> Unit = { Transport.send(it) }
-
-        private const val CONNECT_TIMEOUT_MS = 20_000
-        private const val READ_TIMEOUT_MS = 30_000
     }
 }
