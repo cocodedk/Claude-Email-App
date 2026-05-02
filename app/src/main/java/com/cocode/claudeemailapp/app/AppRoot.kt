@@ -35,6 +35,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.claudeemailapp.data.Conversation
+import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
@@ -42,7 +43,10 @@ enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Di
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory)) {
+fun ClaudeEmailApp(
+    viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory),
+    prefill: MailCredentials? = null
+) {
     val credentials by viewModel.credentials.collectAsState()
     val inbox by viewModel.inbox.collectAsState()
     val conversations by viewModel.conversations.collectAsState()
@@ -153,7 +157,8 @@ fun ClaudeEmailApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Fa
                 onArchiveToggle = ::toggleArchiveWithUndo,
                 syncIntervalMs = syncIntervalMs,
                 recentProjects = recentProjects,
-                viewModel = viewModel
+                viewModel = viewModel,
+                prefill = prefill
             )
         }
     }
@@ -200,7 +205,8 @@ private fun AppNavHost(
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
     recentProjects: List<String>,
-    viewModel: AppViewModel
+    viewModel: AppViewModel,
+    prefill: MailCredentials?
 ) {
     val reduceMotion = rememberReduceMotion()
     Crossfade(
@@ -225,7 +231,8 @@ private fun AppNavHost(
         onArchiveToggle = onArchiveToggle,
         syncIntervalMs = syncIntervalMs,
         recentProjects = recentProjects,
-        viewModel = viewModel
+        viewModel = viewModel,
+        prefill = prefill
     ) }
 }
 
@@ -248,7 +255,8 @@ private fun AppScreenContent(
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
     recentProjects: List<String>,
-    viewModel: AppViewModel
+    viewModel: AppViewModel,
+    prefill: MailCredentials?
 ) {
     when (screen) {
         Screen.Onboarding -> OnboardingScreen(
@@ -259,7 +267,7 @@ private fun AppScreenContent(
         )
         Screen.Setup -> SetupScreen(
             viewModel = viewModel,
-            initial = if (editingCredentials) credentials else null
+            initial = if (editingCredentials) credentials else prefill
         )
         Screen.Home -> HomeScreen(
             state = inbox,

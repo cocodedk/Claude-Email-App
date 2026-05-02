@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.cocode.claudeemailapp.app.ClaudeEmailApp
+import com.cocode.claudeemailapp.app.PrefillCredentials
 import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,9 +25,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         maybeAskNotificationPermission()
+        val prefill = PrefillCredentials.fromExtras { intent?.getStringExtra(it) }
+        if (prefill != null) Log.d("MainActivity", "prefill applied")
         setContent {
             ClaudeEmailAppTheme {
-                ClaudeEmailApp()
+                ClaudeEmailApp(prefill = prefill)
             }
         }
     }
