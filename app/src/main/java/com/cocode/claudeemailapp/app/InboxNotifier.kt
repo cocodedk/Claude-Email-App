@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.cocode.claudeemailapp.MainActivity
@@ -61,6 +62,9 @@ class InboxNotifier(
             "Notifications when an agent replies to one of your commands."
 
         fun registerChannel(context: Context) {
+            // Notification channels are an Oreo+ concept. On API 24/25 the system
+            // routes notifications without a channel; nothing to register.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (nm.getNotificationChannel(CHANNEL_ID) != null) return
             nm.createNotificationChannel(
