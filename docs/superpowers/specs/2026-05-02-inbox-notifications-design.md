@@ -12,9 +12,12 @@ Buzz the device when a Claude reply arrives, so the user can pocket the phone af
 
 | Decision | Choice | Reason |
 |---|---|---|
-| What triggers a notification? | Skip `Envelope.kind == ACK`; fire on `PROGRESS`, `QUESTION`, `RESULT`, `ERROR` | Each command emits ACK + N PROGRESS + RESULT (or ERROR / QUESTION). Buzzing on ACK is noise — the user just hit Send. The other kinds all need attention; QUESTION especially since the agent is blocked waiting. |
+| What triggers a notification? | Skip `Envelope.kind == ACK` only; fire on every other kind (including unknown/null) | Each command emits ACK + N PROGRESS + RESULT (or ERROR / QUESTION). Buzzing on ACK is noise — the user just hit Send. **Fail-open** on unknown/missing kinds so future schema additions don't silently swallow important replies. |
+| Notification ID strategy | Persistent `conversationKey → Int` map (atomic counter, stored in DataStore) | `String.hashCode()` collisions would overwrite the wrong conversation. Allocate a stable int ID on first sight of each conversation. |
+| Watcher lifecycle | Reactive on credentials, prefs, permission, network — not one-shot | Restart on any of these signals changing, not just process startup. |
+| PROGRESS rate-limiting | First PROGRESS per conversation buzzes; subsequent PROGRESS updates use `setOnlyAlertOnce(true)`. QUESTION / RESULT / ERROR always re-buzz | Avoids notification spam for chatty agents emitting many PROGRESS lines, while preserving urgency for terminal/blocking states. |
 | When does the listener run? | Process-lifetime only (no Service) | User explicitly: "when the app is closed it means I am done." Process death = silence. |
-| Notification grouping | One per conversation, updated in place | C-rule keeps volume low; collapsing keeps the shade clean. |
+| Notification grouping | One per conversation, updated in place | Skipping ACK keeps volume low; collapsing keeps the shade clean. |
 | Tap target | Deep-link to that `ConversationScreen` | Obvious. |
 | Channel/importance | Single `"replies"` channel, `IMPORTANCE_DEFAULT` (heads-up + sound) | One knob. Users can tweak per-channel in system settings. |
 | `POST_NOTIFICATIONS` ask | Just-in-time, on first Send when toggle is ON | No upfront permission scare. |
@@ -51,11 +54,11 @@ Application (ClaudeEmailApp)
 | File | Lines (est) | Layer | Responsibility |
 |---|---|---|---|
 | `app/ClaudeEmailApp.kt` | ~50 | app | `Application` subclass: register channel + lifecycle observer |
-| `app/InboxWatcher.kt` | ~120 | app | Owns process-scoped scope; wires IDLE callbacks → notifier |
-| `app/InboxNotifier.kt` | ~140 | app | Applies kind-rule, posts/updates grouped notifications, suppression check |
-| `mail/ImapIdleListener.kt` | ~150 | mail | Long-lived IMAP connection issuing IDLE; emits arrival callbacks |
+| `app/InboxWatcher.kt` | ~140 | app | Owns process-scoped scope; reactive on credentials/prefs/network/permission changes; wires IDLE callbacks → notifier |
+| `app/InboxNotifier.kt` | ~150 | app | Applies kind-rule, posts/updates grouped notifications, suppression check, PROGRESS rate-limit |
+| `mail/ImapIdleListener.kt` | ~150 | mail | Long-lived IMAP connection issuing IDLE on `Dispatchers.IO`; emits arrival callbacks; cancellation closes folder/store to break IDLE |
 | `mail/ImapSession.kt` | ~60 | mail | Shared session/properties factory (extracted from `ImapMailFetcher`) |
-| `data/InboxNotificationPrefs.kt` | ~50 | data | Notification toggle + last-notified UID per (UIDVALIDITY) |
+| `data/InboxNotificationPrefs.kt` | ~80 | data | Notification toggle + (UIDVALIDITY, lastNotifiedUid) + atomic `conversationKey → Int` ID allocator + first-PROGRESS-seen set |
 
 ### Files modified
 
@@ -66,7 +69,7 @@ Application (ClaudeEmailApp)
 | `app/SettingsScreen.kt` | Add "Notify on replies" toggle |
 | `app/AppRoot.kt` | Trigger `POST_NOTIFICATIONS` permission ask on first Send when toggle ON |
 | `mail/ImapMailFetcher.kt` | Refactor to use new `ImapSession` factory (offsets size cost so file stays under 200 LOC) |
-| `gradle/libs.versions.toml` + `app/build.gradle.kts` | Add `androidx.lifecycle:lifecycle-process` |
+| `gradle/libs.versions.toml` + `app/build.gradle.kts` | Add `androidx.lifecycle:lifecycle-process`. Verify Angus Mail + Angus Activation versions are pinned and that R8/release-build still passes (Jakarta Mail 2.0.x has historically had Android packaging quirks) |
 
 ## Data flow
 
@@ -74,10 +77,10 @@ Application (ClaudeEmailApp)
 2. **IDLE loop.** `InboxWatcher` launches a coroutine on a process-scoped scope. Connects via `ImapSession`, checks `CAPABILITY` for `IDLE`. If absent, logs once and exits silently (existing 15s foreground poll still works).
 3. **Initial sync.** Reads stored `(UIDVALIDITY, lastNotifiedUid)`. If UIDVALIDITY changed (rare: mailbox rebuilt), updates pointer to current `UIDNEXT - 1` and skips notifying for the backlog. Otherwise records `UIDNEXT - 1` if no value yet (first run).
 4. **Wait.** Issues `IDLE`. Server pushes `EXISTS` when new mail arrives.
-5. **Fetch.** On push, sends `DONE`, fetches `UID > lastNotifiedUid`, advances pointer.
-6. **Filter + post.** For each message: read parsed `envelope?.kind`. Skip if `ACK` or null (not a JSON envelope). For `PROGRESS`, `QUESTION`, `RESULT`, `ERROR`: look up conversation key, hand to `InboxNotifier`.
+5. **Fetch.** On push, sends `DONE`, fetches `UID > lastNotifiedUid`. Advances the high-water-mark pointer **only after** all post-processing for that batch succeeds (so a parse error or notification failure doesn't permanently skip the message — next loop will re-fetch).
+6. **Filter + post.** For each message: read parsed `envelope?.kind`. Skip only if `kind == ACK`. For everything else (including null and unknown kinds): look up conversation key, hand to `InboxNotifier`. **Fail-open** so a future kind addition isn't silently swallowed.
 7. **Suppress check.** `InboxNotifier` checks `ProcessLifecycleOwner.get().lifecycle.currentState`. If `STARTED+`, refresh inbox state but skip `notify()`.
-8. **Post.** Otherwise build `NotificationCompat.Builder` with conversation ID as notification ID. Title = project path; text = subject of latest message; `setOnlyAlertOnce(false)` so subsequent updates re-buzz; deep-link extras: `conversationKey`.
+8. **Post.** Allocate / look up the conversation's notification `Int` ID via `InboxNotificationPrefs` (atomic counter, persisted, never reused). Build `NotificationCompat.Builder`: title = project path; text = subject of latest message; `setOnlyAlertOnce(true)` for `PROGRESS` *after* the first one for that conversation, otherwise `false` (always alert on the first PROGRESS, plus every QUESTION / RESULT / ERROR). Deep-link extras: `conversationKey`.
 9. **Re-IDLE.** Loop back to step 4.
 10. **Process death.** User swipes app from recents → process killed → coroutine cancelled → `finally` closes IMAP socket → no further notifications.
 
@@ -92,7 +95,9 @@ Application (ClaudeEmailApp)
 | Notification flood on first run | High-water-mark UID stored per UIDVALIDITY in `InboxNotificationPrefs` |
 | Sign-out / credentials change | Observe `CredentialsStore` flow → cancel + relaunch listener |
 | Permission denied | One-time inline hint on `ConversationScreen` ("Enable notifications in system settings") — non-blocking, dismissible |
-| Process death mid-IDLE | Coroutine cancellation closes socket via `try/finally` — no leak |
+| Process death mid-IDLE | Coroutine cancellation closes folder/store in `finally`, which is what breaks the blocking `IMAPFolder.idle()` call. IDLE runs on a dedicated `Dispatchers.IO` thread |
+| OEM keeps process alive after recents-swipe | Some OEMs (Samsung, Xiaomi) don't kill the process on swipe. In that case notifications continue — acceptable since the app is still effectively "alive". `Application.onTaskRemoved` is overridden to explicitly cancel the watcher scope so the user-visible behavior matches expectations on those devices too |
+| Doze / app standby | Acknowledged limitation: under deep Doze (device unplugged + screen off + idle for 1h+) network access is restricted. Notifications will resume when Doze releases. Documented as a known trade-off of the no-service approach |
 
 ## Permission flow
 
@@ -116,11 +121,14 @@ Stored in the same DataStore as `syncIntervalMs`.
 
 Unit (Robolectric + MockK):
 
-- `InboxNotifier` kind-rule: `ACK` input → no post; `PROGRESS` / `QUESTION` / `RESULT` / `ERROR` → post; null envelope → no post; toggle OFF → no post for any kind.
+- `InboxNotifier` kind-rule: `ACK` → no post; `PROGRESS` / `QUESTION` / `RESULT` / `ERROR` → post; **null envelope → POST (fail-open)**; **unknown kind string → POST (fail-open)**; toggle OFF → no post for any kind.
+- `InboxNotifier` PROGRESS rate-limit: first PROGRESS in conversation → `setOnlyAlertOnce(false)`; second PROGRESS in same conversation → `setOnlyAlertOnce(true)`; subsequent QUESTION → always `false`.
 - `InboxNotifier` foreground suppression: `STARTED` lifecycle state → no `notify()` call (verify via mocked `NotificationManagerCompat`).
-- `InboxNotifier` grouping: two messages in same conversation → single `notify()` call with same ID, second overwrites.
-- `InboxNotificationPrefs` high-water-mark: UIDVALIDITY change resets pointer; UIDVALIDITY same advances pointer.
+- `InboxNotifier` grouping + ID allocation: two messages in same conversation → same `Int` ID (verify allocator returns same value); two messages in different conversations → distinct IDs; allocator is persisted across process restarts.
+- `InboxNotificationPrefs` high-water-mark: UIDVALIDITY change resets pointer; UIDVALIDITY same advances pointer; **pointer only advances after the post step succeeds** (simulate post failure → next call re-fetches the same UID).
 - `ImapIdleListener` capability fallback: mock CAPABILITY response without `IDLE` → listener exits cleanly without throwing.
+- `ImapIdleListener` cancellation: cancel coroutine → `folder.close()` invoked in `finally` (verify via spy) → IDLE thread unblocks within 1s.
+- `InboxWatcher` reactivity: credentials emission → restart; prefs toggle OFF emission → cancel; network `onLost` → cancel; network `onAvailable` → restart.
 
 Integration (existing `.env` IMAP):
 
@@ -133,6 +141,11 @@ Manual (device):
 - Send command → swipe app from recents → wait for reply → confirm no notification.
 - Toggle off in Settings → confirm no notification fires.
 - Wifi → cellular handoff during IDLE → confirm reconnect (logcat).
+
+## Known limitations
+
+- **Reliability is best-effort, not guaranteed.** This is the explicit user-chosen trade-off of "no background service". Under aggressive OEM background restrictions, deep Doze, or process-killed-by-low-memory, notifications may be missed. If the user wants guaranteed delivery, the upgrade path is FCM push from the backend (see "Out of scope").
+- **Foreground suppression is coarse.** Suppresses any time the activity is `STARTED+`, not specifically when viewing the matching conversation. Future iteration could thread the visible conversation key through to the notifier; not worth the state churn for v1.
 
 ## Out of scope (follow-ups)
 
