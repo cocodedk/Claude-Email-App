@@ -58,8 +58,8 @@ class MailProbe(
             put("mail.imaps.port", credentials.imapPort.toString())
             put("mail.imaps.ssl.enable", "true")
             put("mail.imaps.ssl.checkserveridentity", "true")
-            put("mail.imaps.connectiontimeout", TIMEOUT_MS.toString())
-            put("mail.imaps.timeout", TIMEOUT_MS.toString())
+            put("mail.imaps.connectiontimeout", MailTimeouts.CONNECT_MS.toString())
+            put("mail.imaps.timeout", MailTimeouts.READ_MS.toString())
         }
 
         internal fun smtpProperties(credentials: MailCredentials): Properties = Properties().apply {
@@ -67,9 +67,9 @@ class MailProbe(
             put("mail.smtp.host", credentials.smtpHost)
             put("mail.smtp.port", credentials.smtpPort.toString())
             put("mail.smtp.auth", "true")
-            put("mail.smtp.connectiontimeout", TIMEOUT_MS.toString())
-            put("mail.smtp.timeout", TIMEOUT_MS.toString())
-            put("mail.smtp.writetimeout", TIMEOUT_MS.toString())
+            put("mail.smtp.connectiontimeout", MailTimeouts.CONNECT_MS.toString())
+            put("mail.smtp.timeout", MailTimeouts.READ_MS.toString())
+            put("mail.smtp.writetimeout", MailTimeouts.READ_MS.toString())
             if (credentials.smtpUseStartTls) {
                 put("mail.smtp.starttls.enable", "true")
                 put("mail.smtp.starttls.required", "true")
@@ -91,7 +91,5 @@ class MailProbe(
                 it.connect(c.smtpHost, c.smtpPort, c.emailAddress, c.password)
             }
         }
-
-        private const val TIMEOUT_MS = 15_000
     }
 }
