@@ -18,8 +18,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -40,6 +42,8 @@ fun SettingsScreen(
     credentials: MailCredentials,
     syncIntervalMs: Long,
     onSyncIntervalChange: (Long) -> Unit,
+    notificationsEnabled: Boolean,
+    onNotificationsEnabledChange: (Boolean) -> Unit,
     onBack: () -> Unit,
     onSignOut: () -> Unit,
     onEdit: () -> Unit,
@@ -77,6 +81,12 @@ fun SettingsScreen(
         } }
         item { SectionCard("Sync") {
             SyncIntervalPicker(selectedMs = syncIntervalMs, onSelect = onSyncIntervalChange)
+        } }
+        item { SectionCard("Notifications") {
+            NotificationsToggle(
+                enabled = notificationsEnabled,
+                onChange = onNotificationsEnabledChange
+            )
         } }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -142,4 +152,30 @@ private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) ->
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
+}
+
+@Composable
+private fun ColumnScope.NotificationsToggle(enabled: Boolean, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.padding(end = 12.dp)) {
+            Text(
+                text = "Notify on replies",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "Get a device notification when an agent reply arrives. Stops when you close the app.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = enabled,
+            onCheckedChange = onChange,
+            modifier = Modifier.testTag("settings_notifications_toggle")
+        )
+    }
 }

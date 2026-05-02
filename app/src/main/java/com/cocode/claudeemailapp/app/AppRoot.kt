@@ -281,10 +281,13 @@ private fun AppScreenContent(
             }
         )
         Screen.Settings -> credentials?.let {
+            val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
             SettingsScreen(
                 credentials = it,
                 syncIntervalMs = syncIntervalMs,
                 onSyncIntervalChange = { viewModel.setSyncIntervalMs(it) },
+                notificationsEnabled = notificationsEnabled,
+                onNotificationsEnabledChange = { viewModel.setNotificationsEnabled(it) },
                 onBack = { onScreenChange(Screen.Home) },
                 onSignOut = {
                     viewModel.signOut()
