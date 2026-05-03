@@ -113,7 +113,7 @@ class InboxIdleService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle("Watching inbox")
             .setContentText("Listening for replies in the background")
             .setPriority(NotificationCompat.PRIORITY_MIN)

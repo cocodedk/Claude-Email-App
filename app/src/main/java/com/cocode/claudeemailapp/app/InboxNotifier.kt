@@ -41,7 +41,7 @@ class InboxNotifier(
         )
         val title = message.fromName?.takeIf { it.isNotBlank() } ?: message.from
         val notif = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle(title)
             .setContentText(message.subject)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message.subject))
