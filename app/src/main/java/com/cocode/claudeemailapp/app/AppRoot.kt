@@ -289,7 +289,10 @@ private fun AppScreenContent(
                 onSelectConversation(it.id)
                 onScreenChange(Screen.Conversation)
             },
-            onCompose = { onScreenChange(Screen.Compose) },
+            onCompose = {
+                onClearComposeProject()
+                onScreenChange(Screen.Compose)
+            },
             onOpenSettings = { onScreenChange(Screen.Settings) },
             onArchiveToggle = onArchiveToggle,
             onRetryPending = { p ->
@@ -315,7 +318,10 @@ private fun AppScreenContent(
                     onSelectComposeProject(p.path)
                     onScreenChange(Screen.Compose)
                 },
-                onCompose = { onScreenChange(Screen.Compose) }
+                onCompose = {
+                    onClearComposeProject()
+                    onScreenChange(Screen.Compose)
+                }
             )
         }
         Screen.Settings -> credentials?.let {
@@ -384,7 +390,10 @@ private fun AppScreenContent(
                         }
                     },
                     onOpenSettings = { onScreenChange(Screen.Settings) },
-                    onEditCommand = { onScreenChange(Screen.Compose) },
+                    onEditCommand = {
+                        onClearComposeProject()
+                        onScreenChange(Screen.Compose)
+                    },
                     onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
                 )
             }
