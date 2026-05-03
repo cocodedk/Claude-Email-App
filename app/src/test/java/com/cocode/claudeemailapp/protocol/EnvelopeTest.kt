@@ -177,4 +177,18 @@ class EnvelopeTest {
         val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
         assertNull(env.meta.progress)
     }
+
+    @Test
+    fun envelopeMeta_suggestedReplies_parsesArray() {
+        val raw = """{"v":1,"kind":"question","body":"ok?","meta":{"suggested_replies":["yes","no","edit first"]}}"""
+        val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
+        assertEquals(listOf("yes", "no", "edit first"), env.meta.suggestedReplies)
+    }
+
+    @Test
+    fun envelopeMeta_suggestedReplies_absentWhenMissing() {
+        val raw = """{"v":1,"kind":"question","body":"ok?","meta":{}}"""
+        val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
+        assertNull(env.meta.suggestedReplies)
+    }
 }

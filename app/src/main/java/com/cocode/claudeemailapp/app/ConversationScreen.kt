@@ -2,22 +2,12 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,22 +17,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.app.steering.SteeringBar
 import com.cocode.claudeemailapp.app.steering.SteeringBarController
 import com.cocode.claudeemailapp.app.steering.SteeringBarState
-import com.cocode.claudeemailapp.app.steering.SteeringChip
-import com.cocode.claudeemailapp.app.steering.SteeringChipVariant
 import com.cocode.claudeemailapp.app.steering.SteeringIntent
 import com.cocode.claudeemailapp.app.steering.SteeringTemplateSheet
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.PendingCommand
-import com.cocode.claudeemailapp.mail.FetchedMessage
 
 @Composable
 fun ConversationScreen(
@@ -115,15 +99,34 @@ fun ConversationScreen(
                 item(key = "error") { StatusCard(title = "Send failed", message = it) }
             }
         }
+        val suggestedReplies = pickSuggestedReplies(conversation.messages)
         when (steering) {
             SteeringBarState.Idle -> SteeringBar(state = steering, controller = controller)
-            is SteeringBarState.AwaitingUser -> SteeringTemplateSheet(
-                onTemplateTap = { template ->
-                    reply = if (reply.isBlank()) template else "$reply\n$template"
+            is SteeringBarState.AwaitingUser -> {
+                // Backend-tailored chips for this question take precedence over generic
+                // free-form templates — render one or the other, never both stacked.
+                if (suggestedReplies.isEmpty()) {
+                    SteeringTemplateSheet(
+                        onTemplateTap = { template ->
+                            reply = if (reply.isBlank()) template else "$reply\n$template"
+                        }
+                    )
                 }
-            )
+            }
             SteeringBarState.Hidden -> Unit
         }
+        SuggestedRepliesRow(
+            replies = suggestedReplies,
+            enabled = !sending,
+            onTap = { chip ->
+                if (steering is SteeringBarState.AwaitingUser) {
+                    onSteeringIntent(SteeringIntent.Reply(steering.askId, chip))
+                } else {
+                    onSendReply(chip)
+                }
+                reply = ""
+            }
+        )
         ReplyComposer(
             reply = reply,
             onReplyChange = { reply = it },
@@ -140,49 +143,6 @@ fun ConversationScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun ConversationHeaderCard(
-    conversation: Conversation,
-    isArchived: Boolean,
-    onBack: () -> Unit,
-    onArchiveToggle: () -> Unit
-) {
-    ElevatedCard(
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = conversation.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f).testTag("conversation_subject")
-                )
-                OutlinedButton(onClick = onBack, modifier = Modifier.testTag("conversation_back")) {
-                    Text("Back")
-                }
-            }
-            Text(
-                text = "${conversation.agentDisplay} · ${conversation.messageCount} ${if (conversation.messageCount == 1) "message" else "messages"}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(modifier = Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SteeringChip(
-                    label = if (isArchived) "Unarchive" else "Archive",
-                    onClick = onArchiveToggle,
-                    variant = SteeringChipVariant.Default,
-                    modifier = Modifier.testTag("conversation_archive")
-                )
-            }
-        }
     }
 }
 
