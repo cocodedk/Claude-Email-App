@@ -51,6 +51,30 @@ class ImapIdleListenerTest {
     }
 
     @Test
+    fun `surfaces mid-listen throwable through onError and retries`() = runTest {
+        val received = mutableListOf<Unit>()
+        val errors = mutableListOf<Throwable>()
+        val sessions = ArrayDeque<ImapIdleSession>().apply {
+            // First session emits 2 events then throws — mirrors JakartaImapIdleSession's
+            // events.close(t) path when idle() fails after some activity.
+            add(EmitThenThrowIdleSession(events = 2, throwAfter = IllegalStateException("idle dropped")))
+            add(FakeIdleSession(events = 1))
+        }
+        val listener = ImapIdleListener(
+            sessionFactory = { sessions.removeFirst() },
+            onActivity = { received += Unit },
+            onError = { errors += it },
+            backoffMs = 0
+        )
+        val job = launch { listener.run() }
+        (sessions.lastOrNull() as? FakeIdleSession ?: error("no fake")).awaitDrained()
+        job.cancelAndJoin()
+        assertEquals(3, received.size) // 2 from session-1 before throw, 1 from session-2
+        assertEquals(1, errors.size)
+        assertTrue(errors[0] is IllegalStateException)
+    }
+
+    @Test
     fun `lets cancellation exit run cleanly without retrying`() = runTest {
         var sessionCount = 0
         val listener = ImapIdleListener(
@@ -71,6 +95,17 @@ class ImapIdleListenerTest {
 private class ThrowingIdleSession(private val cause: Throwable) : ImapIdleSession {
     override suspend fun listen(onEvent: suspend () -> Unit) {
         throw cause
+    }
+    override fun close() = Unit
+}
+
+private class EmitThenThrowIdleSession(
+    private val events: Int,
+    private val throwAfter: Throwable
+) : ImapIdleSession {
+    override suspend fun listen(onEvent: suspend () -> Unit) {
+        repeat(events) { onEvent() }
+        throw throwAfter
     }
     override fun close() = Unit
 }

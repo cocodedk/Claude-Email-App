@@ -51,8 +51,13 @@ class JakartaImapIdleSession(
             override fun messagesAdded(e: MessageCountEvent) { events.trySend(Unit) }
         })
         val idleThread = thread(name = "imap-idle", isDaemon = true) {
-            try { while (f.isOpen) f.idle() } catch (_: Throwable) {}
-            events.close()
+            // Forward any IDLE-side failure (auth dropped, socket reset, BAD response)
+            // through the channel cause so listen()'s for-loop rethrows it and the
+            // outer ImapIdleListener sees it via its onError callback. Without the
+            // cause the listener silently reconnects with no visibility into why.
+            var cause: Throwable? = null
+            try { while (f.isOpen) f.idle() } catch (t: Throwable) { cause = t }
+            events.close(cause)
         }
         try {
             for (event in events) onEvent()

@@ -371,6 +371,7 @@ class AppViewModel(
 
     fun signOut() {
         stopInboxPolling()
+        InboxIdleService.stop(getApplication())
         credentialsStore.clear()
         pendingStore.clear()
         conversationStateStore.clear()

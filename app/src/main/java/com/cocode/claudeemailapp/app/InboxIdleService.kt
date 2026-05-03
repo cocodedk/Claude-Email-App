@@ -47,6 +47,10 @@ class InboxIdleService : Service() {
         startListener()
     }
 
+    // START_STICKY so the OS recreates us after a low-memory kill. Without this
+    // the IDLE listener stays dead until the user reopens MainActivity.
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+
     private fun startInForeground() {
         ensureChannel()
         val notif = buildOngoingNotification()
