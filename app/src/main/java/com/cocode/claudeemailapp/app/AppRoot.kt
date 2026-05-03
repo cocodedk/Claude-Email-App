@@ -57,7 +57,6 @@ fun ClaudeEmailApp(
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
     val hasSeenOnboarding by viewModel.hasSeenOnboarding.collectAsState()
-    val recentProjects by viewModel.recentProjects.collectAsState()
 
     var screen by rememberSaveable {
         mutableStateOf(
@@ -70,6 +69,9 @@ fun ClaudeEmailApp(
     }
     var editingCredentials by rememberSaveable { mutableStateOf(false) }
     var selectedConversationId by rememberSaveable { mutableStateOf<String?>(null) }
+    // Set when the user taps a row in the Projects tab so Compose pre-fills with
+    // the deliberately-chosen project path; cleared on return to Home.
+    var selectedComposeProject by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -156,9 +158,11 @@ fun ClaudeEmailApp(
                 onSelectConversation = { selectedConversationId = it },
                 onArchiveToggle = ::toggleArchiveWithUndo,
                 syncIntervalMs = syncIntervalMs,
-                recentProjects = recentProjects,
                 viewModel = viewModel,
-                prefill = prefill
+                prefill = prefill,
+                selectedComposeProject = selectedComposeProject,
+                onClearComposeProject = { selectedComposeProject = null },
+                onSelectComposeProject = { selectedComposeProject = it }
             )
         }
     }
@@ -205,9 +209,11 @@ private fun AppNavHost(
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
-    recentProjects: List<String>,
     viewModel: AppViewModel,
-    prefill: MailCredentials?
+    prefill: MailCredentials?,
+    selectedComposeProject: String?,
+    onClearComposeProject: () -> Unit,
+    onSelectComposeProject: (String) -> Unit
 ) {
     val reduceMotion = rememberReduceMotion()
     Crossfade(
@@ -231,9 +237,11 @@ private fun AppNavHost(
         onSelectConversation = onSelectConversation,
         onArchiveToggle = onArchiveToggle,
         syncIntervalMs = syncIntervalMs,
-        recentProjects = recentProjects,
         viewModel = viewModel,
-        prefill = prefill
+        prefill = prefill,
+        selectedComposeProject = selectedComposeProject,
+        onClearComposeProject = onClearComposeProject,
+        onSelectComposeProject = onSelectComposeProject
     ) }
 }
 
@@ -255,9 +263,11 @@ private fun AppScreenContent(
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
-    recentProjects: List<String>,
     viewModel: AppViewModel,
-    prefill: MailCredentials?
+    prefill: MailCredentials?,
+    selectedComposeProject: String?,
+    onClearComposeProject: () -> Unit,
+    onSelectComposeProject: (String) -> Unit
 ) {
     when (screen) {
         Screen.Onboarding -> OnboardingScreen(
@@ -299,9 +309,10 @@ private fun AppScreenContent(
                 state = projects,
                 onRefresh = { viewModel.refreshProjects() },
                 onProjectTap = { p ->
-                    // For v1 the tap simply opens Compose pre-filled with the
-                    // project path; conversation routing comes in Tier 2 once
-                    // the per-project conversation map is wired.
+                    // Pass the deliberately-chosen project path through to
+                    // Compose; conversation routing arrives in Tier 2 once the
+                    // per-project conversation map is wired.
+                    onSelectComposeProject(p.path)
                     onScreenChange(Screen.Compose)
                 },
                 onCompose = { onScreenChange(Screen.Compose) }
@@ -380,14 +391,17 @@ private fun AppScreenContent(
         }
         Screen.Compose -> ComposeMessageScreen(
             defaultTo = credentials?.serviceAddress.orEmpty(),
-            defaultProject = recentProjects.firstOrNull().orEmpty(),
+            defaultProject = selectedComposeProject.orEmpty(),
             sending = send.sending,
             sendError = send.lastError,
-            onCancel = { onScreenChange(Screen.Home) },
+            onCancel = {
+                onClearComposeProject()
+                onScreenChange(Screen.Home)
+            },
             onSend = { to, project, body ->
                 viewModel.sendCommand(to = to, project = project, body = body)
-            },
-            recentProjects = recentProjects
+                onClearComposeProject()
+            }
         )
     }
 }
