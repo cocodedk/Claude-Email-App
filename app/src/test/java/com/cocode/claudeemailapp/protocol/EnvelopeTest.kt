@@ -144,4 +144,37 @@ class EnvelopeTest {
         assertEquals("x", e.code)
         assertEquals("y", e.message)
     }
+
+    @Test
+    fun envelopeMeta_progress_parsesAllFields() {
+        val raw = """
+            {"v":1,"kind":"progress","body":"running tests","meta":{"progress":{"current":3,"total":7,"percent":42.8,"label":"tests passed"}}}
+        """.trimIndent()
+        val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
+        val p = env.meta.progress
+        assertNotNull(p)
+        assertEquals(3, p!!.current)
+        assertEquals(7, p.total)
+        assertEquals(42.8, p.percent!!, 0.001)
+        assertEquals("tests passed", p.label)
+    }
+
+    @Test
+    fun envelopeMeta_progress_allFieldsOptional() {
+        val raw = """{"v":1,"kind":"progress","body":"x","meta":{"progress":{}}}"""
+        val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
+        val p = env.meta.progress
+        assertNotNull(p)
+        assertNull(p!!.current)
+        assertNull(p.total)
+        assertNull(p.percent)
+        assertNull(p.label)
+    }
+
+    @Test
+    fun envelopeMeta_progress_absentWhenMissing() {
+        val raw = """{"v":1,"kind":"progress","body":"x","meta":{}}"""
+        val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
+        assertNull(env.meta.progress)
+    }
 }
