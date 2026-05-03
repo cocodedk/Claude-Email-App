@@ -414,6 +414,61 @@ class AppViewModelTest {
     )
 
     @Test
+    fun refreshProjects_sendsListProjectsEnvelopeViaSender() = runTest(dispatcher) {
+        val sender = mockk<MailSender>(relaxed = true)
+        val vm = buildVm(initialCreds = creds(), sender = sender)
+        advanceUntilIdle()
+
+        vm.refreshProjects()
+        advanceUntilIdle()
+
+        coVerify {
+            sender.send(any(), match { msg ->
+                msg.body.contains("\"kind\":\"list_projects\"") &&
+                    msg.contentType == com.cocode.claudeemailapp.protocol.ENVELOPE_CONTENT_TYPE
+            })
+        }
+        assertTrue(vm.projects.value.loading || vm.projects.value.lastFetchedAt != null)
+    }
+
+    @Test
+    fun refreshInbox_parsesListProjectsAckIntoProjectsState() = runTest(dispatcher) {
+        val data = kotlinx.serialization.json.buildJsonObject {
+            put("projects", kotlinx.serialization.json.buildJsonArray {
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("claude-email"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/p/claude-email"))
+                    put("running_task_id", kotlinx.serialization.json.JsonPrimitive(42L))
+                    put("queue_depth", kotlinx.serialization.json.JsonPrimitive(2))
+                    put("last_activity_at", kotlinx.serialization.json.JsonPrimitive("2026-05-03T09:24:00Z"))
+                })
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("babakcast"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/p/babakcast"))
+                    put("queue_depth", kotlinx.serialization.json.JsonPrimitive(0))
+                })
+            })
+        }
+        val ackMsg = fakeMessage("<list-ack@x>", "Re: list").copy(
+            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        val state = vm.projects.value
+        assertEquals(2, state.projects.size)
+        assertEquals("claude-email", state.projects[0].name)
+        assertEquals(42L, state.projects[0].runningTaskId)
+        assertEquals(2, state.projects[0].queueDepth)
+        assertEquals("babakcast", state.projects[1].name)
+        assertNull(state.projects[1].runningTaskId)
+        assertEquals(0, state.projects[1].queueDepth)
+    }
+
+    @Test
     fun notifier_suppressedOnFirstPoll_thenFiresForNewMessages() = runTest(dispatcher) {
         val notifier = mockk<InboxNotifier>(relaxed = true)
         val m1 = fakeMessage("<m1@x>", "first")

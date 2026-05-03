@@ -26,7 +26,8 @@ internal fun HeroCard(
     buckets: AppViewModel.HomeBuckets,
     onCompose: () -> Unit,
     onRefresh: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenProjects: () -> Unit = {}
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(24.dp),
@@ -58,6 +59,9 @@ internal fun HeroCard(
                     enabled = !loading,
                     modifier = Modifier.testTag("home_refresh_button")
                 ) { Text(if (loading) "Refreshing…" else "Refresh") }
+                TextButton(onClick = onOpenProjects, modifier = Modifier.testTag("home_projects_button")) {
+                    Text("Projects")
+                }
                 TextButton(onClick = onOpenSettings, modifier = Modifier.testTag("home_settings_button")) {
                     Text("Settings")
                 }

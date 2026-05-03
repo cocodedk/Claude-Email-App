@@ -39,7 +39,7 @@ import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
-enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics }
+enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics, Projects }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +57,6 @@ fun ClaudeEmailApp(
     val send by viewModel.send.collectAsState()
     val pending by viewModel.pending.collectAsState()
     val hasSeenOnboarding by viewModel.hasSeenOnboarding.collectAsState()
-    val recentProjects by viewModel.recentProjects.collectAsState()
 
     var screen by rememberSaveable {
         mutableStateOf(
@@ -70,6 +69,7 @@ fun ClaudeEmailApp(
     }
     var editingCredentials by rememberSaveable { mutableStateOf(false) }
     var selectedConversationId by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedComposeProject by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -156,9 +156,10 @@ fun ClaudeEmailApp(
                 onSelectConversation = { selectedConversationId = it },
                 onArchiveToggle = ::toggleArchiveWithUndo,
                 syncIntervalMs = syncIntervalMs,
-                recentProjects = recentProjects,
                 viewModel = viewModel,
-                prefill = prefill
+                prefill = prefill,
+                selectedComposeProject = selectedComposeProject,
+                onSelectComposeProject = { selectedComposeProject = it }
             )
         }
     }
@@ -178,6 +179,7 @@ private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
                     Screen.Conversation -> "Conversation"
                     Screen.Compose -> "New command"
                     Screen.Diagnostics -> "Diagnostics"
+                    Screen.Projects -> "Projects"
                 },
                 style = MaterialTheme.typography.titleLarge
             )
@@ -204,9 +206,10 @@ private fun AppNavHost(
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
-    recentProjects: List<String>,
     viewModel: AppViewModel,
-    prefill: MailCredentials?
+    prefill: MailCredentials?,
+    selectedComposeProject: String?,
+    onSelectComposeProject: (String?) -> Unit
 ) {
     val reduceMotion = rememberReduceMotion()
     Crossfade(
@@ -230,9 +233,10 @@ private fun AppNavHost(
         onSelectConversation = onSelectConversation,
         onArchiveToggle = onArchiveToggle,
         syncIntervalMs = syncIntervalMs,
-        recentProjects = recentProjects,
         viewModel = viewModel,
-        prefill = prefill
+        prefill = prefill,
+        selectedComposeProject = selectedComposeProject,
+        onSelectComposeProject = onSelectComposeProject
     ) }
 }
 
@@ -254,9 +258,10 @@ private fun AppScreenContent(
     onSelectConversation: (String?) -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     syncIntervalMs: Long,
-    recentProjects: List<String>,
     viewModel: AppViewModel,
-    prefill: MailCredentials?
+    prefill: MailCredentials?,
+    selectedComposeProject: String?,
+    onSelectComposeProject: (String?) -> Unit
 ) {
     when (screen) {
         Screen.Onboarding -> OnboardingScreen(
@@ -278,7 +283,10 @@ private fun AppScreenContent(
                 onSelectConversation(it.id)
                 onScreenChange(Screen.Conversation)
             },
-            onCompose = { onScreenChange(Screen.Compose) },
+            onCompose = {
+                onSelectComposeProject(null)
+                onScreenChange(Screen.Compose)
+            },
             onOpenSettings = { onScreenChange(Screen.Settings) },
             onArchiveToggle = onArchiveToggle,
             onRetryPending = { p ->
@@ -286,8 +294,27 @@ private fun AppScreenContent(
             },
             onCancelPending = { p ->
                 viewModel.dispatchSteering(p, com.cocode.claudeemailapp.app.steering.SteeringIntent.Cancel)
+            },
+            onOpenProjects = {
+                viewModel.refreshProjects()
+                onScreenChange(Screen.Projects)
             }
         )
+        Screen.Projects -> {
+            val projects by viewModel.projects.collectAsState()
+            ProjectsScreen(
+                state = projects,
+                onRefresh = { viewModel.refreshProjects() },
+                onProjectTap = { p ->
+                    onSelectComposeProject(p.path)
+                    onScreenChange(Screen.Compose)
+                },
+                onCompose = {
+                    onSelectComposeProject(null)
+                    onScreenChange(Screen.Compose)
+                }
+            )
+        }
         Screen.Settings -> credentials?.let {
             val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
             SettingsScreen(
@@ -354,21 +381,27 @@ private fun AppScreenContent(
                         }
                     },
                     onOpenSettings = { onScreenChange(Screen.Settings) },
-                    onEditCommand = { onScreenChange(Screen.Compose) },
+                    onEditCommand = {
+                        onSelectComposeProject(null)
+                        onScreenChange(Screen.Compose)
+                    },
                     onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
                 )
             }
         }
         Screen.Compose -> ComposeMessageScreen(
             defaultTo = credentials?.serviceAddress.orEmpty(),
-            defaultProject = recentProjects.firstOrNull().orEmpty(),
+            defaultProject = selectedComposeProject.orEmpty(),
             sending = send.sending,
             sendError = send.lastError,
-            onCancel = { onScreenChange(Screen.Home) },
+            onCancel = {
+                onSelectComposeProject(null)
+                onScreenChange(Screen.Home)
+            },
             onSend = { to, project, body ->
                 viewModel.sendCommand(to = to, project = project, body = body)
-            },
-            recentProjects = recentProjects
+                onSelectComposeProject(null)
+            }
         )
     }
 }

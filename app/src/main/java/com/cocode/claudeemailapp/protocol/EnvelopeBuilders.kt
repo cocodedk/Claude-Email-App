@@ -75,6 +75,20 @@ object Envelopes {
         meta = EnvelopeMeta(client = client, sentAt = sentAt, auth = auth)
     )
 
+    /**
+     * Discovery query: backend enumerates git repos under allowed_base + merges
+     * task-history state per project. Response is an `ack` carrying
+     * `data.projects: [{name, path, running_task_id, queue_depth, last_activity_at}]`.
+     */
+    fun listProjects(
+        auth: String? = null,
+        client: String = CLIENT_ID,
+        sentAt: String = Instant.now().toString()
+    ): Envelope = Envelope(
+        kind = Kinds.LIST_PROJECTS,
+        meta = EnvelopeMeta(client = client, sentAt = sentAt, auth = auth)
+    )
+
     fun cancel(
         project: String,
         drainQueue: Boolean = false,

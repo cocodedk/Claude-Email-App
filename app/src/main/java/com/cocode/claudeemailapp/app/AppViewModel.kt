@@ -16,7 +16,9 @@ import com.cocode.claudeemailapp.data.InboxNotificationPrefs
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingCommandStore
+import com.cocode.claudeemailapp.data.ListProjectsResponse
 import com.cocode.claudeemailapp.data.PendingStatus
+import com.cocode.claudeemailapp.data.ProjectSummary
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import com.cocode.claudeemailapp.mail.ImapMailFetcher
 import com.cocode.claudeemailapp.mail.MailException
@@ -27,7 +29,9 @@ import com.cocode.claudeemailapp.mail.OutgoingMessage
 import com.cocode.claudeemailapp.mail.ProbeResult
 import com.cocode.claudeemailapp.mail.SendResult
 import com.cocode.claudeemailapp.mail.SmtpMailSender
+import com.cocode.claudeemailapp.protocol.EnvelopeJson
 import com.cocode.claudeemailapp.protocol.Envelopes
+import com.cocode.claudeemailapp.protocol.Kinds
 import com.cocode.claudeemailapp.protocol.envelope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -83,6 +87,13 @@ class AppViewModel(
         val justSentMessageId: String? = null
     )
 
+    data class ProjectsState(
+        val loading: Boolean = false,
+        val projects: List<ProjectSummary> = emptyList(),
+        val error: String? = null,
+        val lastFetchedAt: Long? = null
+    )
+
     private val _credentials = MutableStateFlow(credentialsStore.load())
     val credentials: StateFlow<MailCredentials?> = _credentials.asStateFlow()
 
@@ -102,6 +113,9 @@ class AppViewModel(
 
     private val _send = MutableStateFlow(SendState())
     val send: StateFlow<SendState> = _send.asStateFlow()
+
+    private val _projects = MutableStateFlow(ProjectsState())
+    val projects: StateFlow<ProjectsState> = _projects.asStateFlow()
 
     private val _pending = MutableStateFlow(pendingStore.all())
     val pending: StateFlow<List<PendingCommand>> = _pending.asStateFlow()
@@ -224,6 +238,49 @@ class AppViewModel(
         _probe.value = ProbeState()
     }
 
+    fun refreshProjects() {
+        val creds = _credentials.value ?: return
+        // Concurrent-fire guard: tapping Refresh twice (or re-entering Projects
+        // mid-flight) would otherwise stack overlapping SMTP sends.
+        if (_projects.value.loading) return
+        viewModelScope.launch {
+            _projects.value = _projects.value.copy(loading = true, error = null)
+            try {
+                val envelope = Envelopes.listProjects(auth = creds.sharedSecret.takeIf { it.isNotBlank() })
+                val msg = OutgoingMessage.envelope(
+                    to = creds.serviceAddress,
+                    subject = "list-projects",
+                    envelope = envelope
+                )
+                mailSender.send(creds, msg)
+                _projects.value = _projects.value.copy(loading = false, lastFetchedAt = System.currentTimeMillis())
+            } catch (t: Throwable) {
+                _projects.value = _projects.value.copy(loading = false, error = t.message)
+            }
+        }
+    }
+
+    private var lastProjectsAckMessageId: String? = null
+
+    private fun extractProjectsFromAcks(messages: List<FetchedMessage>) {
+        val candidate = messages.firstOrNull { msg ->
+            val env = msg.envelope ?: return@firstOrNull false
+            env.kind == Kinds.ACK && env.data?.containsKey("projects") == true
+        } ?: return
+        // Skip the no-op write that would re-emit StateFlow on every IMAP cycle
+        // while the same ack still sits in the recent-50 window.
+        if (candidate.messageId.isNotBlank() && candidate.messageId == lastProjectsAckMessageId) return
+        val data = candidate.envelope?.data ?: return
+        val parsed = runCatching {
+            EnvelopeJson.decodeFromJsonElement(ListProjectsResponse.serializer(), data)
+        }.getOrNull() ?: return
+        lastProjectsAckMessageId = candidate.messageId
+        _projects.value = _projects.value.copy(
+            projects = parsed.projects.take(MAX_PROJECTS),
+            lastFetchedAt = System.currentTimeMillis()
+        )
+    }
+
     fun refreshInbox() {
         val creds = _credentials.value ?: return
         viewModelScope.launch {
@@ -244,6 +301,7 @@ class AppViewModel(
                 )
                 if (!firstPoll) newOnes.forEach { inboxNotifier?.handle(it) }
                 reconcilePending(messages)
+                extractProjectsFromAcks(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)
             } catch (t: Throwable) {
@@ -390,6 +448,9 @@ class AppViewModel(
          * cost down; the picker in Settings configures that bg value.
          */
         const val FOREGROUND_POLL_INTERVAL_MS: Long = 15_000L
+
+        /** Defensive cap on rendered project list — backend currently returns ~10s of entries. */
+        private const val MAX_PROJECTS = 500
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
