@@ -7,5 +7,6 @@ class ClaudeEmailApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         InboxNotifier.registerChannel(this)
+        ForegroundState.bind()
     }
 }

@@ -38,33 +38,43 @@ class JakartaImapIdleSession(
     @Volatile private var store: Store? = null
 
     override suspend fun listen(onEvent: suspend () -> Unit) = withContext(Dispatchers.IO) {
+        // Nested try/finally so that a throw at any step (connect, getFolder,
+        // open, listener registration) still tears down whatever was acquired.
+        // The previous flat structure leaked the connected Store if open()
+        // threw before the outer try block was entered.
         val props = ImapMailFetcher.imapProperties(credentials)
         val session = sessionFactory(props)
-        val s = session.getStore("imaps").also {
-            it.connect(credentials.imapHost, credentials.imapPort, credentials.emailAddress, credentials.password)
-        }
+        val s = session.getStore("imaps")
         store = s
-        val f = (s.getFolder("INBOX") as IMAPFolder).also { it.open(Folder.READ_ONLY) }
-        folder = f
-        val events = Channel<Unit>(Channel.UNLIMITED)
-        f.addMessageCountListener(object : MessageCountAdapter() {
-            override fun messagesAdded(e: MessageCountEvent) { events.trySend(Unit) }
-        })
-        val idleThread = thread(name = "imap-idle", isDaemon = true) {
-            // Forward any IDLE-side failure (auth dropped, socket reset, BAD response)
-            // through the channel cause so listen()'s for-loop rethrows it and the
-            // outer ImapIdleListener sees it via its onError callback. Without the
-            // cause the listener silently reconnects with no visibility into why.
-            var cause: Throwable? = null
-            try { while (f.isOpen) f.idle() } catch (t: Throwable) { cause = t }
-            events.close(cause)
-        }
         try {
-            for (event in events) onEvent()
+            s.connect(credentials.imapHost, credentials.imapPort, credentials.emailAddress, credentials.password)
+            val f = s.getFolder("INBOX") as IMAPFolder
+            f.open(Folder.READ_ONLY)
+            folder = f
+            try {
+                val events = Channel<Unit>(Channel.UNLIMITED)
+                f.addMessageCountListener(object : MessageCountAdapter() {
+                    override fun messagesAdded(e: MessageCountEvent) { events.trySend(Unit) }
+                })
+                val idleThread = thread(name = "imap-idle", isDaemon = true) {
+                    // Forward any IDLE-side failure (auth dropped, socket reset, BAD response)
+                    // through the channel cause so listen()'s for-loop rethrows it and the
+                    // outer ImapIdleListener sees it via its onError callback. Without the
+                    // cause the listener silently reconnects with no visibility into why.
+                    var cause: Throwable? = null
+                    try { while (f.isOpen) f.idle() } catch (t: Throwable) { cause = t }
+                    events.close(cause)
+                }
+                try {
+                    for (event in events) onEvent()
+                } finally {
+                    idleThread.join(2_000)
+                }
+            } finally {
+                try { if (f.isOpen) f.close(false) } catch (_: Throwable) {}
+            }
         } finally {
-            try { if (f.isOpen) f.close(false) } catch (_: Throwable) {}
             try { if (s.isConnected) s.close() } catch (_: Throwable) {}
-            idleThread.join(2_000)
         }
     }
 

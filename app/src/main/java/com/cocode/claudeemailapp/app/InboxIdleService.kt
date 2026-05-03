@@ -11,8 +11,6 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.cocode.claudeemailapp.MainActivity
 import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.CredentialsStore
@@ -71,18 +69,20 @@ class InboxIdleService : Service() {
         val notifier = InboxNotifier(
             context = this,
             prefs = prefs,
-            isForeground = {
-                ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-            }
+            isForeground = ForegroundState::isForeground
         )
         val fetcher = ImapMailFetcher()
         val listener = ImapIdleListener(
             sessionFactory = { JakartaImapIdleSession(credentials) },
             onActivity = {
+                // Fetch a small batch (not just the newest) so multi-message
+                // bursts between IDLE pings — RFC 2177 reconnect gaps, server
+                // batching of EXISTS pushes — don't silently drop replies.
+                // InboxNotifier dedupes by messageId.hashCode() so re-handling
+                // the same message just collapses on the same notification id.
                 runCatching { fetcher.fetchRecent(credentials, FETCH_BATCH) }
                     .getOrNull()
-                    ?.firstOrNull()
-                    ?.let { notifier.handle(it) }
+                    ?.forEach { notifier.handle(it) }
             }
         )
         listenerJob = scope.launch { listener.run() }
@@ -128,7 +128,7 @@ class InboxIdleService : Service() {
         private const val CHANNEL_DESC =
             "Keeps an IMAP IDLE connection open so reply notifications work in the background."
         private const val NOTIF_ID = 4_201
-        private const val FETCH_BATCH = 1
+        private const val FETCH_BATCH = 10
 
         fun start(context: Context) {
             val intent = Intent(context, InboxIdleService::class.java)
