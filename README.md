@@ -23,6 +23,10 @@ Install on any Android device running API 24 or newer.
 - **Command-and-reply UX** — the UI is built around sending an envelope and reading the structured response, not browsing threads.
 - **Shared-secret auth** — envelopes are authenticated end-to-end with a shared secret in addition to transport security.
 - **Offline queue** — outbound envelopes are persisted and retried when connectivity returns.
+- **Inbox notifications** — opt-in device notifications for incoming replies, backed by a foreground IMAP IDLE service so updates land without polling overhead.
+- **Quick-reply chips** — when an agent asks a question, the app surfaces backend-suggested chips above the composer; one tap auto-sends the answer.
+- **Live progress** — `kind=progress` envelopes render as inline labels and a progress bar so long-running tasks show their state without you opening the message.
+- **Projects view** — list of registered projects with their live agent status, so you can route a new command to a project that already has a worker attached.
 - **Dark-first UI** — Material 3 with a dark-first palette and typography tuned for focused operator work.
 
 ## Build from Source
@@ -62,7 +66,7 @@ app/src/main/java/com/cocode/claudeemailapp/
 
 | Area            | Choice                                  |
 | --------------- | --------------------------------------- |
-| Language        | Kotlin 2.2.10                           |
+| Language        | Kotlin 2.3.21                           |
 | UI              | Jetpack Compose + Material 3            |
 | Mail transport  | Angus Mail (IMAP + SMTP)                |
 | Storage         | Android Keystore + encrypted datastore  |
