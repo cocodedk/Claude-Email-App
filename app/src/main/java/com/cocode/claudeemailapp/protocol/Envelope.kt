@@ -51,7 +51,11 @@ data class EnvelopeMeta(
     /** On `kind=question`: short canned reply chips (≤4, ≤30 chars each per spec, but app validates defensively). */
     @SerialName("suggested_replies") val suggestedReplies: List<String>? = null,
     /** Structured progress payload on `kind=progress` envelopes; renders as a progress bar when present. */
-    val progress: ProgressInfo? = null
+    val progress: ProgressInfo? = null,
+    /** Hint to backend: route this command to the registered chat-bus agent if reachable, else worker spawn. */
+    @SerialName("prefer_live_agent") val preferLiveAgent: Boolean? = null,
+    /** Set by backend on outbound acks: which path actually handled the command. */
+    @SerialName("routed_via") val routedVia: String? = null
 )
 
 /**
@@ -94,6 +98,20 @@ object ErrorCodes {
     const val NOT_IMPLEMENTED = "not_implemented"
     const val RATE_LIMITED = "rate_limited"
     const val INTERNAL = "internal"
+}
+
+/** Wire values for `ProjectSummary.agentStatus` (chat-bus presence per project). */
+object AgentStatusValues {
+    const val CONNECTED = "connected"
+    const val DISCONNECTED = "disconnected"
+    const val ABSENT = "absent"
+}
+
+/** Wire values for `EnvelopeMeta.routedVia` (which path handled a command). */
+object RoutedVia {
+    const val AGENT = "agent"
+    const val AGENT_QUEUED = "agent_queued"
+    const val WORKER = "worker"
 }
 
 object Kinds {

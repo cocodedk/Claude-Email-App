@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.data.ProjectSummary
+import com.cocode.claudeemailapp.protocol.AgentStatusValues
 import java.time.Instant
 import java.util.Date
 
@@ -157,6 +158,8 @@ private fun ProjectRow(project: ProjectSummary, onTap: () -> Unit) {
 @Composable
 private fun ProjectStatePill(project: ProjectSummary) {
     val (label, accent) = when {
+        project.agentStatus == AgentStatusValues.CONNECTED ->
+            "agent connected" to MaterialTheme.colorScheme.tertiary
         project.runningTaskId != null ->
             "running task #${project.runningTaskId}" to MaterialTheme.colorScheme.primary
         project.queueDepth > 0 ->

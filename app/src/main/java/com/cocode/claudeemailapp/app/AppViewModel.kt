@@ -29,6 +29,7 @@ import com.cocode.claudeemailapp.mail.OutgoingMessage
 import com.cocode.claudeemailapp.mail.ProbeResult
 import com.cocode.claudeemailapp.mail.SendResult
 import com.cocode.claudeemailapp.mail.SmtpMailSender
+import com.cocode.claudeemailapp.protocol.AgentStatusValues
 import com.cocode.claudeemailapp.protocol.EnvelopeJson
 import com.cocode.claudeemailapp.protocol.Envelopes
 import com.cocode.claudeemailapp.protocol.Kinds
@@ -275,8 +276,11 @@ class AppViewModel(
             EnvelopeJson.decodeFromJsonElement(ListProjectsResponse.serializer(), data)
         }.getOrNull() ?: return
         lastProjectsAckMessageId = candidate.messageId
+        val sorted = parsed.projects
+            .take(MAX_PROJECTS)
+            .sortedByDescending { it.agentStatus == AgentStatusValues.CONNECTED }
         _projects.value = _projects.value.copy(
-            projects = parsed.projects.take(MAX_PROJECTS),
+            projects = sorted,
             lastFetchedAt = System.currentTimeMillis()
         )
     }
@@ -350,12 +354,16 @@ class AppViewModel(
         planFirst: Boolean? = null
     ) {
         val creds = _credentials.value ?: return
+        val preferLiveAgent = _projects.value.projects
+            .firstOrNull { it.path == project }
+            ?.agentStatus == AgentStatusValues.CONNECTED
         runSend {
             val envelope = Envelopes.command(
                 body = body,
                 project = project,
                 priority = priority,
                 planFirst = planFirst,
+                preferLiveAgent = preferLiveAgent.takeIf { it },
                 auth = creds.sharedSecret.takeIf(String::isNotBlank)
             )
             val subject = firstLineSummary(body)
