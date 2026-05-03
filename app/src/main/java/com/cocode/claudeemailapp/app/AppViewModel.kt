@@ -83,6 +83,13 @@ class AppViewModel(
         val justSentMessageId: String? = null
     )
 
+    data class ProjectsState(
+        val loading: Boolean = false,
+        val projects: List<com.cocode.claudeemailapp.data.ProjectSummary> = emptyList(),
+        val error: String? = null,
+        val lastFetchedAt: Long? = null
+    )
+
     private val _credentials = MutableStateFlow(credentialsStore.load())
     val credentials: StateFlow<MailCredentials?> = _credentials.asStateFlow()
 
@@ -102,6 +109,9 @@ class AppViewModel(
 
     private val _send = MutableStateFlow(SendState())
     val send: StateFlow<SendState> = _send.asStateFlow()
+
+    private val _projects = MutableStateFlow(ProjectsState())
+    val projects: StateFlow<ProjectsState> = _projects.asStateFlow()
 
     private val _pending = MutableStateFlow(pendingStore.all())
     val pending: StateFlow<List<PendingCommand>> = _pending.asStateFlow()
@@ -224,6 +234,57 @@ class AppViewModel(
         _probe.value = ProbeState()
     }
 
+    /**
+     * Fires a `kind=list_projects` query at the backend. The reply lands as
+     * `kind=ack` with `data.projects`, which [extractProjectsFromAcks] picks
+     * up on the next inbox refresh — no explicit Message-ID correlation; the
+     * latest such ack is the source of truth.
+     */
+    fun refreshProjects() {
+        val creds = _credentials.value ?: return
+        viewModelScope.launch {
+            _projects.value = _projects.value.copy(loading = true, error = null)
+            try {
+                val envelope = com.cocode.claudeemailapp.protocol.Envelopes.listProjects(
+                    auth = creds.sharedSecret.takeIf { it.isNotBlank() }
+                )
+                val msg = com.cocode.claudeemailapp.mail.OutgoingMessage.envelope(
+                    to = creds.serviceAddress,
+                    subject = "list-projects",
+                    envelope = envelope
+                )
+                mailSender.send(creds, msg)
+                _projects.value = _projects.value.copy(loading = false, lastFetchedAt = System.currentTimeMillis())
+            } catch (t: Throwable) {
+                _projects.value = _projects.value.copy(loading = false, error = t.message)
+            }
+        }
+    }
+
+    /**
+     * Latest `kind=ack` envelope carrying `data.projects` wins. Skips messages
+     * that don't have the projects field so unrelated acks (status/cancel)
+     * don't clobber the list.
+     */
+    private fun extractProjectsFromAcks(messages: List<FetchedMessage>) {
+        val candidate = messages.firstOrNull { msg ->
+            val env = msg.envelope ?: return@firstOrNull false
+            env.kind == com.cocode.claudeemailapp.protocol.Kinds.ACK &&
+                env.data?.containsKey("projects") == true
+        } ?: return
+        val data = candidate.envelope?.data ?: return
+        val parsed = runCatching {
+            com.cocode.claudeemailapp.protocol.EnvelopeJson.decodeFromJsonElement(
+                com.cocode.claudeemailapp.data.ListProjectsResponse.serializer(),
+                data
+            )
+        }.getOrNull() ?: return
+        _projects.value = _projects.value.copy(
+            projects = parsed.projects,
+            lastFetchedAt = System.currentTimeMillis()
+        )
+    }
+
     fun refreshInbox() {
         val creds = _credentials.value ?: return
         viewModelScope.launch {
@@ -244,6 +305,7 @@ class AppViewModel(
                 )
                 if (!firstPoll) newOnes.forEach { inboxNotifier?.handle(it) }
                 reconcilePending(messages)
+                extractProjectsFromAcks(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)
             } catch (t: Throwable) {

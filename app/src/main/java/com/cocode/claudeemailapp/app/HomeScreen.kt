@@ -30,7 +30,8 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     onArchiveToggle: (Conversation) -> Unit,
     onRetryPending: (PendingCommand) -> Unit = {},
-    onCancelPending: (PendingCommand) -> Unit = {}
+    onCancelPending: (PendingCommand) -> Unit = {},
+    onOpenProjects: () -> Unit = {}
 ) {
     var filter by rememberSaveable { mutableStateOf(AppViewModel.HomeFilter.ACTIVE) }
     val visible = buckets[filter]
@@ -46,7 +47,8 @@ fun HomeScreen(
                     buckets = buckets,
                     onCompose = onCompose,
                     onRefresh = onRefresh,
-                    onOpenSettings = onOpenSettings
+                    onOpenSettings = onOpenSettings,
+                    onOpenProjects = onOpenProjects
                 )
             }
             item { HomeFilterTabs(selected = filter, counts = buckets, onSelect = { filter = it }) }

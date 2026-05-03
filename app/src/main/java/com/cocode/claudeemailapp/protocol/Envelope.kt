@@ -89,6 +89,7 @@ object Kinds {
     const val COMMIT = "commit"
     const val RESET = "reset"
     const val CONFIRM_RESET = "confirm_reset"
+    const val LIST_PROJECTS = "list_projects"
 
     // Outbound (backend → app)
     const val ACK = "ack"

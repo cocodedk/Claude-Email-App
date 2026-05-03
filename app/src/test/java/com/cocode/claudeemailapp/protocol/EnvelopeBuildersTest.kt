@@ -57,4 +57,23 @@ class EnvelopeBuildersTest {
         assertEquals(null, env.priority)
         assertEquals(null, env.planFirst)
     }
+
+    @Test
+    fun listProjectsBuilder_setsKindAndOmitsBody() {
+        val env = Envelopes.listProjects(auth = "secret", sentAt = "2026-05-03T00:00:00Z")
+        assertEquals(Kinds.LIST_PROJECTS, env.kind)
+        assertEquals("", env.body)
+        assertEquals(null, env.taskId)
+        assertEquals(null, env.project)
+        assertEquals("secret", env.meta.auth)
+    }
+
+    @Test
+    fun listProjectsBuilder_serializesMinimalEnvelope() {
+        val env = Envelopes.listProjects(auth = "secret", sentAt = "2026-05-03T00:00:00Z")
+        val msg = OutgoingMessage.envelope(to = "svc@ex", subject = "list", envelope = env)
+        assertTrue(msg.body.contains("\"kind\":\"list_projects\""))
+        // No body field should appear since EnvelopeJson encodeDefaults=false and body=""
+        assertTrue(!msg.body.contains("\"body\":\"\""))
+    }
 }

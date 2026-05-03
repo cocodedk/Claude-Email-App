@@ -39,7 +39,7 @@ import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
-enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics }
+enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics, Projects }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -178,6 +178,7 @@ private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
                     Screen.Conversation -> "Conversation"
                     Screen.Compose -> "New command"
                     Screen.Diagnostics -> "Diagnostics"
+                    Screen.Projects -> "Projects"
                 },
                 style = MaterialTheme.typography.titleLarge
             )
@@ -286,8 +287,26 @@ private fun AppScreenContent(
             },
             onCancelPending = { p ->
                 viewModel.dispatchSteering(p, com.cocode.claudeemailapp.app.steering.SteeringIntent.Cancel)
+            },
+            onOpenProjects = {
+                viewModel.refreshProjects()
+                onScreenChange(Screen.Projects)
             }
         )
+        Screen.Projects -> {
+            val projects by viewModel.projects.collectAsState()
+            ProjectsScreen(
+                state = projects,
+                onRefresh = { viewModel.refreshProjects() },
+                onProjectTap = { p ->
+                    // For v1 the tap simply opens Compose pre-filled with the
+                    // project path; conversation routing comes in Tier 2 once
+                    // the per-project conversation map is wired.
+                    onScreenChange(Screen.Compose)
+                },
+                onCompose = { onScreenChange(Screen.Compose) }
+            )
+        }
         Screen.Settings -> credentials?.let {
             val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
             SettingsScreen(
