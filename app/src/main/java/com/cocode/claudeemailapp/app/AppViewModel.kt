@@ -398,10 +398,7 @@ class AppViewModel(
                 val notifier = InboxNotifier(
                     context = app,
                     prefs = prefs,
-                    isForeground = {
-                        androidx.lifecycle.ProcessLifecycleOwner.get().lifecycle.currentState
-                            .isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
-                    }
+                    isForeground = ForegroundState::isForeground
                 )
                 AppViewModel(
                     application = app,
