@@ -36,6 +36,7 @@ object Envelopes {
         project: String,
         priority: Int? = null,
         planFirst: Boolean? = null,
+        preferLiveAgent: Boolean? = null,
         auth: String? = null,
         client: String = CLIENT_ID,
         sentAt: String = Instant.now().toString()
@@ -45,7 +46,12 @@ object Envelopes {
         project = project,
         priority = priority,
         planFirst = planFirst,
-        meta = EnvelopeMeta(client = client, sentAt = sentAt, auth = auth)
+        meta = EnvelopeMeta(
+            client = client,
+            sentAt = sentAt,
+            auth = auth,
+            preferLiveAgent = preferLiveAgent
+        )
     )
 
     fun reply(

@@ -51,7 +51,11 @@ data class EnvelopeMeta(
     /** On `kind=question`: short canned reply chips (≤4, ≤30 chars each per spec, but app validates defensively). */
     @SerialName("suggested_replies") val suggestedReplies: List<String>? = null,
     /** Structured progress payload on `kind=progress` envelopes; renders as a progress bar when present. */
-    val progress: ProgressInfo? = null
+    val progress: ProgressInfo? = null,
+    /** Hint to backend: route this command to the registered chat-bus agent if reachable, else worker spawn. */
+    @SerialName("prefer_live_agent") val preferLiveAgent: Boolean? = null,
+    /** Set by backend on outbound acks: which path actually handled the command. */
+    @SerialName("routed_via") val routedVia: String? = null
 )
 
 /**

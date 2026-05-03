@@ -414,6 +414,54 @@ class AppViewModelTest {
     )
 
     @Test
+    fun sendCommand_setsPreferLiveAgent_whenProjectAgentIsConnected() = runTest(dispatcher) {
+        val data = kotlinx.serialization.json.buildJsonObject {
+            put("projects", kotlinx.serialization.json.buildJsonArray {
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("p"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/p"))
+                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
+                })
+            })
+        }
+        val ackMsg = fakeMessage("<list-ack@x>", "Re: list").copy(
+            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+        val sender = mockk<MailSender>()
+        coEvery { sender.send(any(), any()) } returns com.cocode.claudeemailapp.mail.SendResult("<sent@x>", java.util.Date())
+
+        val vm = buildVm(initialCreds = creds(), sender = sender, fetcher = fetcher)
+        advanceUntilIdle()
+        vm.sendCommand(to = "svc@ex", project = "/p", body = "go")
+        advanceUntilIdle()
+
+        coVerify {
+            sender.send(any(), match { msg ->
+                msg.body.contains("\"prefer_live_agent\":true")
+            })
+        }
+    }
+
+    @Test
+    fun sendCommand_omitsPreferLiveAgent_whenProjectAgentIsAbsent() = runTest(dispatcher) {
+        val sender = mockk<MailSender>()
+        coEvery { sender.send(any(), any()) } returns com.cocode.claudeemailapp.mail.SendResult("<sent@x>", java.util.Date())
+
+        val vm = buildVm(initialCreds = creds(), sender = sender)
+        advanceUntilIdle()
+        vm.sendCommand(to = "svc@ex", project = "/never-listed", body = "go")
+        advanceUntilIdle()
+
+        coVerify {
+            sender.send(any(), match { msg ->
+                !msg.body.contains("prefer_live_agent")
+            })
+        }
+    }
+
+    @Test
     fun refreshProjects_sendsListProjectsEnvelopeViaSender() = runTest(dispatcher) {
         val sender = mockk<MailSender>(relaxed = true)
         val vm = buildVm(initialCreds = creds(), sender = sender)
@@ -429,6 +477,42 @@ class AppViewModelTest {
             })
         }
         assertTrue(vm.projects.value.loading || vm.projects.value.lastFetchedAt != null)
+    }
+
+    @Test
+    fun refreshInbox_sortsConnectedAgentProjectsFirst() = runTest(dispatcher) {
+        val data = kotlinx.serialization.json.buildJsonObject {
+            put("projects", kotlinx.serialization.json.buildJsonArray {
+                // Backend sorts by name; test fixture mirrors that contract so
+                // we're only validating the connected-first overlay.
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("alpha"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/alpha"))
+                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("absent"))
+                })
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("bravo"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/bravo"))
+                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
+                })
+                add(kotlinx.serialization.json.buildJsonObject {
+                    put("name", kotlinx.serialization.json.JsonPrimitive("zulu"))
+                    put("path", kotlinx.serialization.json.JsonPrimitive("/zulu"))
+                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
+                })
+            })
+        }
+        val ackMsg = fakeMessage("<sort-ack@x>", "Re: list").copy(
+            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        val names = vm.projects.value.projects.map { it.name }
+        assertEquals(listOf("bravo", "zulu", "alpha"), names)
     }
 
     @Test

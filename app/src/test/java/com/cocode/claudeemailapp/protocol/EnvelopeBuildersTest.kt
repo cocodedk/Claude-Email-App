@@ -59,6 +59,22 @@ class EnvelopeBuildersTest {
     }
 
     @Test
+    fun commandBuilder_preferLiveAgent_serializesIntoMeta() {
+        val env = Envelopes.command(body = "go", project = "/p", preferLiveAgent = true)
+        assertEquals(true, env.meta.preferLiveAgent)
+        val msg = OutgoingMessage.envelope(to = "svc@ex", subject = "go", envelope = env)
+        assertTrue(msg.body.contains("\"prefer_live_agent\":true"))
+    }
+
+    @Test
+    fun commandBuilder_preferLiveAgent_defaultIsNullAndOmitsField() {
+        val env = Envelopes.command(body = "go", project = "/p")
+        assertEquals(null, env.meta.preferLiveAgent)
+        val msg = OutgoingMessage.envelope(to = "svc@ex", subject = "go", envelope = env)
+        assertTrue(!msg.body.contains("prefer_live_agent"))
+    }
+
+    @Test
     fun listProjectsBuilder_setsKindAndOmitsBody() {
         val env = Envelopes.listProjects(auth = "secret", sentAt = "2026-05-03T00:00:00Z")
         assertEquals(Kinds.LIST_PROJECTS, env.kind)

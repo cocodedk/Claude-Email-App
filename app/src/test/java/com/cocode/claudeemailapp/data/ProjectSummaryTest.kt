@@ -57,6 +57,32 @@ class ProjectSummaryTest {
     }
 
     @Test
+    fun `parses agent_status three-state enum`() {
+        val raw = """
+            {
+              "projects": [
+                {"name": "a", "path": "/a", "agent_status": "connected"},
+                {"name": "b", "path": "/b", "agent_status": "disconnected"},
+                {"name": "c", "path": "/c", "agent_status": "absent"},
+                {"name": "d", "path": "/d"}
+              ]
+            }
+        """.trimIndent()
+        val response = EnvelopeJson.decodeFromString(ListProjectsResponse.serializer(), raw)
+        assertEquals(AgentStatus.CONNECTED, response.projects[0].agentStatus)
+        assertEquals(AgentStatus.DISCONNECTED, response.projects[1].agentStatus)
+        assertEquals(AgentStatus.ABSENT, response.projects[2].agentStatus)
+        assertNull(response.projects[3].agentStatus)
+    }
+
+    @Test
+    fun `unknown agent_status string falls back to null`() {
+        val raw = """{"projects":[{"name":"x","path":"/x","agent_status":"future_state"}]}"""
+        val response = EnvelopeJson.decodeFromString(ListProjectsResponse.serializer(), raw)
+        assertNull(response.projects[0].agentStatus)
+    }
+
+    @Test
     fun `tolerates unknown fields per existing EnvelopeJson contract`() {
         val raw = """
             {
