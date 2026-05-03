@@ -20,6 +20,22 @@ data class UiError(
 enum class UiErrorAction { Retry, OpenSettings, EditCommand, Dismiss }
 
 /**
+ * Short chip-friendly label for an envelope error. Reads as "the agent
+ * replied with an error" rather than "transport failed" — paired with
+ * [tertiary] coloring at the call site so it doesn't look like the red
+ * "send failed" status the user sees on actual SMTP/IMAP failures.
+ */
+fun envelopeErrorChipLabel(error: EnvelopeError?): String = when (error?.code) {
+    ErrorCodes.PROJECT_NOT_FOUND -> "no project"
+    ErrorCodes.UNAUTHORIZED -> "auth"
+    ErrorCodes.RATE_LIMITED -> "throttled"
+    ErrorCodes.NOT_IMPLEMENTED -> "not built"
+    ErrorCodes.INVALID_STATE -> "bad state"
+    ErrorCodes.INTERNAL -> "server"
+    else -> "agent error"
+}
+
+/**
  * Map [EnvelopeError] → [UiError]. Falls back to [UiErrorAction.Retry] when the
  * backend marks the error retryable (e.g. `rate_limited`, `internal`) or the
  * code is unknown; otherwise the error is permanent from the user's view.

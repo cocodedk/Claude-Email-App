@@ -90,6 +90,7 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            buildConfigField("boolean", "ALLOW_PREFILL", "true")
         }
         release {
             if (hasReleaseSigningConfig) {
@@ -100,6 +101,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("boolean", "ALLOW_PREFILL", "false")
         }
     }
     compileOptions {
@@ -109,7 +111,7 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = false
+        buildConfig = true
     }
 
     testOptions {
@@ -150,6 +152,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.angus.mail)
     implementation(libs.angus.activation)

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.mail.FetchedMessage
+import com.cocode.claudeemailapp.protocol.Kinds
 
 private const val LONG_BODY_THRESHOLD = 1500
 private const val LONG_BODY_PREVIEW_CHARS = 1200
@@ -137,7 +138,18 @@ private fun HeaderRow(message: FetchedMessage, isFromSelf: Boolean) {
 private fun EnvelopeRow(message: FetchedMessage) {
     val env = message.envelope ?: return
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        KindChip(kind = env.kind)
+        if (env.kind == Kinds.ERROR) {
+            // Server-returned error envelope (e.g. project_not_found). Distinct
+            // from transport failures (red "Send failed" cards) — surface it as
+            // a tertiary-toned "agent error" chip so users don't misread the
+            // worker's reply as a delivery problem.
+            ChipPill(
+                label = envelopeErrorChipLabel(env.error),
+                accent = MaterialTheme.colorScheme.tertiary
+            )
+        } else {
+            KindChip(kind = env.kind)
+        }
         env.taskId?.let { Text(text = "task #$it", style = MaterialTheme.typography.labelMedium) }
     }
 }

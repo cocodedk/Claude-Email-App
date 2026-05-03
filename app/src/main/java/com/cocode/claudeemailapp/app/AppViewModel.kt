@@ -12,6 +12,7 @@ import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.ConversationGrouper
 import com.cocode.claudeemailapp.data.ConversationStateStore
 import com.cocode.claudeemailapp.data.CredentialsStore
+import com.cocode.claudeemailapp.data.InboxNotificationPrefs
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingCommandStore
@@ -46,7 +47,8 @@ class AppViewModel(
     private val mailFetcher: MailFetcher,
     private val mailProbe: MailProbe,
     private val pendingStore: PendingCommandStore,
-    private val conversationStateStore: ConversationStateStore
+    private val conversationStateStore: ConversationStateStore,
+    private val inboxNotifier: InboxNotifier? = null
 ) : AndroidViewModel(application) {
 
     enum class HomeFilter { ACTIVE, WAITING, ARCHIVED }
@@ -83,6 +85,14 @@ class AppViewModel(
 
     private val _credentials = MutableStateFlow(credentialsStore.load())
     val credentials: StateFlow<MailCredentials?> = _credentials.asStateFlow()
+
+    val notificationsEnabled: StateFlow<Boolean> =
+        inboxNotifier?.prefs?.notificationsEnabled
+            ?: MutableStateFlow(true).asStateFlow()
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        inboxNotifier?.prefs?.setNotificationsEnabled(enabled)
+    }
 
     private val _inbox = MutableStateFlow(InboxState())
     val inbox: StateFlow<InboxState> = _inbox.asStateFlow()
@@ -220,11 +230,19 @@ class AppViewModel(
             _inbox.value = _inbox.value.copy(loading = true, error = null)
             try {
                 val messages = mailFetcher.fetchRecent(creds, count = 50)
+                val firstPoll = _inbox.value.lastFetchedAt == null
+                val previousIds = _inbox.value.messages
+                    .mapNotNull { it.messageId.takeIf(String::isNotBlank) }
+                    .toSet()
+                val newOnes = messages.filter {
+                    it.messageId.isNotBlank() && it.messageId !in previousIds
+                }
                 _inbox.value = InboxState(
                     loading = false,
                     messages = messages,
                     lastFetchedAt = System.currentTimeMillis()
                 )
+                if (!firstPoll) newOnes.forEach { inboxNotifier?.handle(it) }
                 reconcilePending(messages)
             } catch (e: MailException) {
                 _inbox.value = _inbox.value.copy(loading = false, error = e.message)
@@ -353,6 +371,7 @@ class AppViewModel(
 
     fun signOut() {
         stopInboxPolling()
+        InboxIdleService.stop(getApplication())
         credentialsStore.clear()
         pendingStore.clear()
         conversationStateStore.clear()
@@ -375,6 +394,15 @@ class AppViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
+                val prefs = InboxNotificationPrefs(app)
+                val notifier = InboxNotifier(
+                    context = app,
+                    prefs = prefs,
+                    isForeground = {
+                        androidx.lifecycle.ProcessLifecycleOwner.get().lifecycle.currentState
+                            .isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
+                    }
+                )
                 AppViewModel(
                     application = app,
                     credentialsStore = CredentialsStore(app),
@@ -382,7 +410,8 @@ class AppViewModel(
                     mailFetcher = ImapMailFetcher(),
                     mailProbe = MailProbe(),
                     pendingStore = PendingCommandStore(app),
-                    conversationStateStore = ConversationStateStore(app)
+                    conversationStateStore = ConversationStateStore(app),
+                    inboxNotifier = notifier
                 )
             }
         }
