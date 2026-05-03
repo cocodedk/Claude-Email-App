@@ -151,5 +151,8 @@ private fun EnvelopeRow(message: FetchedMessage) {
             KindChip(kind = env.kind)
         }
         env.taskId?.let { Text(text = "task #$it", style = MaterialTheme.typography.labelMedium) }
+        routedViaChipLabel(env.meta.routedVia)?.let { label ->
+            ChipPill(label = label, accent = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }

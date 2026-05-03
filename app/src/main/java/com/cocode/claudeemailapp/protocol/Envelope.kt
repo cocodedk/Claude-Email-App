@@ -47,7 +47,11 @@ data class EnvelopeMeta(
     @SerialName("sent_at") val sentAt: String? = null,
     val auth: String? = null,
     /** When replying to a question, echo back the ask_id so backend unblocks the right chat_ask. */
-    @SerialName("ask_id") val askId: Long? = null
+    @SerialName("ask_id") val askId: Long? = null,
+    /** Hint to backend: route this command to the registered chat-bus agent if reachable, else worker spawn. */
+    @SerialName("prefer_live_agent") val preferLiveAgent: Boolean? = null,
+    /** Set by backend on outbound acks: which path actually handled the command. */
+    @SerialName("routed_via") val routedVia: String? = null
 )
 
 @Serializable

@@ -16,6 +16,7 @@ import com.cocode.claudeemailapp.data.InboxNotificationPrefs
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingCommandStore
+import com.cocode.claudeemailapp.data.AgentStatus
 import com.cocode.claudeemailapp.data.ListProjectsResponse
 import com.cocode.claudeemailapp.data.PendingStatus
 import com.cocode.claudeemailapp.data.ProjectSummary
@@ -275,8 +276,14 @@ class AppViewModel(
             EnvelopeJson.decodeFromJsonElement(ListProjectsResponse.serializer(), data)
         }.getOrNull() ?: return
         lastProjectsAckMessageId = candidate.messageId
+        // Surface live-agent projects at the top of the list — backend already
+        // sorts by name, this overlay groups the rows the user most likely wants
+        // to act on without reshuffling within either group.
+        val sorted = parsed.projects
+            .take(MAX_PROJECTS)
+            .sortedByDescending { it.agentStatus == AgentStatus.CONNECTED }
         _projects.value = _projects.value.copy(
-            projects = parsed.projects.take(MAX_PROJECTS),
+            projects = sorted,
             lastFetchedAt = System.currentTimeMillis()
         )
     }
@@ -350,12 +357,19 @@ class AppViewModel(
         planFirst: Boolean? = null
     ) {
         val creds = _credentials.value ?: return
+        // Hint the backend to route via the live agent when our last project
+        // snapshot says one is connected for this exact path. Backend is
+        // authoritative; falls back to worker spawn silently if the hint is stale.
+        val preferLiveAgent = _projects.value.projects
+            .firstOrNull { it.path == project }
+            ?.agentStatus == AgentStatus.CONNECTED
         runSend {
             val envelope = Envelopes.command(
                 body = body,
                 project = project,
                 priority = priority,
                 planFirst = planFirst,
+                preferLiveAgent = preferLiveAgent.takeIf { it },
                 auth = creds.sharedSecret.takeIf(String::isNotBlank)
             )
             val subject = firstLineSummary(body)
