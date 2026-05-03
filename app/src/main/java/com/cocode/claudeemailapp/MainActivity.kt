@@ -12,7 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.cocode.claudeemailapp.app.ClaudeEmailApp
+import com.cocode.claudeemailapp.app.InboxIdleService
 import com.cocode.claudeemailapp.app.PrefillCredentials
+import com.cocode.claudeemailapp.data.CredentialsStore
 import com.cocode.claudeemailapp.ui.theme.ClaudeEmailAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
         maybeAskNotificationPermission()
         val prefill = PrefillCredentials.fromExtras { intent?.getStringExtra(it) }
         if (prefill != null) Log.d("MainActivity", "prefill applied")
+        if (CredentialsStore(this).hasCredentials()) InboxIdleService.start(this)
         setContent {
             ClaudeEmailAppTheme {
                 ClaudeEmailApp(prefill = prefill)
