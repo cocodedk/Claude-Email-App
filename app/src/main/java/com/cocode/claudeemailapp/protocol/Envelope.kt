@@ -100,6 +100,20 @@ object ErrorCodes {
     const val INTERNAL = "internal"
 }
 
+/** Wire values for `ProjectSummary.agentStatus` (chat-bus presence per project). */
+object AgentStatusValues {
+    const val CONNECTED = "connected"
+    const val DISCONNECTED = "disconnected"
+    const val ABSENT = "absent"
+}
+
+/** Wire values for `EnvelopeMeta.routedVia` (which path handled a command). */
+object RoutedVia {
+    const val AGENT = "agent"
+    const val AGENT_QUEUED = "agent_queued"
+    const val WORKER = "worker"
+}
+
 object Kinds {
     // Inbound (app → backend)
     const val COMMAND = "command"

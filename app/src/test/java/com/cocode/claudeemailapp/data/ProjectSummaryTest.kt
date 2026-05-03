@@ -1,7 +1,7 @@
 package com.cocode.claudeemailapp.data
 
+import com.cocode.claudeemailapp.protocol.AgentStatusValues
 import com.cocode.claudeemailapp.protocol.EnvelopeJson
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -57,7 +57,7 @@ class ProjectSummaryTest {
     }
 
     @Test
-    fun `parses agent_status three-state enum`() {
+    fun `parses agent_status wire strings`() {
         val raw = """
             {
               "projects": [
@@ -69,17 +69,17 @@ class ProjectSummaryTest {
             }
         """.trimIndent()
         val response = EnvelopeJson.decodeFromString(ListProjectsResponse.serializer(), raw)
-        assertEquals(AgentStatus.CONNECTED, response.projects[0].agentStatus)
-        assertEquals(AgentStatus.DISCONNECTED, response.projects[1].agentStatus)
-        assertEquals(AgentStatus.ABSENT, response.projects[2].agentStatus)
+        assertEquals(AgentStatusValues.CONNECTED, response.projects[0].agentStatus)
+        assertEquals(AgentStatusValues.DISCONNECTED, response.projects[1].agentStatus)
+        assertEquals(AgentStatusValues.ABSENT, response.projects[2].agentStatus)
         assertNull(response.projects[3].agentStatus)
     }
 
     @Test
-    fun `unknown agent_status string falls back to null`() {
+    fun `unknown agent_status string passes through verbatim`() {
         val raw = """{"projects":[{"name":"x","path":"/x","agent_status":"future_state"}]}"""
         val response = EnvelopeJson.decodeFromString(ListProjectsResponse.serializer(), raw)
-        assertNull(response.projects[0].agentStatus)
+        assertEquals("future_state", response.projects[0].agentStatus)
     }
 
     @Test

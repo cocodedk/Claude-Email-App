@@ -399,6 +399,35 @@ class AppViewModelTest {
         assertEquals(emptyList<String>(), state.loadRecentProjects())
     }
 
+    /** One row builder for `data.projects[]` in list_projects acks. Keeps test fixtures tight. */
+    private fun projectRow(
+        name: String,
+        path: String = "/$name",
+        runningTaskId: Long? = null,
+        queueDepth: Int = 0,
+        lastActivityAt: String? = null,
+        agentStatus: String? = null
+    ): kotlinx.serialization.json.JsonObject = kotlinx.serialization.json.buildJsonObject {
+        put("name", kotlinx.serialization.json.JsonPrimitive(name))
+        put("path", kotlinx.serialization.json.JsonPrimitive(path))
+        runningTaskId?.let { put("running_task_id", kotlinx.serialization.json.JsonPrimitive(it)) }
+        put("queue_depth", kotlinx.serialization.json.JsonPrimitive(queueDepth))
+        lastActivityAt?.let { put("last_activity_at", kotlinx.serialization.json.JsonPrimitive(it)) }
+        agentStatus?.let { put("agent_status", kotlinx.serialization.json.JsonPrimitive(it)) }
+    }
+
+    private fun listProjectsAckMessage(
+        messageId: String = "<list-ack@x>",
+        vararg rows: kotlinx.serialization.json.JsonObject
+    ): FetchedMessage {
+        val data = kotlinx.serialization.json.buildJsonObject {
+            put("projects", kotlinx.serialization.json.buildJsonArray { rows.forEach { add(it) } })
+        }
+        return fakeMessage(messageId, "Re: list").copy(
+            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        )
+    }
+
     private fun fakeMessage(id: String, subject: String) = FetchedMessage(
         messageId = id,
         from = "x@y",
@@ -415,18 +444,7 @@ class AppViewModelTest {
 
     @Test
     fun sendCommand_setsPreferLiveAgent_whenProjectAgentIsConnected() = runTest(dispatcher) {
-        val data = kotlinx.serialization.json.buildJsonObject {
-            put("projects", kotlinx.serialization.json.buildJsonArray {
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("p"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/p"))
-                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
-                })
-            })
-        }
-        val ackMsg = fakeMessage("<list-ack@x>", "Re: list").copy(
-            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
-        )
+        val ackMsg = listProjectsAckMessage(rows = arrayOf(projectRow("p", agentStatus = "connected")))
         val fetcher = mockk<MailFetcher>()
         coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
         val sender = mockk<MailSender>()
@@ -481,29 +499,13 @@ class AppViewModelTest {
 
     @Test
     fun refreshInbox_sortsConnectedAgentProjectsFirst() = runTest(dispatcher) {
-        val data = kotlinx.serialization.json.buildJsonObject {
-            put("projects", kotlinx.serialization.json.buildJsonArray {
-                // Backend sorts by name; test fixture mirrors that contract so
-                // we're only validating the connected-first overlay.
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("alpha"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/alpha"))
-                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("absent"))
-                })
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("bravo"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/bravo"))
-                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
-                })
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("zulu"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/zulu"))
-                    put("agent_status", kotlinx.serialization.json.JsonPrimitive("connected"))
-                })
-            })
-        }
-        val ackMsg = fakeMessage("<sort-ack@x>", "Re: list").copy(
-            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        val ackMsg = listProjectsAckMessage(
+            messageId = "<sort-ack@x>",
+            rows = arrayOf(
+                projectRow("alpha", agentStatus = "absent"),
+                projectRow("bravo", agentStatus = "connected"),
+                projectRow("zulu", agentStatus = "connected")
+            )
         )
         val fetcher = mockk<MailFetcher>()
         coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
@@ -517,24 +519,12 @@ class AppViewModelTest {
 
     @Test
     fun refreshInbox_parsesListProjectsAckIntoProjectsState() = runTest(dispatcher) {
-        val data = kotlinx.serialization.json.buildJsonObject {
-            put("projects", kotlinx.serialization.json.buildJsonArray {
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("claude-email"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/p/claude-email"))
-                    put("running_task_id", kotlinx.serialization.json.JsonPrimitive(42L))
-                    put("queue_depth", kotlinx.serialization.json.JsonPrimitive(2))
-                    put("last_activity_at", kotlinx.serialization.json.JsonPrimitive("2026-05-03T09:24:00Z"))
-                })
-                add(kotlinx.serialization.json.buildJsonObject {
-                    put("name", kotlinx.serialization.json.JsonPrimitive("babakcast"))
-                    put("path", kotlinx.serialization.json.JsonPrimitive("/p/babakcast"))
-                    put("queue_depth", kotlinx.serialization.json.JsonPrimitive(0))
-                })
-            })
-        }
-        val ackMsg = fakeMessage("<list-ack@x>", "Re: list").copy(
-            envelope = com.cocode.claudeemailapp.protocol.Envelope(kind = "ack", data = data)
+        val ackMsg = listProjectsAckMessage(
+            rows = arrayOf(
+                projectRow("claude-email", path = "/p/claude-email", runningTaskId = 42L,
+                    queueDepth = 2, lastActivityAt = "2026-05-03T09:24:00Z"),
+                projectRow("babakcast", path = "/p/babakcast")
+            )
         )
         val fetcher = mockk<MailFetcher>()
         coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
