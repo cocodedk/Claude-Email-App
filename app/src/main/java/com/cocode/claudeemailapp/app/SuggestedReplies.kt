@@ -32,11 +32,16 @@ fun validSuggestedReplies(raw: List<String>?): List<String> {
         .toList()
 }
 
-/** Chips attach to the latest message only — keeps stale questions from showing chips. */
+/**
+ * Chips attach to the latest `kind=question` in the thread. Strictly checking the
+ * bottom-most message bites when a worker emits progress + question with tied
+ * sentAt — stable sort can leave a non-question last, hiding chips that should
+ * still be relevant to an unanswered ask. Scanning backward is robust to that.
+ */
 fun pickSuggestedReplies(messages: List<FetchedMessage>): List<String> {
-    val env = messages.lastOrNull()?.envelope ?: return emptyList()
-    if (env.kind != Kinds.QUESTION) return emptyList()
-    return validSuggestedReplies(env.meta.suggestedReplies)
+    val latestQuestion = messages.lastOrNull { it.envelope?.kind == Kinds.QUESTION }
+        ?: return emptyList()
+    return validSuggestedReplies(latestQuestion.envelope?.meta?.suggestedReplies)
 }
 
 @Composable

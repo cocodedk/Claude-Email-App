@@ -65,12 +65,25 @@ class SuggestedRepliesTest {
     @Test fun `picker empty messages returns empty`() =
         assertTrue(pickSuggestedReplies(emptyList()).isEmpty())
 
-    @Test fun `picker last is not a question returns empty`() {
+    @Test fun `picker returns latest question chips even when followed by non-question`() {
+        // Reflects the smoke-test scenario: backend emits 2 progress + 1 question, but
+        // tied sentAt + stable sort can leave a non-question at the bottom. Picker
+        // should still find the latest question.
         val msgs = listOf(
             question(listOf("yes", "no")),
-            message(Envelope(kind = Kinds.RESULT, meta = EnvelopeMeta(suggestedReplies = listOf("stale"))))
+            message(Envelope(kind = Kinds.PROGRESS))
         )
-        assertTrue(pickSuggestedReplies(msgs).isEmpty())
+        assertEquals(listOf("yes", "no"), pickSuggestedReplies(msgs))
+    }
+
+    @Test fun `picker scans back through interleaved non-question envelopes`() {
+        val msgs = listOf(
+            message(Envelope(kind = Kinds.RESULT)),
+            question(listOf("ok")),
+            message(Envelope(kind = Kinds.PROGRESS)),
+            message(Envelope(kind = Kinds.PROGRESS))
+        )
+        assertEquals(listOf("ok"), pickSuggestedReplies(msgs))
     }
 
     @Test fun `picker last is question with chips returns validated chips`() =
@@ -79,7 +92,7 @@ class SuggestedRepliesTest {
             pickSuggestedReplies(listOf(question(listOf("  yes  ", "no", ""))))
         )
 
-    @Test fun `picker last is question with no chips returns empty`() =
+    @Test fun `picker question with no chips returns empty`() =
         assertTrue(pickSuggestedReplies(listOf(question(null))).isEmpty())
 
     @Test fun `picker only considers latest question (earlier chips ignored)`() =
@@ -88,6 +101,6 @@ class SuggestedRepliesTest {
             pickSuggestedReplies(listOf(question(listOf("old1", "old2")), question(listOf("ok"))))
         )
 
-    @Test fun `picker last has null envelope returns empty`() =
-        assertTrue(pickSuggestedReplies(listOf(message(envelope = null))).isEmpty())
+    @Test fun `picker no question in conversation returns empty`() =
+        assertTrue(pickSuggestedReplies(listOf(message(envelope = null), message(Envelope(kind = Kinds.RESULT)))).isEmpty())
 }
