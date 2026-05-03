@@ -47,7 +47,22 @@ data class EnvelopeMeta(
     @SerialName("sent_at") val sentAt: String? = null,
     val auth: String? = null,
     /** When replying to a question, echo back the ask_id so backend unblocks the right chat_ask. */
-    @SerialName("ask_id") val askId: Long? = null
+    @SerialName("ask_id") val askId: Long? = null,
+    /** Structured progress payload on `kind=progress` envelopes; renders as a progress bar when present. */
+    val progress: ProgressInfo? = null
+)
+
+/**
+ * Structured progress info on `kind=progress` envelopes. All fields optional —
+ * UI shows whatever the backend chose to populate (a counter, a percent bar,
+ * a label, or any combination). Empty `{}` is valid and renders nothing extra.
+ */
+@Serializable
+data class ProgressInfo(
+    val current: Int? = null,
+    val total: Int? = null,
+    val percent: Double? = null,
+    val label: String? = null
 )
 
 @Serializable

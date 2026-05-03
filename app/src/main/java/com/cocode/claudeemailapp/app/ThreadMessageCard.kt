@@ -87,6 +87,7 @@ internal fun ThreadMessageCard(
             ) {
                 HeaderRow(message, isFromSelf)
                 EnvelopeRow(message)
+                message.envelope?.meta?.progress?.let { ProgressDisplay(it) }
                 if (envError != null) {
                     EnvelopeErrorBanner(
                         error = envError,
