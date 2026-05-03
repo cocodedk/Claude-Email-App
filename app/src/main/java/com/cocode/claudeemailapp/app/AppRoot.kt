@@ -69,8 +69,6 @@ fun ClaudeEmailApp(
     }
     var editingCredentials by rememberSaveable { mutableStateOf(false) }
     var selectedConversationId by rememberSaveable { mutableStateOf<String?>(null) }
-    // Set when the user taps a row in the Projects tab so Compose pre-fills with
-    // the deliberately-chosen project path; cleared on return to Home.
     var selectedComposeProject by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -161,7 +159,6 @@ fun ClaudeEmailApp(
                 viewModel = viewModel,
                 prefill = prefill,
                 selectedComposeProject = selectedComposeProject,
-                onClearComposeProject = { selectedComposeProject = null },
                 onSelectComposeProject = { selectedComposeProject = it }
             )
         }
@@ -212,8 +209,7 @@ private fun AppNavHost(
     viewModel: AppViewModel,
     prefill: MailCredentials?,
     selectedComposeProject: String?,
-    onClearComposeProject: () -> Unit,
-    onSelectComposeProject: (String) -> Unit
+    onSelectComposeProject: (String?) -> Unit
 ) {
     val reduceMotion = rememberReduceMotion()
     Crossfade(
@@ -240,7 +236,6 @@ private fun AppNavHost(
         viewModel = viewModel,
         prefill = prefill,
         selectedComposeProject = selectedComposeProject,
-        onClearComposeProject = onClearComposeProject,
         onSelectComposeProject = onSelectComposeProject
     ) }
 }
@@ -266,8 +261,7 @@ private fun AppScreenContent(
     viewModel: AppViewModel,
     prefill: MailCredentials?,
     selectedComposeProject: String?,
-    onClearComposeProject: () -> Unit,
-    onSelectComposeProject: (String) -> Unit
+    onSelectComposeProject: (String?) -> Unit
 ) {
     when (screen) {
         Screen.Onboarding -> OnboardingScreen(
@@ -290,7 +284,7 @@ private fun AppScreenContent(
                 onScreenChange(Screen.Conversation)
             },
             onCompose = {
-                onClearComposeProject()
+                onSelectComposeProject(null)
                 onScreenChange(Screen.Compose)
             },
             onOpenSettings = { onScreenChange(Screen.Settings) },
@@ -312,14 +306,11 @@ private fun AppScreenContent(
                 state = projects,
                 onRefresh = { viewModel.refreshProjects() },
                 onProjectTap = { p ->
-                    // Pass the deliberately-chosen project path through to
-                    // Compose; conversation routing arrives in Tier 2 once the
-                    // per-project conversation map is wired.
                     onSelectComposeProject(p.path)
                     onScreenChange(Screen.Compose)
                 },
                 onCompose = {
-                    onClearComposeProject()
+                    onSelectComposeProject(null)
                     onScreenChange(Screen.Compose)
                 }
             )
@@ -391,7 +382,7 @@ private fun AppScreenContent(
                     },
                     onOpenSettings = { onScreenChange(Screen.Settings) },
                     onEditCommand = {
-                        onClearComposeProject()
+                        onSelectComposeProject(null)
                         onScreenChange(Screen.Compose)
                     },
                     onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
@@ -404,12 +395,12 @@ private fun AppScreenContent(
             sending = send.sending,
             sendError = send.lastError,
             onCancel = {
-                onClearComposeProject()
+                onSelectComposeProject(null)
                 onScreenChange(Screen.Home)
             },
             onSend = { to, project, body ->
                 viewModel.sendCommand(to = to, project = project, body = body)
-                onClearComposeProject()
+                onSelectComposeProject(null)
             }
         )
     }

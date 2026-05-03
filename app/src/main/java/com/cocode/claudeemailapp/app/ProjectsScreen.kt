@@ -2,7 +2,6 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -141,14 +141,15 @@ private fun ProjectRow(project: ProjectSummary, onTap: () -> Unit) {
                     )
                 }
                 project.lastActivityAt?.let { ts ->
+                    val formatted = remember(ts) { formatTimestamp(parseIso(ts)) }
                     Text(
-                        text = formatTimestamp(parseIso(ts)),
+                        text = formatted,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            Box(modifier = Modifier.padding(top = 2.dp)) { ProjectStatePill(project) }
+            ProjectStatePill(project)
         }
     }
 }
