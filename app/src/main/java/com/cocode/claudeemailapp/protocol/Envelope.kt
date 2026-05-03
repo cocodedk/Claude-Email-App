@@ -48,6 +48,8 @@ data class EnvelopeMeta(
     val auth: String? = null,
     /** When replying to a question, echo back the ask_id so backend unblocks the right chat_ask. */
     @SerialName("ask_id") val askId: Long? = null,
+    /** On `kind=question`: short canned reply chips (≤4, ≤30 chars each per spec, but app validates defensively). */
+    @SerialName("suggested_replies") val suggestedReplies: List<String>? = null,
     /** Structured progress payload on `kind=progress` envelopes; renders as a progress bar when present. */
     val progress: ProgressInfo? = null
 )
