@@ -1,5 +1,6 @@
 package com.cocode.claudeemailapp.app
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
@@ -81,6 +82,18 @@ fun ClaudeEmailApp(
             else -> screen
         }
         if (target != screen) screen = target
+    }
+
+    val backTarget: Screen? = when (screen) {
+        Screen.Conversation, Screen.Compose, Screen.Settings, Screen.Projects -> Screen.Home
+        Screen.Diagnostics -> Screen.Settings
+        Screen.Setup -> if (editingCredentials) Screen.Settings else null
+        Screen.Onboarding, Screen.Home -> null
+    }
+    BackHandler(enabled = backTarget != null) {
+        if (screen == Screen.Compose) selectedComposeProject = null
+        if (screen == Screen.Setup && editingCredentials) editingCredentials = false
+        backTarget?.let { screen = it }
     }
 
     DisposableEffect(credentials) {
