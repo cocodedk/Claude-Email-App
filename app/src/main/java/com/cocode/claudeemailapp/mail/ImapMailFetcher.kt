@@ -88,7 +88,6 @@ class ImapMailFetcher(
                 if (inbox.isOpen) inbox.close(false)
             }
         } catch (_: Throwable) {
-            // Best-effort: read-state is non-fatal; next fetch reflects server truth.
         } finally {
             try { if (store.isConnected) store.close() } catch (_: Throwable) {}
         }
