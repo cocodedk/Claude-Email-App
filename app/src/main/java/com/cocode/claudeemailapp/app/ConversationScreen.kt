@@ -43,8 +43,11 @@ fun ConversationScreen(
     onRetryCommand: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onEditCommand: () -> Unit = {},
-    onOpenDiagnostics: () -> Unit = {}
+    onOpenDiagnostics: () -> Unit = {},
+    onMarkRead: () -> Unit = {}
 ) {
+    LaunchedEffect(conversation.id) { onMarkRead() }
+
     val scope = rememberCoroutineScope()
     val latestIntent by rememberUpdatedState(onSteeringIntent)
     val controller = remember {
