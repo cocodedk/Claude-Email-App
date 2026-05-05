@@ -212,7 +212,7 @@ class AppViewModel(
         val current = _inbox.value
         _inbox.value = current.copy(
             messages = current.messages.map { m ->
-                if (m.messageId in targets && !m.isSeen) m.copy(isSeen = true) else m
+                if (m.messageId in targets) m.copy(isSeen = true) else m
             }
         )
         viewModelScope.launch {
