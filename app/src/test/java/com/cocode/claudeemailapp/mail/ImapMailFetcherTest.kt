@@ -349,4 +349,52 @@ class ImapMailFetcherTest {
         val result = fetcher.fetchRecent(creds())
         assertTrue(result.isEmpty())
     }
+
+    @Test
+    fun markSeen_opensReadWriteAndSetsSeenFlagOnMatchingMessages() = runTest {
+        val match1 = mockk<Message>(relaxed = true)
+        val match2 = mockk<Message>(relaxed = true)
+
+        val inbox = mockk<Folder>(relaxed = true)
+        every { inbox.isOpen } returns true
+        every { inbox.search(any<jakarta.mail.search.SearchTerm>()) } returns arrayOf(match1, match2)
+
+        val store = mockk<Store>(relaxed = true)
+        every { store.getFolder("INBOX") } returns inbox
+        every { store.isConnected } returns true
+
+        val fetcher = ImapMailFetcher(
+            sessionFactory = { Session.getInstance(Properties()) },
+            storeConnector = { _, _ -> store }
+        )
+        fetcher.markSeen(creds(), listOf("<a@x>", "<b@x>"))
+
+        verify { inbox.open(Folder.READ_WRITE) }
+        verify {
+            inbox.setFlags(arrayOf(match1, match2), match { it.contains(Flags.Flag.SEEN) }, true)
+        }
+        verify { inbox.close(false) }
+        verify { store.close() }
+    }
+
+    @Test
+    fun markSeen_emptyIdsList_isNoOp() = runTest {
+        val store = mockk<Store>(relaxed = true)
+        val fetcher = ImapMailFetcher(
+            sessionFactory = { Session.getInstance(Properties()) },
+            storeConnector = { _, _ -> store }
+        )
+        fetcher.markSeen(creds(), emptyList())
+        verify(exactly = 0) { store.getFolder(any<String>()) }
+    }
+
+    @Test
+    fun markSeen_swallowsConnectFailure() = runTest {
+        val fetcher = ImapMailFetcher(
+            sessionFactory = { Session.getInstance(Properties()) },
+            storeConnector = { _, _ -> error("auth no") }
+        )
+        // Best-effort contract: must not throw.
+        fetcher.markSeen(creds(), listOf("<a@x>"))
+    }
 }
