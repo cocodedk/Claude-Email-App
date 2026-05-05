@@ -443,6 +443,48 @@ class AppViewModelTest {
     )
 
     @Test
+    fun markConversationRead_callsFetcherWithUnreadIdsAndClearsLocalUnreadCount() = runTest(dispatcher) {
+        val fetcher = mockk<MailFetcher>()
+        val unreadA = fakeMessage("<a@x>", "Subject")
+        val unreadB = fakeMessage("<b@x>", "Re: Subject")
+            .copy(inReplyTo = "<a@x>", references = listOf("<a@x>"))
+        val seenC = fakeMessage("<c@x>", "Re: Subject")
+            .copy(inReplyTo = "<b@x>", references = listOf("<a@x>", "<b@x>"), isSeen = true)
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(unreadA, unreadB, seenC)
+        coEvery { fetcher.markSeen(any(), any()) } returns Unit
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        // Sanity: grouped into one conversation, two unread.
+        val conv = vm.conversations.value.single()
+        assertEquals(2, conv.unreadCount)
+
+        vm.markConversationRead(conv.id)
+        advanceUntilIdle()
+
+        val captured = slot<List<String>>()
+        coVerify { fetcher.markSeen(any(), capture(captured)) }
+        assertEquals(setOf("<a@x>", "<b@x>"), captured.captured.toSet())
+        assertEquals(0, vm.conversations.value.single().unreadCount)
+    }
+
+    @Test
+    fun markConversationRead_alreadyAllSeen_doesNotCallFetcher() = runTest(dispatcher) {
+        val fetcher = mockk<MailFetcher>()
+        val seen = fakeMessage("<a@x>", "s").copy(isSeen = true)
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(seen)
+        coEvery { fetcher.markSeen(any(), any()) } returns Unit
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+        vm.markConversationRead(vm.conversations.value.single().id)
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { fetcher.markSeen(any(), any()) }
+    }
+
+    @Test
     fun sendCommand_setsPreferLiveAgent_whenProjectAgentIsConnected() = runTest(dispatcher) {
         val ackMsg = listProjectsAckMessage(rows = arrayOf(projectRow("p", agentStatus = "connected")))
         val fetcher = mockk<MailFetcher>()

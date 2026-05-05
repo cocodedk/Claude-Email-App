@@ -198,6 +198,28 @@ class AppViewModel(
         conversationStateStore.saveArchivedIds(updated)
     }
 
+    fun markConversationRead(conversationId: String) {
+        val creds = _credentials.value ?: return
+        val unreadIds = conversations.value
+            .firstOrNull { it.id == conversationId }
+            ?.messages
+            ?.filter { !it.isSeen && it.messageId.isNotBlank() }
+            ?.map { it.messageId }
+            .orEmpty()
+        if (unreadIds.isEmpty()) return
+
+        val targets = unreadIds.toSet()
+        val current = _inbox.value
+        _inbox.value = current.copy(
+            messages = current.messages.map { m ->
+                if (m.messageId in targets && !m.isSeen) m.copy(isSeen = true) else m
+            }
+        )
+        viewModelScope.launch {
+            runCatching { mailFetcher.markSeen(creds, unreadIds) }
+        }
+    }
+
     private var pollingJob: Job? = null
 
     init {
