@@ -14,6 +14,9 @@ import jakarta.mail.Session
 import jakarta.mail.Store
 import jakarta.mail.internet.InternetAddress
 import jakarta.mail.internet.MimeBodyPart
+import jakarta.mail.search.MessageIDTerm
+import jakarta.mail.search.OrTerm
+import jakarta.mail.search.SearchTerm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Properties
@@ -52,6 +55,40 @@ class ImapMailFetcher(
         } catch (t: Throwable) {
             if (t is MailException) throw t
             throw MailException("IMAP fetch failed: ${t.message}", t)
+        } finally {
+            try { if (store.isConnected) store.close() } catch (_: Throwable) {}
+        }
+    }
+
+    override suspend fun markSeen(
+        credentials: MailCredentials,
+        messageIds: List<String>
+    ) = withContext(Dispatchers.IO) {
+        if (messageIds.isEmpty()) return@withContext
+        val session = sessionFactory(imapProperties(credentials))
+        val store = try {
+            storeConnector(session, credentials)
+        } catch (_: Throwable) {
+            return@withContext
+        }
+        try {
+            val inbox = store.getFolder("INBOX")
+            inbox.open(Folder.READ_WRITE)
+            try {
+                val term: SearchTerm = if (messageIds.size == 1) {
+                    MessageIDTerm(messageIds.single())
+                } else {
+                    OrTerm(messageIds.map { MessageIDTerm(it) }.toTypedArray())
+                }
+                val matched = inbox.search(term)
+                if (matched.isNotEmpty()) {
+                    inbox.setFlags(matched, Flags(Flags.Flag.SEEN), true)
+                }
+            } finally {
+                if (inbox.isOpen) inbox.close(false)
+            }
+        } catch (_: Throwable) {
+            // Best-effort: read-state is non-fatal; next fetch reflects server truth.
         } finally {
             try { if (store.isConnected) store.close() } catch (_: Throwable) {}
         }
