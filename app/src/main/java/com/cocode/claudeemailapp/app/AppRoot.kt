@@ -385,7 +385,8 @@ private fun AppScreenContent(
                         onSelectComposeProject(null)
                         onScreenChange(Screen.Compose)
                     },
-                    onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
+                    onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) },
+                    onMarkRead = { viewModel.markConversationRead(conversation.id) }
                 )
             }
         }
