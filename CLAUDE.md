@@ -119,6 +119,7 @@ Integration tests read real IMAP/SMTP credentials from `.env` (git-ignored). Cop
 | `.github/workflows/deploy-pages.yml` | GitHub Pages deploy (on master push to `website/**`) |
 | `.githooks/pre-commit` | Local buildSmoke gate |
 | `.githooks/commit-msg` | Conventional Commits enforcement |
+| `.githooks/pre-push` | Refuses push to any remote outside `github.com/cocodedk` |
 | `scripts/install-hooks.sh` | One-time hook installer |
 | `scripts/setup-signing.sh` | Generates/uploads release keystore secrets |
 | `scripts/setup-repo.sh` | Applies branch protection + merge settings |

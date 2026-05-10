@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+# Guard: this repo must only be pushed to the cocodedk GitHub account.
+# git invokes pre-push as: pre-push <remote-name> <remote-url>
+remote_url="${2:-}"
+
+case "$remote_url" in
+  https://github.com/cocodedk/*|git@github.com:cocodedk/*) ;;
+  *)
+    echo "pre-push: refusing — push URL is not under github.com/cocodedk" >&2
+    echo "  remote: ${1:-?}" >&2
+    echo "  url:    $remote_url" >&2
+    exit 1
+    ;;
+esac
