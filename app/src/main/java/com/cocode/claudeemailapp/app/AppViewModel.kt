@@ -300,7 +300,7 @@ class AppViewModel(
         lastProjectsAckMessageId = candidate.messageId
         val sorted = parsed.projects
             .take(MAX_PROJECTS)
-            .sortedByDescending { it.agentStatus == AgentStatusValues.CONNECTED }
+            .sortedByDescending { AgentStatusValues.isLive(it.agentStatus) }
         _projects.value = _projects.value.copy(
             projects = sorted,
             lastFetchedAt = System.currentTimeMillis()
@@ -376,9 +376,9 @@ class AppViewModel(
         planFirst: Boolean? = null
     ) {
         val creds = _credentials.value ?: return
-        val preferLiveAgent = _projects.value.projects
-            .firstOrNull { it.path == project }
-            ?.agentStatus == AgentStatusValues.CONNECTED
+        val preferLiveAgent = AgentStatusValues.isLive(
+            _projects.value.projects.firstOrNull { it.path == project }?.agentStatus
+        )
         runSend {
             val envelope = Envelopes.command(
                 body = body,

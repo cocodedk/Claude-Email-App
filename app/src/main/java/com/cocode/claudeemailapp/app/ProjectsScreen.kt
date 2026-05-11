@@ -158,7 +158,7 @@ private fun ProjectRow(project: ProjectSummary, onTap: () -> Unit) {
 @Composable
 private fun ProjectStatePill(project: ProjectSummary) {
     val (label, accent) = when {
-        project.agentStatus == AgentStatusValues.CONNECTED ->
+        AgentStatusValues.isLive(project.agentStatus) ->
             "agent connected" to MaterialTheme.colorScheme.tertiary
         project.runningTaskId != null ->
             "running task #${project.runningTaskId}" to MaterialTheme.colorScheme.primary
