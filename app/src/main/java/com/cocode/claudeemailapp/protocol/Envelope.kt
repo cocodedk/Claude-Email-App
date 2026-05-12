@@ -10,14 +10,11 @@ import kotlinx.serialization.json.JsonObject
 /**
  * Claude-email envelope. Wire format agreed with backend (agent-claude-email).
  *
- *   {"v":1, "kind":"...", "task_id":42, "body":"...", "meta":{...}, "data":{...}}
+ *   {"v":2, "kind":"...", "task_id":42, "body":"...", "meta":{...}, "data":{...}}
  *
  * Versioning: clients always send `v`. Server response `v = min(client_v, server_max)`.
  * - v:1 → legacy `agent_status` vocab (connected | disconnected | absent), no `task_state`.
  * - v:2 → new vocab (online | stale | offline) + per-task `task_state`.
- *
- * Outbound default stays at v:1 until the backend service deploys V=2 on master.
- * The parser already accepts v:2 responses, so the bump to 2 is a one-line follow-up.
  *
  * - body is always human-readable (for UI)
  * - data is for programmatic action (typed per kind)
@@ -27,7 +24,7 @@ import kotlinx.serialization.json.JsonObject
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Envelope(
-    @EncodeDefault(EncodeDefault.Mode.ALWAYS) val v: Int = 1,
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS) val v: Int = 2,
     val kind: String,
     @SerialName("task_id") val taskId: Long? = null,
     val body: String = "",

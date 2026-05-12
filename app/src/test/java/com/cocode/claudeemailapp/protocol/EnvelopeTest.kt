@@ -76,20 +76,20 @@ class EnvelopeTest {
     }
 
     @Test
-    fun `default envelope v is 1 and is always serialized`() {
+    fun `default envelope v is 2 and is always serialized`() {
         val env = Envelope(kind = Kinds.COMMAND, body = "hi")
-        assertEquals(1, env.v)
+        assertEquals(2, env.v)
         val json = EnvelopeJson.encodeToString(env)
-        assertTrue("v should always appear in serialized envelope", json.contains("\"v\":1"))
+        assertTrue("v should always appear in serialized envelope", json.contains("\"v\":2"))
     }
 
     @Test
-    fun `parses v2 inbound and preserves v on round trip`() {
-        val raw = """{"v":2,"kind":"ack","task_id":1,"body":"x","meta":{}}"""
+    fun `parses v1 inbound and preserves v on round trip`() {
+        val raw = """{"v":1,"kind":"ack","task_id":1,"body":"x","meta":{}}"""
         val env = EnvelopeJson.decodeFromString(Envelope.serializer(), raw)
-        assertEquals(2, env.v)
+        assertEquals(1, env.v)
         val json = EnvelopeJson.encodeToString(env)
-        assertTrue("v=2 should serialize when explicitly decoded", json.contains("\"v\":2"))
+        assertTrue("v=1 should serialize when explicitly decoded", json.contains("\"v\":1"))
     }
 
     @Test
