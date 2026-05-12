@@ -517,7 +517,8 @@ private fun projectSortKey(p: ProjectSummary): Int = when (p.taskState) {
     TaskStateValues.WAITING -> 4
     TaskStateValues.ERROR -> 3
     else -> when {
-        p.runningTaskId != null -> 2
+        p.runningTaskId != null -> 5
+        p.queueDepth > 0 -> 4
         AgentStatusValues.isLive(p.agentStatus) -> 1
         else -> 0
     }

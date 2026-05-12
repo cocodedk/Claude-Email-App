@@ -562,6 +562,29 @@ class AppViewModelTest {
     }
 
     @Test
+    fun refreshInbox_v1Sort_queuedAndRunningOutrankLiveAndIdle() = runTest(dispatcher) {
+        val ackMsg = listProjectsAckMessage(
+            messageId = "<sort-v1-ack@x>",
+            rows = arrayOf(
+                projectRow("idle"),
+                projectRow("live", agentStatus = "connected"),
+                projectRow("queued", queueDepth = 3),
+                projectRow("running", runningTaskId = 7L)
+            )
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf("running", "queued", "live", "idle"),
+            vm.projects.value.projects.map { it.name }
+        )
+    }
+
+    @Test
     fun refreshInbox_v2Sort_taskStatePriorityOverAgentLive() = runTest(dispatcher) {
         val ackMsg = listProjectsAckMessage(
             messageId = "<sort-v2-ack@x>",
