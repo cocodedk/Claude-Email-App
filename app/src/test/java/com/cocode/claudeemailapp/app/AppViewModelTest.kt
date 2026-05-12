@@ -406,7 +406,8 @@ class AppViewModelTest {
         runningTaskId: Long? = null,
         queueDepth: Int = 0,
         lastActivityAt: String? = null,
-        agentStatus: String? = null
+        agentStatus: String? = null,
+        taskState: String? = null
     ): kotlinx.serialization.json.JsonObject = kotlinx.serialization.json.buildJsonObject {
         put("name", kotlinx.serialization.json.JsonPrimitive(name))
         put("path", kotlinx.serialization.json.JsonPrimitive(path))
@@ -414,6 +415,7 @@ class AppViewModelTest {
         put("queue_depth", kotlinx.serialization.json.JsonPrimitive(queueDepth))
         lastActivityAt?.let { put("last_activity_at", kotlinx.serialization.json.JsonPrimitive(it)) }
         agentStatus?.let { put("agent_status", kotlinx.serialization.json.JsonPrimitive(it)) }
+        taskState?.let { put("task_state", kotlinx.serialization.json.JsonPrimitive(it)) }
     }
 
     private fun listProjectsAckMessage(
@@ -557,6 +559,53 @@ class AppViewModelTest {
 
         val names = vm.projects.value.projects.map { it.name }
         assertEquals(listOf("bravo", "zulu", "alpha"), names)
+    }
+
+    @Test
+    fun refreshInbox_v1Sort_queuedAndRunningOutrankLiveAndIdle() = runTest(dispatcher) {
+        val ackMsg = listProjectsAckMessage(
+            messageId = "<sort-v1-ack@x>",
+            rows = arrayOf(
+                projectRow("idle"),
+                projectRow("live", agentStatus = "connected"),
+                projectRow("queued", queueDepth = 3),
+                projectRow("running", runningTaskId = 7L)
+            )
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf("running", "queued", "live", "idle"),
+            vm.projects.value.projects.map { it.name }
+        )
+    }
+
+    @Test
+    fun refreshInbox_v2Sort_taskStatePriorityOverAgentLive() = runTest(dispatcher) {
+        val ackMsg = listProjectsAckMessage(
+            messageId = "<sort-v2-ack@x>",
+            rows = arrayOf(
+                projectRow("offline-no-task", agentStatus = "offline"),
+                projectRow("live-no-task", agentStatus = "online"),
+                projectRow("error-stale", agentStatus = "stale", taskState = "error"),
+                projectRow("waiting-online", agentStatus = "online", taskState = "waiting"),
+                projectRow("working-offline", agentStatus = "offline", taskState = "working")
+            )
+        )
+        val fetcher = mockk<MailFetcher>()
+        coEvery { fetcher.fetchRecent(any(), any()) } returns listOf(ackMsg)
+
+        val vm = buildVm(initialCreds = creds(), fetcher = fetcher)
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf("working-offline", "waiting-online", "error-stale", "live-no-task", "offline-no-task"),
+            vm.projects.value.projects.map { it.name }
+        )
     }
 
     @Test

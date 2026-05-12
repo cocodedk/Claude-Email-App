@@ -33,6 +33,7 @@ import com.cocode.claudeemailapp.protocol.AgentStatusValues
 import com.cocode.claudeemailapp.protocol.EnvelopeJson
 import com.cocode.claudeemailapp.protocol.Envelopes
 import com.cocode.claudeemailapp.protocol.Kinds
+import com.cocode.claudeemailapp.protocol.TaskStateValues
 import com.cocode.claudeemailapp.protocol.envelope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -300,7 +301,7 @@ class AppViewModel(
         lastProjectsAckMessageId = candidate.messageId
         val sorted = parsed.projects
             .take(MAX_PROJECTS)
-            .sortedByDescending { it.agentStatus == AgentStatusValues.CONNECTED }
+            .sortedByDescending(::projectSortKey)
         _projects.value = _projects.value.copy(
             projects = sorted,
             lastFetchedAt = System.currentTimeMillis()
@@ -376,9 +377,9 @@ class AppViewModel(
         planFirst: Boolean? = null
     ) {
         val creds = _credentials.value ?: return
-        val preferLiveAgent = _projects.value.projects
-            .firstOrNull { it.path == project }
-            ?.agentStatus == AgentStatusValues.CONNECTED
+        val preferLiveAgent = AgentStatusValues.isLive(
+            _projects.value.projects.firstOrNull { it.path == project }?.agentStatus
+        )
         runSend {
             val envelope = Envelopes.command(
                 body = body,
@@ -509,4 +510,16 @@ class AppViewModel(
 private fun firstLineSummary(body: String): String {
     val first = body.lineSequence().firstOrNull()?.trim().orEmpty()
     return first.take(80).ifBlank { "Command" }
+}
+
+private fun projectSortKey(p: ProjectSummary): Int = when (p.taskState) {
+    TaskStateValues.WORKING -> 5
+    TaskStateValues.WAITING -> 4
+    TaskStateValues.ERROR -> 3
+    else -> when {
+        p.runningTaskId != null -> 5
+        p.queueDepth > 0 -> 4
+        AgentStatusValues.isLive(p.agentStatus) -> 1
+        else -> 0
+    }
 }

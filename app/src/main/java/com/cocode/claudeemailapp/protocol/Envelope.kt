@@ -8,9 +8,16 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
 /**
- * Claude-email v1 envelope. Wire format agreed with backend (agent-claude-email).
+ * Claude-email envelope. Wire format agreed with backend (agent-claude-email).
  *
  *   {"v":1, "kind":"...", "task_id":42, "body":"...", "meta":{...}, "data":{...}}
+ *
+ * Versioning: clients always send `v`. Server response `v = min(client_v, server_max)`.
+ * - v:1 → legacy `agent_status` vocab (connected | disconnected | absent), no `task_state`.
+ * - v:2 → new vocab (online | stale | offline) + per-task `task_state`.
+ *
+ * Outbound default stays at v:1 until the backend service deploys V=2 on master.
+ * The parser already accepts v:2 responses, so the bump to 2 is a one-line follow-up.
  *
  * - body is always human-readable (for UI)
  * - data is for programmatic action (typed per kind)
@@ -100,11 +107,38 @@ object ErrorCodes {
     const val INTERNAL = "internal"
 }
 
-/** Wire values for `ProjectSummary.agentStatus` (chat-bus presence per project). */
+/**
+ * Wire values for `ProjectSummary.agentStatus` (chat-bus presence per project).
+ *
+ * - v:2 vocab: [ONLINE], [STALE], [OFFLINE]. Server is source of truth; client just renders.
+ * - v:1 legacy vocab kept so v:1 responses still parse: [CONNECTED], [DISCONNECTED], [ABSENT].
+ * - [isLive] folds both vocabularies into one "agent is reachable" predicate.
+ */
 object AgentStatusValues {
+    // v:2 (current)
+    const val ONLINE = "online"
+    const val STALE = "stale"
+    const val OFFLINE = "offline"
+
+    // v:1 (legacy, still accepted on the wire)
     const val CONNECTED = "connected"
     const val DISCONNECTED = "disconnected"
     const val ABSENT = "absent"
+
+    /** True when the agent is currently reachable on the bus (either vocab). */
+    fun isLive(value: String?): Boolean = value == ONLINE || value == CONNECTED
+}
+
+/**
+ * Wire values for `ProjectSummary.taskState` (Agent View task lifecycle per project).
+ * v:2 only. After [com.cocode.claudeemailapp.data.ProjectSummary.taskState] fades on
+ * the backend (default 30 s for terminal states), the field becomes `null`.
+ */
+object TaskStateValues {
+    const val WAITING = "waiting"
+    const val WORKING = "working"
+    const val COMPLETED = "completed"
+    const val ERROR = "error"
 }
 
 /** Wire values for `EnvelopeMeta.routedVia` (which path handled a command). */
