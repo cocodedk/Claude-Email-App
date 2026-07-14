@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#050506" />
+  <title>Privacy Policy | Claude Email App</title>
+  <meta name="description" content="Privacy policy for Claude Email App (com.cocode.claudeemailapp): an Android IMAP/SMTP email client that stores credentials on-device and sends your commands to a claude-email agent backend you configure." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/privacy.html" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Palette mirrors app/src/main/java/com/cocode/claudeemailapp/ui/theme/Color.kt */
+    :root {
+      --pitch-black: #050506; --carbon: #0D0E11; --graphite: #14161A; --graphite-soft: #1B1E24;
+      --border-strong: #40444C; --border-soft: #2A2E35;
+      --snow: #F6F7F9; --snow-muted: #AEB4BE;
+      --signal-amber: #F0B35A; --signal-blue: #8AB4F8; --signal-green: #81C995; --signal-red: #F28B82;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --farsi: "Vazirmatn", "Inter", system-ui, sans-serif;
+      --container: 820px; --radius: 2px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--pitch-black); color: var(--snow);
+      font-family: var(--sans); font-size: 16px; line-height: 1.65;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility; overflow-x: hidden; min-height: 100vh;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(1200px 600px at 82% -10%, rgba(240, 179, 90, 0.08), transparent 60%),
+        radial-gradient(900px 500px at 0% 100%, rgba(138, 180, 248, 0.035), transparent 70%);
+    }
+    .container { position: relative; z-index: 1; width: min(var(--container), 92vw); margin: 0 auto; padding: 40px 0 64px; }
+    a { color: var(--signal-blue); text-decoration: none; border-bottom: 1px solid var(--border-soft); transition: color .15s, border-color .15s; }
+    a:hover { color: var(--signal-amber); border-bottom-color: var(--signal-amber); }
+    .back { display: inline-block; margin-bottom: 24px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--snow-muted); border: none; }
+    .back:hover { color: var(--signal-amber); }
+    .card { background: var(--carbon); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: clamp(22px, 5vw, 44px); }
+    h1 { font-family: var(--sans); font-weight: 600; font-size: clamp(1.7rem, 5vw, 2.3rem); margin: 0 0 6px; letter-spacing: -0.01em; }
+    h2 { font-family: var(--sans); font-weight: 600; font-size: 1.15rem; margin: 32px 0 8px; color: var(--snow); }
+    .meta { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--snow-muted); margin: 0 0 6px; }
+    .meta code { color: var(--signal-amber); }
+    p, li { color: var(--snow); }
+    ul { padding-inline-start: 1.25em; margin: 8px 0; }
+    li { margin: 5px 0; }
+    strong { color: var(--snow); font-weight: 600; }
+    .lede { border-inline-start: 2px solid var(--signal-amber); padding-inline-start: 16px; color: var(--snow); }
+    .divider { height: 1px; background: var(--border-soft); margin: 48px 0; border: none; }
+    section[dir="rtl"] { font-family: var(--farsi); text-align: right; }
+    section[dir="rtl"] h1, section[dir="rtl"] h2 { font-family: var(--farsi); }
+    footer { margin-top: 40px; text-align: center; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--snow-muted); }
+    footer a { color: var(--snow); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="./index.html">&larr; Claude Email App</a>
+    <div class="card">
+
+      <!-- ==================== ENGLISH ==================== -->
+      <section lang="en">
+        <h1>Privacy Policy</h1>
+        <p class="meta">Claude Email App &middot; <code>com.cocode.claudeemailapp</code></p>
+        <p class="meta">Last updated: 14 July 2026</p>
+
+        <p class="lede"><strong>Claude Email App is an Android email client. It runs on your device, stores your account credentials locally in encrypted form, and connects directly to the email servers you configure. There is no server operated by the developer as part of this app. The commands and messages you send are transmitted as ordinary email to a <em>claude-email</em> agent backend whose address you choose — and because that backend is built on Anthropic's Claude, the content you send may be processed by Anthropic and is subject to Anthropic's privacy policy.</strong></p>
+
+        <h2>What the app is</h2>
+        <p>Claude Email App is a focused IMAP/SMTP email client. You point it at an email account you already control, plus the email address of a <em>claude-email</em> agent backend. You then send structured "commands" to that backend and read its replies inside the app. The app does not create an account for you, and it does not route your mail through any infrastructure operated by the developer.</p>
+
+        <h2>Information you provide, and where it is stored</h2>
+        <p>During setup you enter the details needed to reach your mailbox and the backend. This includes:</p>
+        <ul>
+          <li>Your display name and email address.</li>
+          <li>Your email account <strong>password</strong> (used to log in to your IMAP and SMTP servers).</li>
+          <li>Your IMAP and SMTP server host names, ports, and TLS settings.</li>
+          <li>The <strong>service address</strong> — the email address of the claude-email backend you want to reach.</li>
+          <li>An optional <strong>shared secret</strong> used to authenticate the commands you send to that backend.</li>
+        </ul>
+        <p>These values are stored <strong>only on your device</strong>, in encrypted storage (Android <code>EncryptedSharedPreferences</code>) protected by a hardware-backed key held in the Android Keystore. They are never sent to the developer. If the device-bound key becomes unavailable, the stored values cannot be decrypted and you are simply asked to set up the app again.</p>
+
+        <h2>Access to your email account</h2>
+        <p>To do its job the app connects <strong>directly from your device</strong> to the email servers you configured, over an encrypted (TLS) connection:</p>
+        <ul>
+          <li>It reads messages in your <strong>inbox</strong> in order to find and display replies from the backend agent. Messages that are not claude-email envelopes are ignored, but the app does read your inbox to look for relevant messages, and it may mark messages it has processed as read.</li>
+          <li>It sends outgoing email through your SMTP server to the service address you configured.</li>
+        </ul>
+        <p>The developer has no access to your mailbox, your credentials, or the contents of your email.</p>
+
+        <h2>What is sent to the backend and to Anthropic (Claude)</h2>
+        <p>When you issue a command, the app builds a structured message (a JSON "envelope") and sends it <strong>as an email</strong>, through your own SMTP server, to the service address you configured. That message contains the <strong>text of your command</strong> and related details such as the target project name, priorities, and — if you set one — your shared secret (which the app also places in the email subject line for authentication). Replies from the backend arrive in your inbox and are displayed in the app.</p>
+        <p>The <em>claude-email</em> backend is an AI agent system built on <strong>Anthropic's Claude</strong>. This means the content you send — your commands and any text in them — and the replies you receive are <strong>processed by that backend and may be handled by Anthropic's Claude models</strong>. That processing is therefore subject to
+        <a href="https://www.anthropic.com/legal/privacy" rel="noopener" target="_blank">Anthropic's Privacy Policy</a>, and to the practices of whoever operates the backend you have chosen to use. Do not send information through the app that you are not comfortable having processed this way.</p>
+        <p>Importantly, <strong>the app itself never contacts Anthropic directly</strong>. It holds no Anthropic API key and makes no request to Anthropic's servers; all AI processing happens on the backend you send email to, not inside the app.</p>
+
+        <h2>Notifications and background service</h2>
+        <p>If you enable notifications, the app runs a foreground service that keeps a live connection to your mailbox (IMAP IDLE) so that new replies can notify you promptly, without repeated polling. This service connects only to the mail server you configured and shows a notification while it is active, as Android requires. Notifications are optional and can be turned off in the app or in your device settings.</p>
+
+        <h2>No analytics, no tracking, no ads</h2>
+        <ul>
+          <li>The app contains <strong>no analytics, no crash reporting, and no advertising</strong>.</li>
+          <li>There are <strong>no third-party tracking SDKs, no cookies, and no advertising identifiers</strong>.</li>
+          <li>The only network connections the app makes are to the mail servers and backend address <strong>you</strong> configure.</li>
+        </ul>
+
+        <h2>Device backup</h2>
+        <p>If you have enabled Android Auto Backup or Google account backup, the operating system may include this app's local data in your own personal Google backup. This is controlled entirely by you and Google — the developer has no access to it. Your encrypted credentials are protected by a key held in the Android Keystore that is bound to your device and is not included in backups, so those credentials cannot be decrypted on another device. See
+        <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">Google's Privacy Policy</a> for details.</p>
+
+        <h2>External links</h2>
+        <p>The app and this page link to the developer's website (<a href="https://cocode.dk" rel="noopener" target="_blank">cocode.dk</a>), a GitHub repository, and a LinkedIn profile. Opening them leaves the app; those sites are governed by their own privacy policies.</p>
+
+        <h2>Children</h2>
+        <p>The app is a technical tool for operators and is not directed at children. It does not knowingly collect data from anyone, including children.</p>
+
+        <h2>Changes</h2>
+        <p>If this policy changes, the updated version will be posted on this page with a new "last updated" date.</p>
+
+        <h2>Contact</h2>
+        <p>Questions about this policy can be sent to
+        <a href="mailto:bb@cocode.dk">bb@cocode.dk</a> (CoCode.dk, developer: Babak Bandpey).</p>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- ==================== PERSIAN (فارسی) ==================== -->
+      <section lang="fa" dir="rtl">
+        <h1>سیاست حفظ حریم خصوصی</h1>
+        <p class="meta">کلود ایمیل اپ &middot; <code>com.cocode.claudeemailapp</code></p>
+        <p class="meta">آخرین به‌روزرسانی: ۱۴ ژوئیه ۲۰۲۶</p>
+
+        <p class="lede"><strong>کلود ایمیل اپ یک کلاینت ایمیل اندرویدی است. روی دستگاه شما اجرا می‌شود، اطلاعات ورود حساب شما را به‌صورت رمزنگاری‌شده و محلی ذخیره می‌کند و مستقیماً به سرورهای ایمیلی که شما تنظیم می‌کنید متصل می‌شود. هیچ سروری به‌عنوان بخشی از این برنامه توسط توسعه‌دهنده اجرا نمی‌شود. دستورها و پیام‌هایی که ارسال می‌کنید به‌صورت ایمیل عادی به یک بک‌اند ایجنت <em>claude-email</em> که نشانی آن را خودتان انتخاب می‌کنید فرستاده می‌شوند — و چون آن بک‌اند بر پایهٔ Claude شرکت Anthropic ساخته شده است، محتوایی که می‌فرستید ممکن است توسط Anthropic پردازش شود و مشمول سیاست حریم خصوصی Anthropic است.</strong></p>
+
+        <h2>این برنامه چیست</h2>
+        <p>کلود ایمیل اپ یک کلاینت ایمیل متمرکز مبتنی بر IMAP/SMTP است. آن را به یک حساب ایمیل که خودتان در اختیار دارید و نیز به نشانی ایمیل یک بک‌اند ایجنت <em>claude-email</em> متصل می‌کنید. سپس «دستورهای» ساختاریافته به آن بک‌اند می‌فرستید و پاسخ‌هایش را درون برنامه می‌خوانید. برنامه برای شما حسابی نمی‌سازد و ایمیل شما را از هیچ زیرساختی که توسط توسعه‌دهنده اجرا شود عبور نمی‌دهد.</p>
+
+        <h2>اطلاعاتی که وارد می‌کنید و محل ذخیرهٔ آن</h2>
+        <p>هنگام راه‌اندازی، اطلاعات لازم برای دسترسی به صندوق پستی و بک‌اند را وارد می‌کنید. این شامل موارد زیر است:</p>
+        <ul>
+          <li>نام نمایشی و نشانی ایمیل شما.</li>
+          <li><strong>رمز عبور</strong> حساب ایمیل شما (برای ورود به سرورهای IMAP و SMTP شما).</li>
+          <li>نام میزبان، پورت و تنظیمات TLS سرورهای IMAP و SMTP شما.</li>
+          <li><strong>نشانی سرویس</strong> — یعنی نشانی ایمیل بک‌اند claude-email که می‌خواهید به آن متصل شوید.</li>
+          <li>یک <strong>راز مشترک</strong> اختیاری برای احراز اصالت دستورهایی که به آن بک‌اند می‌فرستید.</li>
+        </ul>
+        <p>این مقادیر <strong>تنها روی دستگاه شما</strong> و در حافظهٔ رمزنگاری‌شده (<code>EncryptedSharedPreferences</code> اندروید) ذخیره می‌شوند که با کلیدی سخت‌افزاری در Android Keystore محافظت می‌شود. این اطلاعات هرگز برای توسعه‌دهنده ارسال نمی‌شوند. اگر کلید مختص دستگاه در دسترس نباشد، مقادیر ذخیره‌شده قابل رمزگشایی نیستند و صرفاً از شما خواسته می‌شود برنامه را دوباره راه‌اندازی کنید.</p>
+
+        <h2>دسترسی به حساب ایمیل شما</h2>
+        <p>برنامه برای انجام کارش <strong>مستقیماً از روی دستگاه شما</strong> و از طریق یک اتصال رمزنگاری‌شده (TLS) به سرورهای ایمیلی که تنظیم کرده‌اید متصل می‌شود:</p>
+        <ul>
+          <li>پیام‌های <strong>صندوق ورودی</strong> شما را می‌خواند تا پاسخ‌های ایجنت بک‌اند را بیابد و نمایش دهد. پیام‌هایی که پاکت claude-email نیستند نادیده گرفته می‌شوند، اما برنامه برای یافتن پیام‌های مرتبط صندوق ورودی شما را می‌خواند و ممکن است پیام‌های پردازش‌شده را خوانده‌شده علامت بزند.</li>
+          <li>ایمیل خروجی را از طریق سرور SMTP شما به نشانی سرویسی که تنظیم کرده‌اید می‌فرستد.</li>
+        </ul>
+        <p>توسعه‌دهنده هیچ دسترسی‌ای به صندوق پستی، اطلاعات ورود یا محتوای ایمیل شما ندارد.</p>
+
+        <h2>چه چیزی به بک‌اند و به Anthropic (Claude) فرستاده می‌شود</h2>
+        <p>وقتی دستوری صادر می‌کنید، برنامه یک پیام ساختاریافته (یک «پاکت» JSON) می‌سازد و آن را <strong>به‌صورت ایمیل</strong> و از طریق سرور SMTP خودتان به نشانی سرویسی که تنظیم کرده‌اید می‌فرستد. این پیام حاوی <strong>متن دستور شما</strong> و جزئیات مرتبط مانند نام پروژهٔ هدف، اولویت‌ها و — در صورت تنظیم — راز مشترک شماست (که برنامه آن را برای احراز اصالت در موضوع ایمیل نیز قرار می‌دهد). پاسخ‌های بک‌اند در صندوق ورودی شما می‌رسند و در برنامه نمایش داده می‌شوند.</p>
+        <p>بک‌اند <em>claude-email</em> یک سیستم ایجنت هوش مصنوعی است که بر پایهٔ <strong>Claude شرکت Anthropic</strong> ساخته شده است. این یعنی محتوایی که می‌فرستید — دستورها و هر متنی در آن‌ها — و پاسخ‌هایی که دریافت می‌کنید <strong>توسط آن بک‌اند پردازش می‌شوند و ممکن است توسط مدل‌های Claude شرکت Anthropic مدیریت شوند</strong>. بنابراین این پردازش مشمول
+        <a href="https://www.anthropic.com/legal/privacy" rel="noopener" target="_blank">سیاست حریم خصوصی Anthropic</a> و نیز رویه‌های هر کسی است که بک‌اند انتخابی شما را اداره می‌کند. اطلاعاتی را از طریق برنامه نفرستید که راحت نیستید به این شکل پردازش شود.</p>
+        <p>نکتهٔ مهم اینکه <strong>خودِ برنامه هرگز مستقیماً با Anthropic تماس نمی‌گیرد</strong>. هیچ کلید API از Anthropic ندارد و هیچ درخواستی به سرورهای Anthropic نمی‌فرستد؛ تمام پردازش هوش مصنوعی روی بک‌اندی که به آن ایمیل می‌فرستید انجام می‌شود، نه درون برنامه.</p>
+
+        <h2>اعلان‌ها و سرویس پس‌زمینه</h2>
+        <p>اگر اعلان‌ها را فعال کنید، برنامه یک سرویس پیش‌زمینه اجرا می‌کند که اتصالی زنده با صندوق پستی شما (IMAP IDLE) نگه می‌دارد تا پاسخ‌های جدید بدون نیاز به بررسی مکرر بی‌درنگ به شما اطلاع داده شوند. این سرویس فقط به سرور ایمیلی که تنظیم کرده‌اید متصل می‌شود و — همان‌طور که اندروید لازم می‌داند — در زمان فعال بودن یک اعلان نشان می‌دهد. اعلان‌ها اختیاری‌اند و می‌توان آن‌ها را در برنامه یا در تنظیمات دستگاه خاموش کرد.</p>
+
+        <h2>بدون تحلیل، بدون ردیابی، بدون تبلیغات</h2>
+        <ul>
+          <li>برنامه <strong>هیچ ابزار تحلیلی، گزارش خطا یا تبلیغاتی</strong> ندارد.</li>
+          <li>هیچ <strong>کیت توسعهٔ ردیابی شخص ثالث، کوکی یا شناسهٔ تبلیغاتی</strong> وجود ندارد.</li>
+          <li>تنها اتصال‌های شبکه‌ای برنامه به سرورهای ایمیل و نشانی بک‌اندی است که <strong>خودتان</strong> تنظیم می‌کنید.</li>
+        </ul>
+
+        <h2>پشتیبان‌گیری دستگاه</h2>
+        <p>اگر پشتیبان‌گیری خودکار اندروید یا پشتیبان‌گیری حساب گوگل را فعال کرده باشید، سیستم‌عامل ممکن است داده‌های محلی این برنامه را در پشتیبان شخصی گوگل شما بگنجاند. این کار کاملاً توسط شما و گوگل کنترل می‌شود و توسعه‌دهنده به آن دسترسی ندارد. اطلاعات ورود رمزنگاری‌شدهٔ شما با کلیدی در Android Keystore محافظت می‌شود که به دستگاه شما مقید است و در پشتیبان‌ها گنجانده نمی‌شود؛ بنابراین این اطلاعات روی دستگاه دیگری قابل رمزگشایی نیستند. برای جزئیات به
+        <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">سیاست حریم خصوصی گوگل</a> مراجعه کنید.</p>
+
+        <h2>پیوندهای بیرونی</h2>
+        <p>برنامه و این صفحه به وب‌سایت توسعه‌دهنده (<a href="https://cocode.dk" rel="noopener" target="_blank">cocode.dk</a>)، یک مخزن گیت‌هاب و یک پروفایل لینکدین پیوند دارند. باز کردن آن‌ها برنامه را ترک می‌کند و این سایت‌ها تابع سیاست‌های حریم خصوصی خودشان هستند.</p>
+
+        <h2>کودکان</h2>
+        <p>این برنامه ابزاری فنی برای اپراتورهاست و برای کودکان طراحی نشده است. آگاهانه هیچ داده‌ای را از هیچ‌کس، از جمله کودکان، جمع‌آوری نمی‌کند.</p>
+
+        <h2>تغییرات</h2>
+        <p>در صورت تغییر این سیاست، نسخهٔ به‌روزشده با تاریخ جدید در همین صفحه منتشر خواهد شد.</p>
+
+        <h2>تماس</h2>
+        <p>پرسش‌های مربوط به این سیاست را می‌توانید به
+        <a href="mailto:bb@cocode.dk">bb@cocode.dk</a> (CoCode.dk، توسعه‌دهنده: بابک بندپی) ارسال کنید.</p>
+      </section>
+
+    </div>
+    <footer>© 2026 CoCode.dk — Babak Bandpey · <a href="./index.html">Claude Email App</a></footer>
+  </div>
+</body>
+</html>
