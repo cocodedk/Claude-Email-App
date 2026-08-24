@@ -443,8 +443,8 @@ private fun replyTo(message: FetchedMessage, selfAddress: String?): String {
     return message.to.firstOrNull { !it.equals(selfAddress, ignoreCase = true) } ?: from
 }
 
-private fun replySubject(title: String, sharedSecret: String?): String {
-    val base = if (title.trim().startsWith("Re:", ignoreCase = true)) title else "Re: $title"
+internal fun replySubject(title: String, sharedSecret: String?): String {
+    val base = replySubjectFor(title)
     return when {
         sharedSecret.isNullOrBlank() -> base
         base.contains("AUTH:") -> base

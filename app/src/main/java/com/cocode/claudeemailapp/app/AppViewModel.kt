@@ -424,9 +424,7 @@ class AppViewModel(
         ) ?: return
         runSend {
             val parentId = pending.messageId.takeIf(String::isNotBlank)
-            val replySubject =
-                if (ConversationGrouper.hasReplyPrefix(pending.subject)) pending.subject
-                else "Re: ${pending.subject}"
+            val replySubject = replySubjectFor(pending.subject)
             val outgoing = OutgoingMessage.envelope(
                 to = pending.to,
                 subject = replySubject,
@@ -523,3 +521,11 @@ private fun projectSortKey(p: ProjectSummary): Int = when (p.taskState) {
         else -> 0
     }
 }
+
+/**
+ * The single "Re: " guard shared by every reply path — the steering path here and the
+ * conversation reply path in AppRoot. A subject that already carries a reply prefix, in
+ * any case or spacing, is returned untouched so we never emit "Re: Re: ...".
+ */
+internal fun replySubjectFor(subject: String): String =
+    if (ConversationGrouper.hasReplyPrefix(subject)) subject else "Re: $subject"
