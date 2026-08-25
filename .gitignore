@@ -24,3 +24,4 @@ local.properties
 release.keystore
 .superpowers/
 .kotlin/
+__pycache__/

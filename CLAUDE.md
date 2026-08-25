@@ -102,9 +102,19 @@ com/cocode/claudeemailapp/
 ./gradlew :app:lintDebug --no-daemon           # Lint
 ./gradlew buildSmoke --no-daemon               # Full smoke (build + tests + lint)
 ./gradlew :app:connectedDebugAndroidTest       # Instrumentation tests (needs device/emulator + .env)
+scripts/e2e/harness.py                         # Hermetic e2e: real app + real backend, no credentials
+scripts/check-line-limit.sh                    # 200-line rule
 ```
 
 Integration tests read real IMAP/SMTP credentials from `.env` (git-ignored). Copy `.env.example` to `.env` and fill in values to run them.
+
+`scripts/e2e/harness.py` needs none of that: it boots a private GreenMail in
+docker, TLS terminators with a certificate valid for `10.0.2.2`, and a real
+`main.py` poller from a claude-email checkout (`CLAUDE_EMAIL_REPO` to override
+which one), then runs `com.cocode.claudeemailapp.e2e.RealMailE2ETest` on an
+emulator. **Never run `:app:connectedDebugAndroidTest` bare for that class** —
+the runner arguments then come from your `.env` and the test would drive a real
+mailbox. See `docs/e2e-app-emulator.md`.
 
 ---
 
@@ -114,6 +124,8 @@ Integration tests read real IMAP/SMTP credentials from `.env` (git-ignored). Cop
 |------|---------|
 | `CLAUDE.md` | This file |
 | `.env.example` | Template for integration-test credentials |
+| `scripts/e2e/` | Hermetic end-to-end harness + the frozen gate's adapter |
+| `.venv/bin/pytest` | Symlink to `scripts/e2e/gate-dispatch.sh` — the e2e chain's frozen gate calls it |
 | `.github/workflows/ci.yml` | PR + branch verification |
 | `.github/workflows/release-apk.yml` | Signed APK build + GitHub Release (workflow_dispatch) |
 | `.github/workflows/deploy-pages.yml` | GitHub Pages deploy (on master push to `website/**`) |

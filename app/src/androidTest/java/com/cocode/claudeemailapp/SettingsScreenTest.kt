@@ -48,7 +48,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithText("Display").assertIsDisplayed()
@@ -67,7 +69,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithText("(not set)").assertIsDisplayed()
@@ -83,7 +87,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         // both serviceAddress and sharedSecret empty → two "(not set)" entries
@@ -99,7 +105,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithText("••••••").assertIsDisplayed()
@@ -115,7 +123,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithText("STARTTLS").assertIsDisplayed()
@@ -132,7 +142,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_back").performClick()
@@ -150,7 +162,9 @@ class SettingsScreenTest {
                 onEdit = { edited = true },
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_edit").performClick()
@@ -168,7 +182,9 @@ class SettingsScreenTest {
                 onEdit = {},
                 onOpenDiagnostics = {},
                 syncIntervalMs = 60_000L,
-                onSyncIntervalChange = {}
+                onSyncIntervalChange = {},
+                notificationsEnabled = true,
+                onNotificationsEnabledChange = {}
             )
         } }
         composeRule.onNodeWithTag("settings_signout").performClick()

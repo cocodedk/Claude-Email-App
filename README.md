@@ -52,6 +52,16 @@ Install a debug build on a connected device:
 
 For integration tests that hit a real IMAP/SMTP account, copy `.env.example` to `.env` and fill in the values before running the instrumented suite.
 
+For the hermetic end-to-end test — the real app on an emulator against a
+throwaway mail server and a real claude-email backend, with nothing in the mail
+path mocked — no credentials are needed:
+
+```bash
+scripts/e2e/harness.py     # needs docker, openssl, gpg, the Android SDK
+```
+
+See [docs/e2e-app-emulator.md](docs/e2e-app-emulator.md).
+
 ## Architecture
 
 ```text
