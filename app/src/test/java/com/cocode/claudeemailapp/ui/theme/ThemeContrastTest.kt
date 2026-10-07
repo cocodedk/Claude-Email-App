@@ -18,14 +18,22 @@ class ThemeContrastTest {
     private val appBackground = Color.Black // the Box behind every screen in AppRoot
 
     @Test
-    fun headingColour_onTheBackground_meetsAA() {
+    fun headingColour_onBlack_meetsAA() {
         assertTrue(contrast(Snow, appBackground) >= 4.5)
+    }
+
+    @Test
+    fun headingColour_onPitchBlack_meetsAA() {
         assertTrue(contrast(Snow, PitchBlack) >= 4.5)
     }
 
     @Test
-    fun bodyColour_onTheBackground_meetsAA() {
+    fun bodyColour_onBlack_meetsAA() {
         assertTrue(contrast(SnowMuted, appBackground) >= 4.5)
+    }
+
+    @Test
+    fun bodyColour_onPitchBlack_meetsAA() {
         assertTrue(contrast(SnowMuted, PitchBlack) >= 4.5)
     }
 }
