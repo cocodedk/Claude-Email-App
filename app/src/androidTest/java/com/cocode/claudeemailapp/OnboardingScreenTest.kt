@@ -32,7 +32,7 @@ class OnboardingScreenTest {
         composeRule.onNodeWithTag("onboarding_next").performClick()
         composeRule.onNodeWithText("Threads, not an inbox.").assertIsDisplayed()
         composeRule.onNodeWithTag("onboarding_next").performClick()
-        composeRule.onNodeWithText("Credentials stay on device.").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in details stored encrypted.").assertIsDisplayed()
         composeRule.onNodeWithTag("onboarding_start").assertIsDisplayed()
     }
 

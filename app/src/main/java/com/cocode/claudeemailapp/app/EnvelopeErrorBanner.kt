@@ -98,7 +98,7 @@ private fun BannerAction(
                 contentColor = MaterialTheme.colorScheme.errorContainer
             ),
             modifier = Modifier.testTag("envelope_error_retry")
-        ) { Text(stringResource(R.string.action_retry)) }
+        ) { Text(stringResource(R.string.action_resend_preview)) }
         UiErrorAction.OpenSettings -> Button(
             onClick = onOpenSettings,
             colors = ButtonDefaults.buttonColors(

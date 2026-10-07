@@ -4,7 +4,8 @@
     <!-- Shared actions -->
     <string name="action_back">Back</string>
     <string name="action_cancel">Cancel</string>
-    <string name="action_retry">Retry</string>
+    <string name="action_resend_preview">Send saved preview again</string>
+    <string name="pending_cancel_task">Cancel project task</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_send">Send</string>
     <string name="action_sending">Sending…</string>
@@ -31,9 +32,9 @@
     <string name="toast_copied_message">Message copied</string>
 
     <!-- Steering bar -->
-    <string name="steering_chip_status">Status</string>
-    <string name="steering_chip_cancel">Cancel</string>
-    <string name="steering_chip_cancel_confirm">Cancel · confirm</string>
+    <string name="steering_chip_status">Request status</string>
+    <string name="steering_chip_cancel">Cancel project task</string>
+    <string name="steering_chip_cancel_confirm">Confirm cancel</string>
     <string name="steering_chip_more">More</string>
     <string name="steering_chip_sending">Sending…</string>
 
@@ -56,15 +57,15 @@
 
     <string name="onboarding_p1_eyebrow">01 · COMMAND</string>
     <string name="onboarding_p1_title">Email Claude. It runs the task.</string>
-    <string name="onboarding_p1_body">Send a command to your claude-email service. It spawns an agent in the target project and replies when the work is done.</string>
+    <string name="onboarding_p1_body">Send a command to your claude-email service. The service does the work in the project you name and replies when it is done.</string>
 
     <string name="onboarding_p2_eyebrow">02 · CONVERSATIONS</string>
     <string name="onboarding_p2_title">Threads, not an inbox.</string>
-    <string name="onboarding_p2_body">Each task is a conversation. Active work up top, questions waiting for you next, finished tasks archived on a swipe.</string>
+    <string name="onboarding_p2_body">Each task is a conversation. Use the Active, Waiting and Archived tabs to switch between them. Swipe a conversation left to archive it.</string>
 
     <string name="onboarding_p3_eyebrow">03 · ENCRYPTED</string>
-    <string name="onboarding_p3_title">Credentials stay on device.</string>
-    <string name="onboarding_p3_body">IMAP and SMTP passwords sit in the Android Keystore. Nothing leaves the phone except mail you explicitly send.</string>
+    <string name="onboarding_p3_title">Sign-in details stored encrypted.</string>
+    <string name="onboarding_p3_body">Your sign-in details are stored encrypted, with a key kept in the Android Keystore. The app signs in to your own mail servers and checks them for replies. If you set a shared secret, it is sent with your commands. Android may back up the app\'s data.</string>
 
     <!-- Home -->
     <string name="home_inbox">Inbox</string>
@@ -123,31 +124,31 @@
     <string name="time_days">%1$dd</string>
 
     <!-- Message and status chips -->
-    <string name="kind_ack">confirmed</string>
+    <string name="kind_ack">received by service</string>
     <string name="kind_progress">running</string>
     <string name="kind_question">needs reply</string>
-    <string name="kind_result">done</string>
+    <string name="kind_result">result</string>
     <string name="kind_error">error</string>
     <string name="kind_command">command</string>
     <string name="kind_reply">reply</string>
-    <string name="status_awaiting_ack">waiting for confirmation</string>
+    <string name="status_awaiting_ack">waiting for the service to confirm</string>
     <string name="status_queued">queued</string>
     <string name="status_running">running</string>
     <string name="status_awaiting_user">needs reply</string>
     <string name="status_stalled">stalled</string>
-    <string name="status_waiting_on_peer">waiting on another agent</string>
+    <string name="status_waiting_on_peer">waiting for another agent</string>
     <string name="status_done">done</string>
     <string name="status_failed">failed</string>
     <string name="status_error">error</string>
-    <string name="routed_via_agent">via agent</string>
-    <string name="routed_via_agent_queued">via agent · queued</string>
-    <string name="routed_via_worker">via worker</string>
+    <string name="routed_via_agent">handled by a running agent</string>
+    <string name="routed_via_agent_queued">queued for a running agent</string>
+    <string name="routed_via_worker">handled by a new background worker</string>
 
     <!-- Pending commands -->
-    <string name="pending_title">Pending commands: %1$d</string>
+    <string name="pending_title">Unfinished or failed commands: %1$d</string>
     <plurals name="pending_retry_in">
-        <item quantity="one">retrying in %1$d second</item>
-        <item quantity="other">retrying in %1$d seconds</item>
+        <item quantity="one">service may give up in about %1$d second (as of the last update)</item>
+        <item quantity="other">service may give up in about %1$d seconds (as of the last update)</item>
     </plurals>
 
     <!-- Errors reported by the claude-email service -->
@@ -164,7 +165,7 @@
     <string name="error_title_invalid_state">Can\'t run right now</string>
     <string name="error_title_rate_limited">Too many requests</string>
     <string name="error_title_service_problem">The service had a problem</string>
-    <string name="error_title_unexpected">Unexpected reply from the service</string>
+    <string name="error_title_unexpected">The service rejected the request</string>
     <string name="error_hint_unauthorized">Open Settings, tap Edit credentials, and check the shared secret.</string>
     <string name="error_hint_project_not_found">Check that the project path exists on your claude-email service, then send the command again.</string>
     <plurals name="error_hint_retry_after">
@@ -173,16 +174,16 @@
     </plurals>
     <string name="error_code">Error code: %1$s</string>
     <string name="error_action_open_settings">Open Settings</string>
-    <string name="error_action_edit_command">Edit command</string>
+    <string name="error_action_edit_command">Write a new command</string>
 
     <!-- Compose a command -->
     <string name="compose_service_address">claude-email service address</string>
-    <string name="compose_project_path">Project path</string>
+    <string name="compose_project_path">Project path on the computer running claude-email</string>
     <string name="compose_command">Command</string>
 
     <!-- Setup -->
     <string name="setup_header_title">Single mailbox</string>
-    <string name="setup_header_body">The app uses one mailbox. It receives mail over IMAP and sends mail over SMTP, the standard ways a mail app talks to a mail provider. Your sign-in details (credentials) stay on this phone, encrypted with the Android Keystore.</string>
+    <string name="setup_header_body">The app uses one mailbox. It receives mail over IMAP and sends mail over SMTP, the standard ways a mail app talks to a mail provider. Your sign-in details (credentials) are stored encrypted on this phone, with a key kept in the Android Keystore. The app sends them only over encrypted connections, to sign in to your mail servers.</string>
     <string name="setup_section_account">Account</string>
     <string name="setup_section_imap">IMAP server (receives mail)</string>
     <string name="setup_section_smtp">SMTP server (sends mail)</string>
@@ -194,7 +195,7 @@
     <string name="setup_smtp_host">SMTP host (server name)</string>
     <string name="setup_port">Port</string>
     <string name="setup_service_address">Service address (email)</string>
-    <string name="setup_shared_secret">Shared secret</string>
+    <string name="setup_shared_secret">Shared secret set on your claude-email service</string>
     <string name="setup_tls_starttls">STARTTLS (typical port 587)</string>
     <string name="setup_tls_implicit">Implicit TLS (typical port 465)</string>
     <string name="setup_tls_hint">STARTTLS starts as an ordinary connection and then switches to an encrypted one. Implicit TLS is encrypted from the start. Turn this on if your mail provider asks for STARTTLS.</string>
@@ -226,13 +227,13 @@
     <string name="settings_sync_hint">While the app is open, it refreshes every 15 seconds, unless you choose Manual. Pulling down on the Inbox refreshes at any time.</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_notify_title">Notify on new messages</string>
-    <string name="settings_notify_body">Show a notification on this phone when a new message arrives and the app is not open on screen. The service\'s short confirmations of a command do not trigger one.</string>
+    <string name="settings_notify_body">Show a notification on this phone when a new message arrives and the app is not open on screen. The service\'s short confirmations of a command do not trigger one. After you change this switch, the background watcher may keep its old setting until the app restarts. To stop all alerts at once, turn off this app\'s notifications in Android settings.</string>
     <string name="settings_edit_credentials">Edit credentials</string>
     <string name="settings_sign_out">Sign out</string>
 
     <!-- Projects -->
     <string name="projects_loading">Loading…</string>
-    <string name="projects_none">No projects</string>
+    <string name="projects_none">No projects loaded</string>
     <plurals name="projects_found">
         <item quantity="one">%1$d project found</item>
         <item quantity="other">%1$d projects found</item>
@@ -241,7 +242,7 @@
     <string name="projects_empty_title">No projects yet.</string>
     <string name="projects_empty_body">The list of projects comes from your claude-email service, and it has not shared one yet. You can send a command now, or tap Refresh later to check again.</string>
     <string name="projects_agent_online">agent online</string>
-    <string name="projects_agent_stale">agent stale</string>
+    <string name="projects_agent_stale">agent has not checked in recently</string>
     <string name="projects_agent_offline">agent offline</string>
     <string name="projects_agent_other">agent %1$s</string>
     <string name="projects_task_working">working</string>
@@ -261,8 +262,8 @@
     <string name="diag_status_refreshing">refreshing</string>
     <string name="diag_status_stalled">stalled</string>
     <string name="diag_status_idle">idle</string>
-    <string name="diag_auto_refresh">Auto-refresh</string>
-    <string name="diag_auto_refresh_manual">manual only</string>
+    <string name="diag_auto_refresh">Background refresh</string>
+    <string name="diag_auto_refresh_manual">Manual</string>
     <plurals name="diag_auto_refresh_every">
         <item quantity="one">every %1$d second</item>
         <item quantity="other">every %1$d seconds</item>

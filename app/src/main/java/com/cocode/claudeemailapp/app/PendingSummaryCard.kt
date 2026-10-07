@@ -128,13 +128,13 @@ private fun PendingRowActions(
             TextButton(
                 onClick = { onRetry(p) },
                 modifier = Modifier.testTag("pending_retry_${p.messageId}")
-            ) { Text(stringResource(R.string.action_retry)) }
+            ) { Text(stringResource(R.string.action_resend_preview)) }
         }
         if (cancel) {
             TextButton(
                 onClick = { onCancel(p) },
                 modifier = Modifier.testTag("pending_cancel_${p.messageId}")
-            ) { Text(stringResource(R.string.action_cancel)) }
+            ) { Text(stringResource(R.string.pending_cancel_task)) }
         }
     }
 }

@@ -41,8 +41,8 @@ class SteeringDemoTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     private val scenes = listOf(
-        "1 / 5   Idle — Status · Cancel · More, all enabled",
-        "2 / 5   Armed — Cancel flips to red \"Cancel · confirm\"",
+        "1 / 5   Idle — Request status · Cancel project task · More, all enabled",
+        "2 / 5   Armed — Cancel flips to red \"Confirm cancel\"",
         "3 / 5   Sending — Status chip becomes \"Sending…\", peers disable",
         "4 / 5   Awaiting user — three reply templates",
         "5 / 5   Hidden — bar disappears (task finished)"

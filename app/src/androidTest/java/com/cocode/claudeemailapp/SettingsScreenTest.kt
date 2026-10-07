@@ -2,10 +2,12 @@ package com.cocode.claudeemailapp
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.SettingsScreen
 import com.cocode.claudeemailapp.data.MailCredentials
@@ -167,6 +169,7 @@ class SettingsScreenTest {
                 onNotificationsEnabledChange = {}
             )
         } }
+        composeRule.onNodeWithTag("settings_screen").performScrollToNode(hasTestTag("settings_edit"))
         composeRule.onNodeWithTag("settings_edit").performClick()
         assert(edited)
     }
@@ -187,6 +190,7 @@ class SettingsScreenTest {
                 onNotificationsEnabledChange = {}
             )
         } }
+        composeRule.onNodeWithTag("settings_screen").performScrollToNode(hasTestTag("settings_signout"))
         composeRule.onNodeWithTag("settings_signout").performClick()
         assert(signedOut)
     }
