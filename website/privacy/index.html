@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050506">
+
+<title>Privacy policy: Claude Email App</title>
+<meta name="description" content="Privacy policy for Claude Email App: no account, no ads, no analytics and no server of ours. The app talks only to the mail servers you name, and your commands travel as email to your own claude-email service.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/privacy/">
+<link rel="alternate" hreflang="en" href="https://cocodedk.github.io/Claude-Email-App/privacy/">
+<link rel="alternate" hreflang="da" href="https://cocodedk.github.io/Claude-Email-App/da/privacy/">
+<link rel="alternate" hreflang="x-default" href="https://cocodedk.github.io/Claude-Email-App/privacy/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Claude Email App">
+<meta property="og:title" content="Privacy policy: Claude Email App">
+<meta property="og:description" content="What Claude Email App sends, to whom and why, and what stays on your phone.">
+<meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/privacy/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="da_DK">
+
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../css/shared-blocks.css">
+<link rel="stylesheet" href="../css/policy.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav nav-shared">
+    <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/Claude-Email-App/css/cocode-nav.css">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="cocode-nav" aria-label="Claude Email App">
+  <a class="brand" href="/Claude-Email-App/" data-nav="home"><img src="/Claude-Email-App/img/icon.png" alt="" width="32" height="32">Claude Email App</a>
+  <a href="/Claude-Email-App/#how" data-nav="how">How it works</a>
+  <a href="/Claude-Email-App/#install" data-nav="install">Install</a>
+  <a href="/Claude-Email-App/privacy/" data-nav="privacy" aria-current="page">Privacy</a>
+  <a href="/Claude-Email-App/da/privacy/" hreflang="da" lang="da" data-nav="lang">Dansk</a>
+  <a href="https://cocode.dk/" data-nav="more">More apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+  </div>
+</header>
+
+<main id="main" class="container policy" tabindex="-1">
+  <h1>Privacy policy: Claude Email App</h1>
+  <p class="meta">Effective <time datetime="2026-10-07">7 October 2026</time>. This policy covers the Claude Email App for Android (<code>com.cocode.claudeemailapp</code>).</p>
+
+  <section>
+    <h2>Summary</h2>
+    <p>Claude Email App sends your commands by email to a claude-email service and shows you its replies. The service is the one that receives your commands, has an agent do the work in the project you name and replies when it is done. You enter your mailbox and the service's address yourself.</p>
+    <p>Cocode, which made the app, receives nothing from it. The app has no account, no server of ours, no ads, no analytics and no crash reporting.</p>
+    <p>The app connects only to the two servers of your mail provider that you enter in Setup. One receives your mail (an IMAP server) and one sends it (an SMTP server). Your mail password goes to them so that you can sign in.</p>
+    <p>Your commands leave the phone as ordinary email to the service address you enter. If you set a shared secret, a password that the service checks, it goes with them. What the service does with a command is outside the app. Everything else stays on the phone.</p>
+    <p>The only other thing the app does is hand a web address to your phone's browser when you tap a button on the About screen. The app itself loads nothing from those sites.</p>
+  </section>
+
+  <section>
+    <h2>What is collected</h2>
+    <p>Cocode collects nothing, because the app has no server of ours to send anything to. This is what the app itself handles:</p>
+    <ul>
+      <li><strong>The details you type in Setup.</strong> Your display name, email address and mail password. The host (server name) and port (connection number) of your IMAP and SMTP servers. Whether SMTP uses STARTTLS. The claude-email service address and, if you set one, the shared secret.</li>
+      <li><strong>Your mail.</strong> The app reads the 50 newest messages in your inbox (the INBOX folder on your IMAP server). For each message it reads the sender, subject, text, read state and the headers that tie replies into threads. It reads all mail in that folder, not only the service's replies, and shows every message in its conversation list. If you want other mail kept out of the app, use a mailbox that you use only for the service. The app keeps these messages in memory and does not save them in its storage.</li>
+      <li><strong>What you write.</strong> The commands and replies you send, the project path, and the status, cancel, reset and project-list requests the app sends when you tap the matching buttons.</li>
+    </ul>
+    <p>When you open a conversation, the app marks its unread messages as read on your mail server. It deletes and moves nothing.</p>
+  </section>
+
+  <section>
+    <h2>Servers the app contacts</h2>
+    <p>The app itself contacts your mail provider's two servers and no others. It has no built-in server address and loads nothing from the internet except mail. The one exception is the About screen, described next, which opens web pages in your browser when you tap a button.</p>
+
+    <h3>The About screen: web pages in your browser</h3>
+    <p>The About screen has five buttons: "See the latest version", "Read the privacy policy", "Open the website", "See the source code on GitHub" and "Report a problem on GitHub". When you tap one, the app hands a web address to your phone's browser, and the browser loads the page. The app never opens one of these pages by itself, and it loads nothing from them. The addresses are <code>github.com/cocodedk/Claude-Email-App/releases/latest</code>, <code>cocodedk.github.io/Claude-Email-App/privacy/</code>, <code>cocodedk.github.io/Claude-Email-App/</code>, <code>github.com/cocodedk/Claude-Email-App</code> and <code>github.com/cocodedk/Claude-Email-App/issues</code>. GitHub and GitHub Pages see your visit under their own privacy policies. The app does not check for updates by itself: "See the latest version" only opens the page where the newest release is listed. If no app on the phone can open a link, the About screen says so and nothing opens.</p>
+
+    <h3>Your IMAP server: receiving mail</h3>
+    <p>This server holds your inbox. IMAP is the standard way an app reads mail that is stored on a mail server. You enter the server's host and port in Setup, and the port is 993 unless you change it. The connection is always encrypted with TLS, and the app checks that the server's name matches its certificate. The server receives your email address and password so that you can sign in. It then receives the app's requests: open the inbox, download the 50 newest messages and mark messages as read.</p>
+    <p><strong>How often the app checks.</strong> Unless you choose Manual under Settings, Background refresh, the app checks for new mail every 15 seconds while it is open. While it is in the background, it checks every 30 seconds, 1 minute or 5 minutes, as you choose under the same setting.</p>
+    <p><strong>The background connection.</strong> When the app starts with your account saved, it also starts a background service. The service keeps one connection to your IMAP server open (IMAP IDLE, a standard way for a mail server to announce new mail as it arrives), so you hear about new mail quickly. Android requires a service like this to show a notification, so you see a low-priority one called "Watching inbox". When the server reports new mail, the app fetches the 10 newest messages and notifies you about them, as described under Permissions.</p>
+
+    <h3>Your SMTP server: sending mail</h3>
+    <p>This server sends your mail. SMTP is the standard way an app sends mail through a mail server. You enter its host and port in Setup, and the port is 465 unless you change it. The connection is encrypted from the first byte (TLS). If you choose STARTTLS in Setup, a method that starts as an ordinary connection and then switches to encrypted, the app requires it. In both cases the app checks that the server's name matches its certificate. The server receives your email address and password so that you can sign in, and every message you send.</p>
+
+    <h3>Test and save</h3>
+    <p>When you tap "Test and save", the app signs in once to each of the two servers to check your details. It saves them only if both sign-ins work.</p>
+
+    <h3>The claude-email service</h3>
+    <p>The app does not connect to this service directly. The service is an email address that you enter in Setup. The app sends mail to it through your SMTP server and reads its replies in your inbox.</p>
+    <p>A command is a message in JSON, a plain-text data format. It holds your text, the project path, a routing hint, the client name <code>cocode-android/1.0</code>, the time it was sent and, if you set one, your shared secret. Status, cancel, reset and project-list requests use the same format. A reply you type in a conversation is sent as plain text, with the shared secret at the start of the subject line as <code>AUTH:</code> followed by the secret. There is one exception. If you answer a question that the service asked about a command you sent (the command shows in the app as "needs reply"), the answer is sent in the same JSON format as a command, and the shared secret is inside the message instead of the subject line. Commands go to the service address from Setup. On the screen where you write a command, you can type a different address, and the command then goes there.</p>
+    <p>Email is not end-to-end encrypted. The app protects the connection between the phone and your mail servers. After your SMTP server passes a message on, protection depends on the mail systems it passes through. Your mail provider can read the shared secret in the message and in the subject line. Treat the secret as a password for the service, not as something your provider cannot see.</p>
+    <p>Whoever runs the service decides what it does with a command, which AI it uses and what it keeps. The app cannot see that, and this policy does not cover it.</p>
+  </section>
+
+  <section>
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>Internet.</strong> To reach your IMAP and SMTP servers.</li>
+      <li><strong>Network state.</strong> This permission lets an app see whether the phone is online. The app lists it, but its own code does not use it.</li>
+      <li><strong>Notifications.</strong> The app asks for this on Android 13 and later, so that it can tell you when mail arrives. Notifications are on by default. To switch them off, go to Settings, Notifications, and turn off "Notify on new messages". The background connection described above may keep its previous setting until the app restarts, so to stop all alerts at once, turn off this app's notifications in Android's settings. A notification shows the sender and the subject of a message. The app posts them for messages in your inbox, not only for the service's replies, and only while the app is not open on screen. The exception is the service's short confirmations that it received a command (shown in the app as "received by service"). The background connection does not check whether a message is new or already read. Each time your mail server reports new mail, it posts a notification for each of the 10 newest messages in your inbox, however old they are and whether or not you have read them. So you can get an alert for a message you have already read, and a notification you dismissed can come back the next time new mail arrives.</li>
+      <li><strong>Foreground service for data sync.</strong> This lets the app keep the background connection to your IMAP server open, as described above.</li>
+    </ul>
+    <p>The app asks for no other permissions: not contacts, location, camera, microphone, files or phone state.</p>
+  </section>
+
+  <section>
+    <h2>What stays on the phone</h2>
+    <p>The app keeps these in its own private storage on the phone:</p>
+    <ul>
+      <li><strong>Your sign-in details, encrypted.</strong> Everything you typed in Setup, including the password and the shared secret, is stored in an encrypted file. The key for it is in the Android Keystore, the part of Android that stores encryption keys. If the key no longer matches the file, the app deletes the file and shows Setup again.</li>
+      <li><strong>A record of the commands you sent, not encrypted.</strong> For each command: the address it went to, the time, the first line (up to 80 characters), the first 200 characters of the text, the project, and what the service reports back about it: status, task number, branch name and error text.</li>
+      <li><strong>Small settings, not encrypted.</strong> Which conversations you archived, the refresh interval, the five most recent project names, whether you have seen the introduction and the notification switch.</li>
+    </ul>
+    <p>If you long-press a message to copy it, its text goes to Android's clipboard, which is shared with other apps.</p>
+    <p><strong>To remove what the app keeps,</strong> tap "Sign out" under Settings. This stops the background service and deletes your sign-in details, the record of sent commands, the archive list, the refresh interval and the recent project names. The notification switch and the introduction flag stay. To remove those too, clear the app's data in Android's settings or uninstall the app. That removes everything the app keeps.</p>
+    <p><strong>Backup.</strong> The app allows Android's own backup of its data and sets no exclusions. If backup is switched on for your phone, the files above can be part of it, the unencrypted ones included. Android does not copy Keystore keys to another device, so the encrypted sign-in file should not open on a different phone. Your phone decides where a backup is stored, not the app.</p>
+  </section>
+
+  <section>
+    <h2>Third parties</h2>
+    <ul>
+      <li><strong>Your mail provider</strong> holds your mailbox and handles every message the app sends and reads, under its own privacy policy.</li>
+      <li><strong>Whoever runs your claude-email service</strong> receives your commands and decides what happens to them, as described above.</li>
+      <li><strong>GitHub and GitHub Pages</strong> see your visit if you tap a button on the About screen, because your browser loads the page. They do so under their own privacy policies.</li>
+    </ul>
+    <p>The app has no analytics, no ads and no crash reporting. It does not use Google Play services (Google's add-on services for Android), and its build lists none of them. Its libraries are AndroidX and Jetpack Compose for the screens and local storage, Kotlin libraries, Tink (an encryption library that comes with AndroidX's encrypted storage), and Angus Mail, which makes the IMAP and SMTP connections described above. The build includes no other networking library.</p>
+    <p><strong>The website is separate.</strong> This policy is about the app. The website is served by GitHub Pages, and the home pages load fonts from Google Fonts. This page loads nothing from other sites.</p>
+  </section>
+
+  <section>
+    <h2>Your rights</h2>
+    <p>Under the General Data Protection Regulation (GDPR) you can ask for access to, correction of and deletion of your data. You can ask us to limit its use, and you can object to it. The app sends nothing to Cocode, so Cocode holds no personal data about you from the app. There is nothing for us to give you, correct or delete. What the app keeps on your phone is yours to remove, as described above.</p>
+    <p>Your mail is held by your mail provider, and your commands by whoever runs your claude-email service. Take up these rights with them. You can also complain to the Danish Data Protection Agency, <a href="https://www.datatilsynet.dk/english">Datatilsynet</a>.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Cocode (Babak Bandpey), <a href="mailto:bb@cocode.dk">bb@cocode.dk</a>. You can also send questions about the app or this policy to <a href="https://github.com/cocodedk/Claude-Email-App/issues">GitHub issues</a>. To report a security problem, use the repository's private "Report a vulnerability" form on its <a href="https://github.com/cocodedk/Claude-Email-App/security">Security tab</a> instead of a public issue.</p>
+  </section>
+
+  <section>
+    <h2>Changes</h2>
+    <p>If this policy changes, the date at the top changes and this section says what is new. Older versions are in the project's history on <a href="https://github.com/cocodedk/Claude-Email-App">GitHub</a>.</p>
+    <p><strong>7 October 2026:</strong> the first version as a page of its own.</p>
+  </section>
+</main>
+
+<div class="site-footer">
+  <div class="container">
+    <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/Claude-Email-App">Source code</a> ·
+  <a href="/Claude-Email-App/privacy/">Privacy</a> ·
+  License: Apache-2.0 ·
+  <a href="https://cocode.dk/">Made by Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
+  </div>
+</div>
+
+</body>
+</html>
