@@ -23,16 +23,16 @@ Requires Android 7.0 or newer.
 
 ## Features
 
-- **Your own mailbox** — mail is received over IMAP and sent over SMTP, the standard ways a mail app talks to a mail provider (through Angus Mail). No relay of ours is involved.
-- **Sign-in details stored encrypted** — your mail password and the shared secret are stored encrypted on the phone, with a key kept in the Android Keystore, never in plain preferences.
-- **Commands and replies as conversations** — send a command, then read the agent's replies, grouped into conversations.
-- **Shared secret** — commands carry the shared secret you set in the app, for the claude-email service to check.
-- **Notifications** — a notification arrives when a new message comes in and the app is not open on screen. They are on by default. A background service keeps an IMAP IDLE connection open (a standard way for a mail server to announce new mail) so they work while the app is in the background. To stop all alerts at once, turn off this app's notifications in Android settings.
-- **Quick-reply chips** — when an agent asks a question, the app shows suggested answers above the composer; one tap sends the answer.
-- **Live progress** — progress messages from a task show as a label and, when the service reports how far along the task is, a progress bar.
-- **Projects view** — the projects the claude-email service reports, with agent and task status; tap one to start a command for it.
-- **Dark theme** — Material 3 with a dark palette.
-- **English and Danish** — the app follows your phone's language.
+- **Your own mailbox**: mail is received over IMAP and sent over SMTP, the standard ways a mail app talks to a mail provider (through Angus Mail). No relay of ours is involved.
+- **Sign-in details stored encrypted**: your mail password and the shared secret are stored encrypted on the phone, with a key kept in the Android Keystore, never in plain preferences.
+- **Commands and replies as conversations**: send a command, then read the agent's replies, grouped into conversations.
+- **Shared secret**: commands carry the shared secret you set in the app, for the claude-email service to check.
+- **Notifications**: a notification arrives when a new message comes in and the app is not open on screen. They are on by default. A background service keeps an IMAP IDLE connection open (a standard way for a mail server to announce new mail) so they work while the app is in the background. To stop all alerts at once, turn off this app's notifications in Android settings.
+- **Quick-reply chips**: when an agent asks a question, the app shows suggested answers above the composer; one tap sends the answer.
+- **Live progress**: progress messages from a task show as a label and, when the service reports how far along the task is, a progress bar.
+- **Projects view**: the projects the claude-email service reports, with agent and task status; tap one to start a command for it.
+- **Dark theme**: Material 3 with a dark palette.
+- **English and Danish**: the app follows your phone's language.
 
 ## Privacy
 

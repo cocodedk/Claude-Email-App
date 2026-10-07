@@ -17,7 +17,7 @@ Connect one email account, send commands to projects, and read the replies group
 - [Privacy policy](https://cocodedk.github.io/Claude-Email-App/privacy/): What the app sends, to whom, and what stays on the phone
 - [Android app plan](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/android-app-plan.md): Product, architecture, delivery phases
 - [UX/UI spec](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/ux-ui-spec.md): Navigation, visual direction, accessibility
-- [Gap analysis](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/gap-analysis-vs-claude-email.md): App vs. claude-email backend
+- [Gap analysis](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/gap-analysis-vs-claude-email.md): The app compared with the claude-email service (a snapshot from 2026-04-19)
 
 ## Downloads
 - [Latest APK](https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk): Signed release APK
