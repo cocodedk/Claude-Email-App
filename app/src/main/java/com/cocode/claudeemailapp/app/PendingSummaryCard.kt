@@ -3,7 +3,6 @@ package com.cocode.claudeemailapp.app
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -130,7 +129,7 @@ private fun PendingRowActions(
     val retry = isRetryable(p)
     val cancel = isCancellable(p)
     if (!retry && !cancel) return
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (retry) {
             TextButton(
                 onClick = { onRetry(p) },

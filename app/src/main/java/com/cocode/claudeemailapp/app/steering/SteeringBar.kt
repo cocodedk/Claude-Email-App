@@ -3,7 +3,7 @@ package com.cocode.claudeemailapp.app.steering
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +30,9 @@ fun SteeringBar(
     val chipsEnabled = ui.sending == null
     val consoleShape = RoundedCornerShape(18.dp)
 
-    Row(
+    // A wrapping row: the chip labels are long enough ("Cancel project task") that three of them do
+    // not fit side by side on a 360 dp screen or with larger text.
+    FlowRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -39,7 +41,8 @@ fun SteeringBar(
             .padding(horizontal = 10.dp, vertical = 10.dp)
             .testTag("steering_bar"),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        itemVerticalAlignment = Alignment.CenterVertically
     ) {
         val statusSending = ui.sending == SteeringIntent.Status
         SteeringChip(

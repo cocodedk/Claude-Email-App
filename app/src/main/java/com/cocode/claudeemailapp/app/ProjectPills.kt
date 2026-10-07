@@ -1,10 +1,11 @@
 package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -16,7 +17,11 @@ import com.cocode.claudeemailapp.protocol.TaskStateValues
 @Composable
 internal fun ProjectStatePills(project: ProjectSummary) {
     val colors = MaterialTheme.colorScheme
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        itemVerticalAlignment = Alignment.CenterVertically
+    ) {
         agentPill(project.agentStatus, colors)?.let { (label, accent) -> ChipPill(label, accent) }
         taskPill(project, colors)?.let { (label, accent) -> ChipPill(label, accent) }
     }

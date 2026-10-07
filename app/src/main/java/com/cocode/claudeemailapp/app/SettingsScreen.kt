@@ -103,7 +103,7 @@ fun SettingsScreen(
             )
         } }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(onClick = onEdit, modifier = Modifier.testTag("settings_edit")) {
                     Text(stringResource(R.string.settings_edit_credentials))
                 }
