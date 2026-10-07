@@ -1,1 +1,1 @@
-Android email client for the claude-email backend, built on IMAP and SMTP
+Send commands to AI agents through your own claude-email service

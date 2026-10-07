@@ -634,6 +634,11 @@ body > * { position: relative; z-index: 1; }
   font-family: "Vazirmatn", var(--sans);
   line-height: 1.85;
 }
+[dir="rtl"] .install-box .install a,
+[dir="rtl"] .install-box .install .fdroid-soon {
+  font-family: "Vazirmatn", var(--sans);
+  letter-spacing: 0;
+}
 [dir="rtl"] .feature::before { inset-inline-start: -1px; }
 
 /* Reduced motion --------------------------------------------------------- */

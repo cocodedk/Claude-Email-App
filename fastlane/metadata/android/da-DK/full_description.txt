@@ -1,0 +1,16 @@
+Med Claude Email kan du sende kommandoer til AI-agenter og læse deres svar på Android. Du skal have en eksisterende mailkonto og en kørende claude-email-tjeneste.
+
+claude-email-tjenesten er det program, der modtager dine kommandoer, lader en agent (et hjælpeprogram) udføre arbejdet i det projekt, du angiver, og svarer, når det er færdigt. Appen er stedet, hvor du skriver kommandoerne og læser svarene, som samtaler i din egen postkasse.
+
+Det kan appen
+- Bruger din egen postkasse. Mail modtages via IMAP og sendes via SMTP, de almindelige måder en mailapp taler med en mailudbyder på.
+- Gemmer din mailadgangskode og din delte hemmelighed krypteret på telefonen med en nøgle i Android Keystore. Adgangskoden sendes kun til din egen mailserver, så du kan logge ind.
+- Viser dine kommandoer og agentens svar som samtaler.
+- Sender den delte hemmelighed, du angiver i appen, med dine kommandoer, så claude-email-tjenesten kan tjekke den.
+- Giver dig besked, når der kommer en ny besked, og appen ikke er åben på skærmen. Notifikationer er slået til som standard. Vil du stoppe alle notifikationer på én gang, så slå denne apps notifikationer fra i Androids indstillinger.
+- Viser forslag til svar, når en agent stiller et spørgsmål. Tryk på et forslag for at sende det.
+- Viser en etiket og, når tjenesten oplyser, hvor langt en opgave er nået, en statuslinje for opgaver, der tager lang tid.
+- Viser de projekter, som claude-email-tjenesten melder tilbage, med agentens og opgavens status for hvert projekt. Tryk på et projekt for at starte en kommando til det.
+- Bruger et mørkt tema (Material 3).
+
+Appen følger telefonens sprog: engelsk eller dansk. Den kræver Android 7.0 eller nyere. Kildekoden ligger på GitHub under Apache-2.0-licensen.

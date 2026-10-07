@@ -1,6 +1,6 @@
 # Gap Analysis: Android App vs. `claude-email` Backend
 
-> **Historical snapshot — frozen 2026-04-19.** Captured when the app was a Compose prototype with zero transport. All "missing" rows have since been delivered: IMAP/SMTP via Angus Mail, Android Keystore credential storage, pending-command queue, conversation grouping, foreground-service IDLE inbox notifications, agent-routing wires (`agent_status`, `prefer_live_agent`, `routed_via`), `meta.progress` progress bars, `meta.suggested_replies` quick-reply chips. For current capability surface, read the source under `app/src/main/java/com/cocode/claudeemailapp/{mail,protocol,data,app}` and `git log master`. Kept here for context on the original delta.
+> **Historical snapshot — frozen 2026-04-19.** Captured when the app was a Compose prototype with zero transport. Several of the "missing" rows have since been closed, among them: IMAP/SMTP via Angus Mail, Android Keystore credential storage, pending-command queue, conversation grouping, foreground-service IDLE inbox notifications, agent-routing wires (`agent_status`, `prefer_live_agent`, `routed_via`), `meta.progress` progress bars, `meta.suggested_replies` quick-reply chips. For current capability surface, read the source under `app/src/main/java/com/cocode/claudeemailapp/{mail,protocol,data,app}` and `git log master`. This snapshot is not a checklist of what the app does today. Kept here for context on the original delta.
 
 Status: archived snapshot
 Last updated: 2026-04-19

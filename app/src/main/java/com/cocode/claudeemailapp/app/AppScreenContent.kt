@@ -106,7 +106,7 @@ internal fun AppScreenContent(
         }
         Screen.About -> AboutScreen(
             version = BuildConfig.VERSION_NAME,
-            showPrivacyLink = aboutUrl(AboutLink.Privacy) != null,
+            showPrivacyLink = PRIVACY_URL != null,
             onOpenLink = rememberLinkOpener(),
             onBack = { onScreenChange(Screen.Home) }
         )

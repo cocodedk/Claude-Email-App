@@ -1,14 +1,16 @@
-Claude Email is an Android client for the claude-email backend. It signs in to your own IMAP/SMTP mail account and shows your mail as conversations, where you send commands to agents and read their replies.
+Claude Email lets you send commands to AI agents and read their replies on Android. You need an existing email account and a running claude-email service.
 
-Features
-- IMAP/SMTP mail transport, powered by Angus Mail.
-- Your mail password and shared secret are stored encrypted on the device with the Android Keystore, not in plain preferences. The password is sent only to your own mail server, to sign in.
-- Command-and-reply interface: send a command and read the agent's replies in a conversation.
-- Commands carry the shared secret you set in the app, for the claude-email service to check.
-- Reply notifications are on by default and can be switched off in Settings. A foreground IMAP IDLE service keeps a connection open so they work in the background.
-- Quick-reply chips: when an agent asks a question, tap a suggested answer to send it.
-- Progress messages from long-running tasks show a label and, when the task reports a fraction, a progress bar.
-- Projects view with the agent and task status of each project the claude-email service reports. Tap a project to start a command for it.
-- Material 3 interface with a dark theme.
+The claude-email service is the program that receives your commands, has an agent (a helper program) do the work in the project you name, and replies when it is done. The app is where you write the commands and read the replies, as conversations in your own mailbox.
 
-Requires Android 7.0 or newer. The source code is on GitHub under the Apache-2.0 license.
+What the app does
+- Uses your own mailbox. Mail is received over IMAP and sent over SMTP, the standard ways a mail app talks to a mail provider.
+- Stores your mail password and shared secret encrypted on the phone, with a key kept in the Android Keystore. The password is sent only to your own mail server, to sign in.
+- Shows your commands and the agent's replies as conversations.
+- Sends the shared secret you set in the app with your commands, for the claude-email service to check.
+- Notifies you when a new message arrives and the app is not open on screen. Notifications are on by default. To stop all alerts at once, turn off this app's notifications in Android settings.
+- Shows suggested answers when an agent asks a question. Tap one to send it.
+- Shows a label and, when the service reports how far along a task is, a progress bar for long-running tasks.
+- Lists the projects the claude-email service reports, with the agent and task status of each. Tap a project to start a command for it.
+- Uses a dark theme (Material 3).
+
+The app follows your phone's language: English or Danish. It requires Android 7.0 or newer. The source code is on GitHub under the Apache-2.0 license.
