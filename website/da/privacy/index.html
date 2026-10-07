@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050506">
+
+<title>Privatlivspolitik: Claude Email App</title>
+<meta name="description" content="Privatlivspolitik for Claude Email App: ingen konto, ingen reklamer, ingen analyse og ingen server hos os. Appen taler kun med de mailservere, du selv angiver, og dine kommandoer sendes som mail til din egen claude-email-tjeneste.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/da/privacy/">
+<link rel="alternate" hreflang="en" href="https://cocodedk.github.io/Claude-Email-App/privacy/">
+<link rel="alternate" hreflang="da" href="https://cocodedk.github.io/Claude-Email-App/da/privacy/">
+<link rel="alternate" hreflang="x-default" href="https://cocodedk.github.io/Claude-Email-App/privacy/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Claude Email App">
+<meta property="og:title" content="Privatlivspolitik: Claude Email App">
+<meta property="og:description" content="Hvad Claude Email App sender, til hvem og hvorfor, og hvad der bliver på din telefon.">
+<meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/da/privacy/">
+<meta property="og:locale" content="da_DK">
+<meta property="og:locale:alternate" content="en_US">
+
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../css/shared-blocks.css">
+<link rel="stylesheet" href="../../css/policy.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav nav-shared">
+    <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/Claude-Email-App/css/cocode-nav.css">
+<a class="skip" href="#main">Spring til indhold</a>
+<nav class="cocode-nav" aria-label="Claude Email App">
+  <a class="brand" href="/Claude-Email-App/da/" data-nav="home"><img src="/Claude-Email-App/img/icon.png" alt="" width="32" height="32">Claude Email App</a>
+  <a href="/Claude-Email-App/da/#how" data-nav="how">Sådan virker det</a>
+  <a href="/Claude-Email-App/da/#install" data-nav="install">Installér</a>
+  <a href="/Claude-Email-App/da/privacy/" data-nav="privacy" aria-current="page">Privatliv</a>
+  <a href="/Claude-Email-App/privacy/" hreflang="en" lang="en" data-nav="lang">English</a>
+  <a href="https://cocode.dk/" data-nav="more">Flere apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+  </div>
+</header>
+
+<main id="main" class="container policy" tabindex="-1">
+  <h1>Privatlivspolitik: Claude Email App</h1>
+  <p class="meta">Gældende fra <time datetime="2026-10-07">7. oktober 2026</time>. Politikken gælder Claude Email App til Android (<code>com.cocode.claudeemailapp</code>). Appen findes på engelsk og dansk og følger telefonens sprog. Knapper og menuer står her med deres danske navne.</p>
+
+  <section>
+    <h2>Resumé</h2>
+    <p>Claude Email App sender dine kommandoer som mail til en claude-email-tjeneste og viser dig svarene. Tjenesten er den, der modtager dine kommandoer, lader en agent udføre arbejdet i det projekt, du angiver, og svarer, når det er gjort. Du skriver selv din postkasse og tjenestens adresse ind.</p>
+    <p>Cocode, der har lavet appen, modtager ingenting fra den. Appen har ingen konto, ingen server hos os, ingen reklamer, ingen analyse og ingen fejlrapportering.</p>
+    <p>Appen opretter kun forbindelse til de to servere hos din mailudbyder, som du angiver under Opsætning. Den ene modtager din mail (en IMAP-server), og den anden sender den (en SMTP-server). Din adgangskode til mailen går til dem, så du kan logge ind.</p>
+    <p>Dine kommandoer forlader telefonen som almindelig mail til den tjenesteadresse, du har skrevet ind. Har du sat en delt hemmelighed, en adgangskode som tjenesten tjekker, følger den med. Hvad tjenesten gør med en kommando, ligger uden for appen. Alt andet bliver på telefonen.</p>
+    <p>Det eneste andet, appen gør, er at give din telefons browser en webadresse, når du trykker på en knap på skærmen Om. Selve appen henter ikke noget fra de websteder.</p>
+  </section>
+
+  <section>
+    <h2>Hvad der indsamles</h2>
+    <p>Cocode indsamler ingenting, fordi appen ikke har nogen server hos os at sende noget til. Det her håndterer appen selv:</p>
+    <ul>
+      <li><strong>Det, du taster ind under Opsætning.</strong> Dit visningsnavn, din mailadresse og adgangskode til mailen. Værten (serverens navn) og porten (forbindelsens nummer) til din IMAP- og SMTP-server. Om SMTP bruger STARTTLS. Claude-email-tjenestens adresse og, hvis du har sat en, den delte hemmelighed.</li>
+      <li><strong>Din mail.</strong> Appen læser de 50 nyeste beskeder i din indbakke (mappen INBOX på din IMAP-server). Fra hver besked læser den afsender, emne, tekst, om den er læst, og de hovedfelter, der binder svar sammen til tråde. Den læser al mail i mappen, ikke kun tjenestens svar, og viser hver besked i sin samtaleliste. Vil du holde anden mail ude af appen, så brug en postkasse, du kun bruger til tjenesten. Appen holder beskederne i hukommelsen og gemmer dem ikke i sin lagerplads.</li>
+      <li><strong>Det, du skriver.</strong> De kommandoer og svar, du sender, projektstien og de forespørgsler om status, annullering, nulstilling og projektliste, som appen sender, når du trykker på de tilsvarende knapper.</li>
+    </ul>
+    <p>Når du åbner en samtale, markerer appen dens ulæste beskeder som læst på din mailserver. Den sletter og flytter ingenting.</p>
+  </section>
+
+  <section>
+    <h2>Servere appen kontakter</h2>
+    <p>Appen selv kontakter de to servere hos din mailudbyder og ingen andre. Den har ingen indbygget serveradresse og henter ikke andet fra internettet end mail. Undtagelsen er skærmen Om, som beskrives herunder, og som åbner websider i din browser, når du trykker på en knap.</p>
+
+    <h3>Skærmen Om: websider i din browser</h3>
+    <p>Skærmen Om har fem knapper: "Se den nyeste version", "Læs privatlivspolitikken", "Åbn websitet", "Se kildekoden på GitHub" og "Meld et problem på GitHub". Når du trykker på en af dem, giver appen en webadresse til din telefons browser, og browseren henter siden. Appen åbner aldrig selv en af siderne og henter ikke noget fra dem. Adresserne er <code>github.com/cocodedk/Claude-Email-App/releases/latest</code>, <code>cocodedk.github.io/Claude-Email-App/privacy/</code>, <code>cocodedk.github.io/Claude-Email-App/</code>, <code>github.com/cocodedk/Claude-Email-App</code> og <code>github.com/cocodedk/Claude-Email-App/issues</code>. GitHub og GitHub Pages ser dit besøg efter deres egne privatlivspolitikker. Appen leder ikke selv efter opdateringer: "Se den nyeste version" åbner kun den side, hvor den nyeste udgivelse står. Kan ingen app på telefonen åbne et link, siger skærmen Om det, og der åbnes ingenting.</p>
+
+    <h3>Din IMAP-server: modtagelse af mail</h3>
+    <p>Serveren har din indbakke. IMAP er den almindelige måde, en app læser mail på, som ligger på en mailserver. Du skriver serverens vært og port ind under Opsætning, og porten er 993, medmindre du ændrer den. Forbindelsen er altid krypteret med TLS, og appen tjekker, at serverens navn passer til dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind. Derefter får den appens forespørgsler: åbn indbakken, hent de 50 nyeste beskeder og markér beskeder som læst.</p>
+    <p><strong>Hvor ofte appen tjekker.</strong> Vælger du ikke "Manuel" under Indstillinger, Opdatering i baggrunden, tjekker appen for ny mail hvert 15. sekund, mens den er åben. Mens den er i baggrunden, tjekker den hvert 30. sekund, hvert minut eller hvert 5. minut, som du vælger under samme indstilling.</p>
+    <p><strong>Baggrundsforbindelsen.</strong> Når appen starter med din konto gemt, starter den også en baggrundstjeneste. Tjenesten holder én forbindelse til din IMAP-server åben (IMAP IDLE, en almindelig måde, hvorpå en mailserver melder ny mail, så snart den kommer), så du hurtigt hører om ny mail. Android kræver, at sådan en tjeneste viser en notifikation, så du ser en lavt prioriteret med teksten "Overvåger indbakken". Når serveren melder ny mail, henter appen de 10 nyeste beskeder for at afgøre, om du skal have en notifikation.</p>
+
+    <h3>Din SMTP-server: afsendelse af mail</h3>
+    <p>Serveren sender din mail. SMTP er den almindelige måde, en app sender mail på gennem en mailserver. Du skriver vært og port ind under Opsætning, og porten er 465, medmindre du ændrer den. Forbindelsen er krypteret fra første byte (TLS). Vælger du STARTTLS under Opsætning, en metode der starter som en almindelig forbindelse og så skifter til krypteret, kræver appen den. I begge tilfælde tjekker appen, at serverens navn passer til dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind, og hver besked, du sender.</p>
+
+    <h3>Test og gem</h3>
+    <p>Når du trykker på "Test og gem", logger appen ind én gang på hver af de to servere for at tjekke dine oplysninger. Den gemmer dem kun, hvis begge logins virker.</p>
+
+    <h3>Claude-email-tjenesten</h3>
+    <p>Appen forbinder ikke direkte til tjenesten. Tjenesten er en mailadresse, som du skriver ind under Opsætning. Appen sender mail til den gennem din SMTP-server og læser svarene i din indbakke.</p>
+    <p>En kommando er en besked i JSON, et dataformat i ren tekst. Den indeholder din tekst, projektstien, et tip om, hvordan opgaven skal dirigeres, klientnavnet <code>cocode-android/1.0</code>, tidspunktet for afsendelsen og, hvis du har sat en, din delte hemmelighed. Forespørgsler om status, annullering, nulstilling og projektliste bruger det samme format. Et svar, du skriver i en samtale, sendes som ren tekst med den delte hemmelighed forrest i emnelinjen som <code>AUTH:</code> efterfulgt af hemmeligheden. Kommandoer går til den tjenesteadresse, du skrev under Opsætning. På skærmen, hvor du skriver en kommando, kan du taste en anden adresse, og så går kommandoen dertil.</p>
+    <p>Mail er ikke ende-til-ende-krypteret. Appen beskytter forbindelsen mellem telefonen og dine mailservere. Når din SMTP-server har sendt en besked videre, afhænger beskyttelsen af de mailsystemer, den kommer forbi. Din mailudbyder kan læse den delte hemmelighed i beskeden og i emnelinjen. Behandl hemmeligheden som en adgangskode til tjenesten og ikke som noget, din udbyder ikke kan se.</p>
+    <p>Den, der driver tjenesten, bestemmer, hvad den gør med en kommando, hvilken AI den bruger, og hvad den gemmer. Appen kan ikke se det, og politikken her dækker det ikke.</p>
+  </section>
+
+  <section>
+    <h2>Tilladelser</h2>
+    <ul>
+      <li><strong>Internet.</strong> For at nå din IMAP- og SMTP-server.</li>
+      <li><strong>Netværksstatus.</strong> Tilladelsen lader en app se, om telefonen er online. Appen angiver den, men dens egen kode bruger den ikke.</li>
+      <li><strong>Notifikationer.</strong> Appen beder om den på Android 13 og nyere, så den kan give dig besked, når der kommer mail. Notifikationer er slået til som standard. Vil du slå dem fra, så gå til Indstillinger, Notifikationer, og slå "Giv besked om nye beskeder" fra. Baggrundsforbindelsen beskrevet ovenfor kan beholde sin tidligere indstilling, indtil appen genstarter. Vil du stoppe alle notifikationer med det samme, så slå denne apps notifikationer fra i Androids indstillinger. En notifikation viser afsender og emne på den nye besked. Appen laver en for hver ny besked i din indbakke, ikke kun for tjenestens svar, og kun mens appen ikke er åben på skærmen. Undtagelsen er tjenestens korte kvitteringer for, at den har modtaget en kommando (vist i appen som "modtaget af tjenesten").</li>
+      <li><strong>Forgrundstjeneste til datasynkronisering.</strong> Den lader appen holde baggrundsforbindelsen til din IMAP-server åben, som beskrevet ovenfor.</li>
+    </ul>
+    <p>Appen beder ikke om andre tilladelser: hverken kontakter, placering, kamera, mikrofon, filer eller telefonstatus.</p>
+  </section>
+
+  <section>
+    <h2>Hvad der bliver på telefonen</h2>
+    <p>Appen gemmer følgende i sin egen private lagerplads på telefonen:</p>
+    <ul>
+      <li><strong>Dine loginoplysninger, krypteret.</strong> Alt, hvad du tastede under Opsætning, også adgangskoden og den delte hemmelighed, ligger i en krypteret fil. Nøglen til den ligger i Android Keystore, den del af Android, der opbevarer krypteringsnøgler. Passer nøglen ikke længere til filen, sletter appen filen og viser Opsætning igen.</li>
+      <li><strong>En oversigt over de kommandoer, du har sendt, ikke krypteret.</strong> For hver kommando: adressen, den gik til, tidspunktet, første linje (op til 80 tegn), de første 200 tegn af teksten, projektet og det, tjenesten melder tilbage om den: status, opgavenummer, branchnavn og fejltekst.</li>
+      <li><strong>Små indstillinger, ikke krypteret.</strong> Hvilke samtaler du har arkiveret, opdateringsintervallet, de fem senest brugte projektnavne, om du har set introduktionen, og til/fra-knappen til notifikationer.</li>
+    </ul>
+    <p>Trykker du længe på en besked for at kopiere den, havner teksten i Androids udklipsholder, som andre apps også kan se.</p>
+    <p><strong>Vil du fjerne det, appen gemmer,</strong> så tryk på "Log ud" under Indstillinger. Det stopper baggrundstjenesten og sletter dine loginoplysninger, oversigten over sendte kommandoer, listen over arkiverede samtaler, opdateringsintervallet og de senest brugte projektnavne. Til/fra-knappen til notifikationer og markeringen af introduktionen bliver. Vil du fjerne dem også, så ryd appens data i Androids indstillinger eller afinstaller appen. Det fjerner alt, hvad appen gemmer.</p>
+    <p><strong>Sikkerhedskopi.</strong> Appen tillader Androids egen sikkerhedskopiering af sine data og har ingen undtagelser. Er sikkerhedskopiering slået til på din telefon, kan filerne ovenfor være med, også de ukrypterede. Android kopierer ikke Keystore-nøgler til en anden enhed, så den krypterede loginfil bør ikke kunne åbnes på en anden telefon. Din telefon bestemmer, hvor en sikkerhedskopi havner, og ikke appen.</p>
+  </section>
+
+  <section>
+    <h2>Tredjeparter</h2>
+    <ul>
+      <li><strong>Din mailudbyder</strong> har din postkasse og håndterer hver besked, appen sender og læser, efter sin egen privatlivspolitik.</li>
+      <li><strong>Den, der driver din claude-email-tjeneste,</strong> modtager dine kommandoer og afgør, hvad der sker med dem, som beskrevet ovenfor.</li>
+      <li><strong>GitHub og GitHub Pages</strong> ser dit besøg, hvis du trykker på en knap på skærmen Om, fordi din browser henter siden. De gør det efter deres egne privatlivspolitikker.</li>
+    </ul>
+    <p>Appen har ingen analyse, ingen reklamer og ingen fejlrapportering. Den bruger ikke Google Play-tjenester (Googles tilføjelsestjenester til Android), og dens build nævner ingen af dem. Dens biblioteker er AndroidX og Jetpack Compose til skærme og lokal lagring, Kotlin-biblioteker, Tink (et krypteringsbibliotek, der følger med AndroidX' krypterede lagring) og Angus Mail, der laver IMAP- og SMTP-forbindelserne beskrevet ovenfor. Buildet indeholder intet andet netværksbibliotek.</p>
+    <p><strong>Websitet er noget andet.</strong> Politikken handler om appen. Websitet leveres af GitHub Pages, og forsiderne henter skrifttyper fra Google Fonts. Den her side henter ikke noget fra andre websteder.</p>
+  </section>
+
+  <section>
+    <h2>Dine rettigheder</h2>
+    <p>Efter databeskyttelsesforordningen (GDPR) kan du bede om indsigt i, berigtigelse af og sletning af dine data. Du kan bede os begrænse brugen af dem, og du kan gøre indsigelse. Appen sender ingenting til Cocode, så Cocode har ingen personoplysninger om dig fra appen. Der er hverken noget at udlevere, rette eller slette hos os. Det, appen gemmer på din telefon, kan du selv fjerne, som beskrevet ovenfor.</p>
+    <p>Din mail ligger hos din mailudbyder, og dine kommandoer hos den, der driver din claude-email-tjeneste. Henvend dig til dem for at bruge dine rettigheder. Du kan også klage til <a href="https://www.datatilsynet.dk/">Datatilsynet</a>.</p>
+  </section>
+
+  <section>
+    <h2>Kontakt</h2>
+    <p>Cocode (Babak Bandpey), <a href="mailto:bb@cocode.dk">bb@cocode.dk</a>. Du kan også sende spørgsmål om appen eller politikken som <a href="https://github.com/cocodedk/Claude-Email-App/issues">issue på GitHub</a>. En sikkerhedsfejl skal du ikke melde i et offentligt issue, men i repositoriets private formular "Report a vulnerability" under fanen <a href="https://github.com/cocodedk/Claude-Email-App/security">Security</a>.</p>
+  </section>
+
+  <section>
+    <h2>Ændringer</h2>
+    <p>Hvis politikken ændres, skifter datoen øverst, og dette afsnit siger, hvad der er nyt. Ældre versioner ligger i projektets historik på <a href="https://github.com/cocodedk/Claude-Email-App">GitHub</a>.</p>
+    <p><strong>7. oktober 2026:</strong> første version som en side for sig.</p>
+  </section>
+</main>
+
+<div class="site-footer">
+  <div class="container">
+    <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/Claude-Email-App">Kildekode</a> ·
+  <a href="/Claude-Email-App/da/privacy/">Privatliv</a> ·
+  Licens: Apache-2.0 ·
+  <a href="https://cocode.dk/">Lavet af Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,8 +1,8 @@
 # Claude-Email-App
 
-> Android email client for the `claude-email` backend service. IMAP/SMTP with Android Keystore credential storage, command-and-reply UX for agents and tasks.
+> Android app for sending commands to AI agents through a running claude-email service and reading their replies, using your own email account.
 
-Single-mailbox mobile client built in Kotlin + Jetpack Compose. Calmer than Slack, more premium than a utility app, more readable than Outlook, more human than a terminal.
+Connect one email account, send commands to projects, and read the replies grouped into conversations. Built in Kotlin with Jetpack Compose. Available in English and Danish.
 
 ## Source
 - [Repository](https://github.com/cocodedk/Claude-Email-App): Main repo
@@ -12,7 +12,9 @@ Single-mailbox mobile client built in Kotlin + Jetpack Compose. Calmer than Slac
 
 ## Documentation
 - [Website (English)](https://cocodedk.github.io/Claude-Email-App/)
+- [Website (Dansk)](https://cocodedk.github.io/Claude-Email-App/da/)
 - [Website (فارسی)](https://cocodedk.github.io/Claude-Email-App/fa/)
+- [Privacy policy](https://cocodedk.github.io/Claude-Email-App/privacy/): What the app sends, to whom, and what stays on the phone
 - [Android app plan](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/android-app-plan.md): Product, architecture, delivery phases
 - [UX/UI spec](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/ux-ui-spec.md): Navigation, visual direction, accessibility
 - [Gap analysis](https://github.com/cocodedk/Claude-Email-App/blob/master/docs/gap-analysis-vs-claude-email.md): App vs. claude-email backend

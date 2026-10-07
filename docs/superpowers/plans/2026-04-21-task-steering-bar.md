@@ -600,7 +600,7 @@ fun SteeringBar(
 
 - [ ] **Step 3: Run — expect PASS.**
 
-Run: `./gradlew :app:connectedDebugAndroidTest --tests "*SteeringBarTest.idle_shows_status_cancel_more_chips" --no-daemon`
+Run: `./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.cocode.claudeemailapp.SteeringBarTest#idle_shows_status_cancel_more_chips --no-daemon`
 
 - [ ] **Step 4: Commit.**
 
@@ -862,7 +862,7 @@ class SteeringFlowTest {
 
 - [ ] **Step 2: Run the test.**
 
-Run: `./gradlew :app:connectedDebugAndroidTest --tests "*SteeringFlowTest*" --no-daemon`
+Run: `./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.cocode.claudeemailapp.SteeringFlowTest --no-daemon`
 Expected: PASS.
 
 - [ ] **Step 3: Final smoke.**

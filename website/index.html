@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#050506" />
 
-  <title>Claude Email &mdash; Android mail client for claude-email agents</title>
-  <meta name="description" content="Focused Android email client for the claude-email backend. IMAP/SMTP, Android Keystore credential storage, command-and-reply UX for agents and tasks." />
+  <title>Claude Email: send commands to AI agents from Android</title>
+  <meta name="description" content="Send commands to AI agents and read their replies on Android. Requires your email account and a running claude-email service." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -19,19 +19,19 @@
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Claude Email" />
-  <meta property="og:title" content="Claude Email — Android mail client for claude-email agents" />
-  <meta property="og:description" content="Focused Android email client for the claude-email backend. IMAP/SMTP, encrypted credential storage, command-and-reply UX." />
+  <meta property="og:title" content="Claude Email: send commands to AI agents from Android" />
+  <meta property="og:description" content="Send commands to AI agents and read their replies using your email account and claude-email service." />
   <meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/" />
   <meta property="og:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Claude Email — Android client for the claude-email backend" />
+  <meta property="og:image:alt" content="Claude Email: Android app for sending commands to AI agents" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="fa_IR" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Claude Email — Android mail client for claude-email agents" />
-  <meta name="twitter:description" content="Focused Android email client for the claude-email backend." />
+  <meta name="twitter:title" content="Claude Email: send commands to AI agents from Android" />
+  <meta name="twitter:description" content="Send commands to AI agents and read their replies on Android." />
   <meta name="twitter:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
   <meta name="twitter:image:alt" content="Claude Email — Android client" />
 
@@ -47,7 +47,7 @@
     "@context": "https://schema.org",
     "@type": "MobileApplication",
     "name": "Claude Email",
-    "description": "Android email client for the claude-email backend. IMAP/SMTP, Android Keystore credential storage, command-and-reply UX.",
+    "description": "Android app for sending commands to AI agents and reading their replies through your email account and claude-email service.",
     "url": "https://cocodedk.github.io/Claude-Email-App/",
     "downloadUrl": "https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk",
     "applicationCategory": "CommunicationApplication",
@@ -74,6 +74,8 @@
   <a class="brand" href="/Claude-Email-App/" data-nav="home" aria-current="page"><img src="/Claude-Email-App/img/icon.png" alt="" width="32" height="32">Claude Email App</a>
   <a href="/Claude-Email-App/#how" data-nav="how">How it works</a>
   <a href="/Claude-Email-App/#install" data-nav="install">Install</a>
+  <a href="/Claude-Email-App/privacy/" data-nav="privacy">Privacy</a>
+  <a href="/Claude-Email-App/da/" hreflang="da" lang="da" data-nav="lang">Dansk</a>
   <a href="https://cocode.dk/" data-nav="more">More apps</a>
 </nav>
 <!-- cocode-apps:nav:end -->
@@ -87,13 +89,13 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow hero-eyebrow reveal d1">v1 · Android · Apache-2.0</p>
+          <p class="eyebrow hero-eyebrow reveal d1">Android · Apache-2.0</p>
           <h1 class="hero-title reveal d2">
-            Email, reimagined<br/>
-            for <span class="accent">agents</span>.
+            Send commands<br/>
+            to <span class="accent">AI agents</span>.
           </h1>
           <p class="hero-sub reveal d3">
-            A focused Android client for the claude-email backend. Think in conversations and commands, not folders and headers &mdash; with IMAP/SMTP under the hood and credentials sealed by the Android Keystore.
+            Use your own email account to send commands to a running <a href="https://github.com/cocodedk/claude-email" rel="noreferrer">claude-email</a> service, the program that runs your AI agents. Read the replies as conversations. Your sign-in details are stored encrypted on your phone.
           </p>
           <div class="hero-cta reveal d3">
             <a class="btn btn-primary"
@@ -108,9 +110,9 @@
             </a>
           </div>
           <div class="hero-meta reveal d4">
-            <span>Android 7.0+</span>
+            <span>Android 7.0 or newer</span>
             <span>Signed release</span>
-            <span>IMAP · SMTP</span>
+            <span>Uses your own mailbox</span>
           </div>
         </div>
 
@@ -178,47 +180,47 @@
       <div class="container">
         <header class="section-head">
           <p class="eyebrow section-eyebrow">Features</p>
-          <h2 class="section-title">Built for command-and-reply work.</h2>
+          <h2 class="section-title">What the app does.</h2>
           <p class="section-lede">
-            Six deliberate capabilities. Nothing decorative, nothing enterprise &mdash; the surface area a person working with agents actually needs.
+            Connect your mailbox, send commands, follow the replies and get notified.
           </p>
         </header>
 
         <div class="features">
           <article class="feature">
-            <span class="feature-label">01 · IMAP + SMTP</span>
-            <h3 class="feature-title">Real email transport.</h3>
-            <p class="feature-desc">Standards under the hood. No proprietary lock-in, no bespoke protocol, no account you can&rsquo;t leave.</p>
+            <span class="feature-label">01 · Your mailbox</span>
+            <h3 class="feature-title">Works with your own mailbox.</h3>
+            <p class="feature-desc">Mail is received over IMAP and sent over SMTP, the standard ways a mail app talks to a mail provider. Commands and replies travel as email in the claude-email message format.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">02 · Android Keystore</span>
-            <h3 class="feature-title">Credentials stored encrypted.</h3>
-            <p class="feature-desc">Your password and shared secret are stored encrypted with the Android Keystore. The password goes only to your own mail server, to sign in.</p>
+            <span class="feature-label">02 · Sign-in details</span>
+            <h3 class="feature-title">Sign-in details stored encrypted.</h3>
+            <p class="feature-desc">Your mail password and shared secret are stored encrypted, with a key kept in the Android Keystore. The password goes only to your own mail server, to sign in.</p>
           </article>
 
           <article class="feature">
             <span class="feature-label">03 · Command &amp; reply</span>
-            <h3 class="feature-title">Conversations, not threads.</h3>
-            <p class="feature-desc">Agents and tasks are first-class. Title, agent badge, state &mdash; readable in one glance.</p>
+            <h3 class="feature-title">Commands and replies in conversations.</h3>
+            <p class="feature-desc">Each conversation shows its title, the sender, a preview and a label for the latest message, such as &ldquo;needs reply&rdquo; or &ldquo;result&rdquo;.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">04 · Shared-secret auth</span>
-            <h3 class="feature-title">Authorize without passwords.</h3>
-            <p class="feature-desc">Route commands to the claude-email service with a shared secret. Agents stay scoped and revocable.</p>
+            <span class="feature-label">04 · Shared secret</span>
+            <h3 class="feature-title">A shared secret for your service.</h3>
+            <p class="feature-desc">Commands carry the shared secret you set in the app. Your claude-email service checks it before it accepts a command.</p>
           </article>
 
           <article class="feature">
             <span class="feature-label">05 · Notifications</span>
-            <h3 class="feature-title">Hear back in the background.</h3>
-            <p class="feature-desc">Reply notifications are on by default and can be switched off in Settings. A foreground IMAP IDLE service keeps a connection open.</p>
+            <h3 class="feature-title">Hear back when the app is closed.</h3>
+            <p class="feature-desc">A notification arrives when a new message comes in and the app is not open on screen. They are on by default. To stop all alerts at once, turn off this app&rsquo;s notifications in Android settings.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">06 · Dark-first UI</span>
-            <h3 class="feature-title">Material 3, tuned for focus.</h3>
-            <p class="feature-desc">Calmer than Slack, more readable than Outlook. Built for long reading sessions, not consumer chat.</p>
+            <span class="feature-label">06 · Dark theme</span>
+            <h3 class="feature-title">Easy on the eyes.</h3>
+            <p class="feature-desc">Read conversations in a dark interface, and expand long replies when you want the rest.</p>
           </article>
         </div>
       </div>
@@ -243,27 +245,27 @@
       <div class="container">
         <header class="section-head">
           <p class="eyebrow section-eyebrow">Install</p>
-          <h2 class="section-title">Three steps to first command.</h2>
+          <h2 class="section-title">Three steps to your first command.</h2>
           <p class="section-lede">
-            No account to create. You hold the keys &mdash; the app just uses them.
+            You need an existing email account and a running <a href="https://github.com/cocodedk/claude-email" rel="noreferrer">claude-email</a> service. The app has no account of its own.
           </p>
         </header>
 
         <ol class="install-grid" role="list">
           <li class="step">
             <span class="step-number">01 / Download</span>
-            <h3 class="step-title">Grab the signed APK.</h3>
-            <p class="step-body">Pull the latest release straight from GitHub. Reproducible, signed, and checksummed.</p>
+            <h3 class="step-title">Download the signed APK.</h3>
+            <p class="step-body">Get the latest release straight from GitHub. An APK is Android&rsquo;s installation file.</p>
           </li>
           <li class="step">
             <span class="step-number">02 / Install</span>
-            <h3 class="step-title">Install on Android 7.0+.</h3>
-            <p class="step-body">Allow &ldquo;install unknown apps&rdquo; for your file manager once. Android handles the rest.</p>
+            <h3 class="step-title">Install on Android 7.0 or newer.</h3>
+            <p class="step-body">Open the downloaded file. On Android 8 or newer, allow installs from the app you opened it with. On Android 7, turn on &ldquo;Unknown sources&rdquo;. Then confirm the installation.</p>
           </li>
           <li class="step">
-            <span class="step-number">03 / Configure</span>
-            <h3 class="step-title">Enter IMAP/SMTP credentials.</h3>
-            <p class="step-body">Credentials are stored encrypted by the Keystore. The password is sent only to your own mail server, to sign in.</p>
+            <span class="step-number">03 / Set up</span>
+            <h3 class="step-title">Add your details, then send a command.</h3>
+            <p class="step-body">Enter your mail account and the details of its mail servers, then tap &ldquo;Test and save&rdquo;. Next tap &ldquo;New command&rdquo;, enter the project path and your command, and tap &ldquo;Send&rdquo;.</p>
           </li>
         </ol>
 
@@ -271,8 +273,8 @@
           <!-- cocode-apps:install:start -->
 <ul class="install" role="list">
   <li><p class="fdroid-soon">Coming to F-Droid</p></li>
-  <li><a href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk">Download the APK from GitHub</a></li>
-  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/Claude-Email-App">Auto-update the GitHub APK with Obtainium</a></li>
+  <li><a href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk">Download the Android installation file (APK) from GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/Claude-Email-App">Add the app to Obtainium, an app that keeps it up to date</a></li>
 </ul>
 <!-- cocode-apps:install:end -->
         </div>
@@ -286,6 +288,7 @@
       <!-- cocode-apps:footer:start -->
 <footer class="cocode-footer">
   <a href="https://github.com/cocodedk/Claude-Email-App">Source code</a> ·
+  <a href="/Claude-Email-App/privacy/">Privacy</a> ·
   License: Apache-2.0 ·
   <a href="https://cocode.dk/">Made by Cocode (cocode.dk)</a>
 </footer>

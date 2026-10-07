@@ -160,7 +160,7 @@ Reuses the existing chain:
 
 - Transport failure → `StatusCard` ("Send failed: <reason>") via `_send.lastError`.
 - Envelope error (`kind=error`) → `EnvelopeErrorBanner` with `meta.error.{code,message,hint}` rendered verbatim, plus the discriminated `agent error`/`no project`/`auth`/etc chip from PR #40.
-- No `kind=ack` reply within ~30s → existing `PendingCommand` stalled flow already handles this.
+- No `kind=ack` reply: the app has no acknowledgement timeout. A command is marked stalled only when the service sends a status message that says so (`PendingCommandStore`). A timeout for project-list requests would have to be added.
 
 ## Migration / impact
 

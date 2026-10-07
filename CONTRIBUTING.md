@@ -2,8 +2,8 @@
 
 ## Local Setup
 
-1. Install Android Studio (Ladybug or newer) with SDK 36 and command-line tools.
-2. Install JDK 17 (Temurin recommended).
+1. Install an Android Studio version that supports Android Gradle Plugin 9.2.1 ([compatibility table](https://developer.android.com/studio/releases#android_gradle_plugin_and_android_studio_compatibility)), with Android SDK platform 36.1 and the command-line tools.
+2. Install JDK 21 (Temurin recommended), or let Gradle download the JDK 21 it is set up for.
 3. Clone the repo and open it in Android Studio — Gradle will sync automatically.
 4. (Optional, for integration tests) Copy `.env.example` to `.env` and fill in IMAP/SMTP credentials.
 

@@ -4,7 +4,7 @@
 
 Android email client for the claude-email backend service. Receives over IMAP, sends over SMTP, stores credentials encrypted with the Android Keystore, and presents a focused command-and-reply UX instead of a traditional inbox.
 
-- **Language / Runtime**: Kotlin 2.2.10, JVM target 11, Android minSdk 24 / targetSdk 36
+- **Language / Runtime**: Kotlin 2.3.21, JVM target 11, Android minSdk 24 / targetSdk 36
 - **Framework**: Jetpack Compose + Material 3
 - **Architecture**: Layered (app UI → data → mail/protocol), MVVM within the UI layer
 - **Package / Namespace**: `com.cocode.claudeemailapp`
@@ -18,7 +18,7 @@ The claude-email backend is the SMTP/IMAP relay this app talks to. It runs as a 
 - **Repo**: `/home/cocodedk/0-projects/claude-email` (Python)
 - **Service**: `claude-email.service` (user unit) — logs via `journalctl --user -u claude-email.service`
 - **Claude-chat agent**: `agent-claude-email` (I am `agent-Claude-Email-App`)
-- **Wire contract**: subject-tag identifiers (`[steer-<ms>]`, `[agent-<slug>]`) + RFC threading via Message-ID / In-Reply-To / References
+- **Wire contract**: versioned JSON email envelopes (`protocol/Envelope.kt`, `v` = 2) carrying the command, task, project and authentication fields, with RFC threading via Message-ID / In-Reply-To / References. The subject of a command is a short summary of the first line of its text.
 - **Split of concerns**: subject-rebuild/template logic lives in `src/mailer.py` on their side; envelope parsing + PendingCommandStore live in `mail/` + `data/` on ours
 
 Coordinate via `mcp__claude-chat__chat_message_agent` when a change spans both sides (e.g. protocol tweaks, regression captures, fix ownership). Peer agent tails journalctl and captures server-side timings on request.

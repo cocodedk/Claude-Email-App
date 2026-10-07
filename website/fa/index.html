@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#050506" />
 
-  <title>کلود ایمیل — کلاینت اندروید برای سرویس claude-email</title>
-  <meta name="description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email. IMAP/SMTP، ذخیره‌سازی رمزشده credential با Android Keystore، تجربه کاربری دستور و پاسخ برای ایجنت‌ها." />
+  <title>کلود ایمیل: ارسال دستور به دستیارهای هوش مصنوعی از اندروید</title>
+  <meta name="description" content="برنامه‌ای اندرویدی برای ارسال دستور به دستیارهای هوش مصنوعی و خواندن پاسخ‌ها؛ با استفاده از حساب ایمیل شما و سرویس claude-email." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/fa/" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
@@ -19,21 +19,21 @@
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Claude Email" />
-  <meta property="og:title" content="کلود ایمیل — کلاینت اندروید برای سرویس claude-email" />
-  <meta property="og:description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email. IMAP/SMTP، credential رمزشده، تجربه دستور و پاسخ." />
+  <meta property="og:title" content="کلود ایمیل: ارسال دستور به دستیارهای هوش مصنوعی از اندروید" />
+  <meta property="og:description" content="دستورهای خود را از طریق سرویس claude-email ارسال کنید و پاسخ‌ها را در اندروید بخوانید. اطلاعات ورود روی دستگاه رمزگذاری می‌شوند." />
   <meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/fa/" />
   <meta property="og:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="کلود ایمیل — کلاینت اندروید" />
+  <meta property="og:image:alt" content="کلود ایمیل: برنامه اندروید برای ارسال دستور به دستیارهای هوش مصنوعی" />
   <meta property="og:locale" content="fa_IR" />
   <meta property="og:locale:alternate" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="کلود ایمیل — کلاینت اندروید برای سرویس claude-email" />
-  <meta name="twitter:description" content="کلاینت ایمیل اندرویدی متمرکز برای بک‌اند claude-email." />
+  <meta name="twitter:title" content="کلود ایمیل: ارسال دستور به دستیارهای هوش مصنوعی از اندروید" />
+  <meta name="twitter:description" content="برنامه‌ای اندرویدی برای ارسال دستور به دستیارهای هوش مصنوعی و خواندن پاسخ‌ها." />
   <meta name="twitter:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
-  <meta name="twitter:image:alt" content="کلود ایمیل — کلاینت اندروید" />
+  <meta name="twitter:image:alt" content="کلود ایمیل: برنامه اندروید برای ارسال دستور به دستیارهای هوش مصنوعی" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,8 +46,8 @@
     "@context": "https://schema.org",
     "@type": "MobileApplication",
     "name": "کلود ایمیل",
-    "inLanguage": "fa",
-    "description": "کلاینت ایمیل اندرویدی برای بک‌اند claude-email. IMAP/SMTP، ذخیره‌سازی رمزشده credential با Android Keystore، تجربه کاربری دستور و پاسخ.",
+    "inLanguage": ["en", "da"],
+    "description": "برنامه‌ای اندرویدی برای ارسال دستور و خواندن پاسخ‌ها از طریق سرویس claude-email، با ذخیره‌سازی رمزگذاری‌شدهٔ اطلاعات ورود.",
     "url": "https://cocodedk.github.io/Claude-Email-App/fa/",
     "downloadUrl": "https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk",
     "applicationCategory": "CommunicationApplication",
@@ -67,7 +67,7 @@
 
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="/Claude-Email-App/fa/" aria-label="کلود ایمیل — خانه">
+      <a class="brand" href="/Claude-Email-App/fa/" aria-label="کلود ایمیل: صفحهٔ اصلی">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
             <rect x="3" y="6" width="18" height="12"/>
@@ -78,6 +78,7 @@
       </a>
       <div class="nav-actions">
         <a class="btn-ghost btn" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer" aria-label="مشاهده در گیت‌هاب">GitHub</a>
+        <a class="lang-switch" href="../da/" hreflang="da" lang="da">Dansk</a>
         <a class="lang-switch" href="../" hreflang="en" lang="en">English</a>
       </div>
     </div>
@@ -89,13 +90,13 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow hero-eyebrow reveal d1">نسخه ۱ · اندروید · Apache-2.0</p>
+          <p class="eyebrow hero-eyebrow reveal d1">اندروید · Apache-2.0</p>
           <h1 class="hero-title reveal d2">
-            ایمیل، بازطراحی شده<br/>
-            برای <span class="accent">ایجنت‌ها</span>.
+            ارسال دستور<br/>
+            به <span class="accent">دستیارهای هوش مصنوعی</span>.
           </h1>
           <p class="hero-sub reveal d3">
-            یک کلاینت اندرویدی متمرکز برای بک‌اند claude-email. به جای پوشه و هدر، در قالب گفت‌وگو و دستور فکر کنید &mdash; با IMAP/SMTP در لایه‌ی زیرین و credential هایی که توسط Android Keystore مهر و موم می‌شوند.
+            با حساب ایمیل خودتان به سرویس در حال اجرای <a href="https://github.com/cocodedk/claude-email" rel="noreferrer">claude-email</a>، برنامه‌ای که دستیارهای هوش مصنوعی شما را اجرا می‌کند، دستور بفرستید و پاسخ‌ها را در قالب گفت‌وگو بخوانید. اطلاعات ورود شما رمزگذاری‌شده روی گوشی ذخیره می‌شود.
           </p>
           <div class="hero-cta reveal d3">
             <a class="btn btn-primary"
@@ -110,9 +111,9 @@
             </a>
           </div>
           <div class="hero-meta reveal d4">
-            <span>Android 7.0+</span>
-            <span>نسخه‌ی امضاشده</span>
-            <span>IMAP · SMTP</span>
+            <span>اندروید ۷٫۰ یا جدیدتر</span>
+            <span>نسخهٔ امضاشده</span>
+            <span>با صندوق ایمیل خودتان</span>
           </div>
         </div>
 
@@ -180,47 +181,47 @@
       <div class="container">
         <header class="section-head">
           <p class="eyebrow section-eyebrow">قابلیت‌ها</p>
-          <h2 class="section-title">ساخته شده برای کار دستور و پاسخ.</h2>
+          <h2 class="section-title">برنامه چه کاری می‌کند.</h2>
           <p class="section-lede">
-            شش قابلیت سنجیده. بدون تزئین، بدون سربار سازمانی &mdash; دقیقاً همان چیزی که برای کار با ایجنت‌ها لازم دارید.
+            صندوق ایمیلتان را وصل کنید، دستور بفرستید، پاسخ‌ها را دنبال کنید و اعلان بگیرید.
           </p>
         </header>
 
         <div class="features">
           <article class="feature">
-            <span class="feature-label">۰۱ · IMAP + SMTP</span>
-            <h3 class="feature-title">انتقال واقعی ایمیل.</h3>
-            <p class="feature-desc">در لایه‌ی زیرین، استاندارد. بدون قفل‌شدن در پروتکل اختصاصی و بدون حسابی که نتوانید ترک کنید.</p>
+            <span class="feature-label">۰۱ · صندوق ایمیل شما</span>
+            <h3 class="feature-title">با صندوق ایمیل خودتان کار می‌کند.</h3>
+            <p class="feature-desc">ایمیل با IMAP دریافت و با SMTP ارسال می‌شود، یعنی همان روش‌های استانداردی که برنامه‌های ایمیل برای گفت‌وگو با سرویس‌دهندهٔ ایمیل به کار می‌برند. دستورها و پاسخ‌ها به‌صورت ایمیل و در قالب پیام claude-email جابه‌جا می‌شوند.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">۰۲ · Android Keystore</span>
-            <h3 class="feature-title">Credential مهر و موم‌شده روی دستگاه.</h3>
-            <p class="feature-desc">رمزهای عبور با کلیدهای سخت‌افزاری رمزگذاری می‌شوند. همگام‌سازی نمی‌شوند و از دستگاه خارج نمی‌شوند.</p>
+            <span class="feature-label">۰۲ · اطلاعات ورود</span>
+            <h3 class="feature-title">اطلاعات ورود رمزگذاری‌شده.</h3>
+            <p class="feature-desc">رمز عبور ایمیل و رمز مشترک شما رمزگذاری‌شده ذخیره می‌شوند و کلید آن‌ها در Android Keystore نگه‌داری می‌شود. رمز عبور فقط برای ورود به سرور ایمیل خودتان فرستاده می‌شود.</p>
           </article>
 
           <article class="feature">
             <span class="feature-label">۰۳ · دستور و پاسخ</span>
-            <h3 class="feature-title">گفت‌وگو، نه رشته.</h3>
-            <p class="feature-desc">ایجنت و تسک شهروند درجه‌یک هستند. عنوان، نشان ایجنت و وضعیت &mdash; در یک نگاه خوانده می‌شوند.</p>
+            <h3 class="feature-title">دستورها و پاسخ‌ها در قالب گفت‌وگو.</h3>
+            <p class="feature-desc">هر گفت‌وگو عنوان، فرستنده، پیش‌نمایش و برچسب آخرین پیام را نشان می‌دهد، مثلاً «<bdi>needs reply</bdi>» یا «<bdi>result</bdi>».</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">۰۴ · احراز با کلید مشترک</span>
-            <h3 class="feature-title">تأیید هویت بدون ذخیره‌ی رمز.</h3>
-            <p class="feature-desc">دستورها با یک کلید مشترک به سرویس claude-email هدایت می‌شوند. ایجنت‌ها محدود و قابل ابطال می‌مانند.</p>
+            <span class="feature-label">۰۴ · رمز مشترک</span>
+            <h3 class="feature-title">رمز مشترک برای سرویس شما.</h3>
+            <p class="feature-desc">دستورها همراه با رمز مشترکی که در برنامه تنظیم کرده‌اید ارسال می‌شوند. سرویس claude-email پیش از پذیرفتن دستور، آن را بررسی می‌کند.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">۰۵ · صف آفلاین</span>
-            <h3 class="feature-title">الآن بنویس، بعد می‌رود.</h3>
-            <p class="feature-desc">دستورها آفلاین نوشته و محلی صف می‌شوند. لحظه‌ای که شبکه برگردد، ارسال می‌شوند.</p>
+            <span class="feature-label">۰۵ · اعلان‌ها</span>
+            <h3 class="feature-title">وقتی برنامه بسته است هم خبردار شوید.</h3>
+            <p class="feature-desc">وقتی پیام تازه‌ای می‌رسد و برنامه روی صفحه باز نیست، اعلان می‌گیرید. اعلان‌ها به‌طور پیش‌فرض روشن‌اند. برای خاموش‌کردن همهٔ هشدارها یک‌جا، اعلان‌های این برنامه را در تنظیمات اندروید خاموش کنید.</p>
           </article>
 
           <article class="feature">
-            <span class="feature-label">۰۶ · رابط کاربری تاریک</span>
-            <h3 class="feature-title">Material 3، تنظیم‌شده برای تمرکز.</h3>
-            <p class="feature-desc">آرام‌تر از Slack و خواناتر از Outlook. ساخته شده برای جلسات طولانی مطالعه، نه چت مصرفی.</p>
+            <span class="feature-label">۰۶ · پوستهٔ تاریک</span>
+            <h3 class="feature-title">راحت برای چشم.</h3>
+            <p class="feature-desc">گفت‌وگوها را در رابطی تیره بخوانید و پاسخ‌های طولانی را در صورت نیاز باز کنید.</p>
           </article>
         </div>
       </div>
@@ -247,30 +248,30 @@
           <p class="eyebrow section-eyebrow">نصب</p>
           <h2 class="section-title">سه گام تا اولین دستور.</h2>
           <p class="section-lede">
-            بدون نیاز به فروشگاه. بدون ساخت حساب. کلیدها دست شماست &mdash; اپ فقط از آن‌ها استفاده می‌کند.
+            برای استفاده به یک حساب ایمیل موجود و سرویس <a href="https://github.com/cocodedk/claude-email" rel="noreferrer">claude-email</a> در حال اجرا نیاز دارید. خود برنامه حساب جداگانه‌ای ندارد.
           </p>
         </header>
 
         <ol class="install-grid" role="list">
           <li class="step">
             <span class="step-number">۰۱ / دانلود</span>
-            <h3 class="step-title">APK امضاشده را بگیرید.</h3>
-            <p class="step-body">جدیدترین نسخه را مستقیم از گیت‌هاب دانلود کنید. قابل بازتولید، امضاشده و دارای checksum.</p>
+            <h3 class="step-title">فایل APK امضاشده را دریافت کنید.</h3>
+            <p class="step-body">جدیدترین نسخه را مستقیم از گیت‌هاب بگیرید. APK فایل نصب اندروید است.</p>
           </li>
           <li class="step">
             <span class="step-number">۰۲ / نصب</span>
-            <h3 class="step-title">روی Android 7.0+ نصب کنید.</h3>
-            <p class="step-body">یک‌بار اجازه‌ی «نصب برنامه‌های ناشناس» را برای مدیر فایل بدهید. اندروید بقیه را انجام می‌دهد.</p>
+            <h3 class="step-title">روی اندروید ۷٫۰ یا جدیدتر نصب کنید.</h3>
+            <p class="step-body">فایل دریافت‌شده را باز کنید. در اندروید ۸ یا جدیدتر، نصب از برنامه‌ای را که فایل را با آن باز کرده‌اید مجاز کنید. در اندروید ۷، گزینهٔ «منابع ناشناس» را روشن کنید. سپس نصب را تأیید کنید.</p>
           </li>
           <li class="step">
             <span class="step-number">۰۳ / پیکربندی</span>
-            <h3 class="step-title">اطلاعات IMAP/SMTP را وارد کنید.</h3>
-            <p class="step-body">Credential ها توسط Keystore روی دستگاه رمز می‌شوند. هرگز دستگاه را ترک نمی‌کنند.</p>
+            <h3 class="step-title">اطلاعات را وارد کنید و دستور بفرستید.</h3>
+            <p class="step-body">حساب ایمیل و مشخصات سرورهای آن را وارد کنید و روی «<bdi>Test and save</bdi>» بزنید. سپس «<bdi>New command</bdi>» را بزنید، مسیر پروژه و دستورتان را بنویسید و روی «<bdi>Send</bdi>» بزنید.</p>
           </li>
         </ol>
 
         <div class="install-cta">
-          <p class="install-cta-text"><strong>آخرین انتشار &mdash; Claude-Email-App.apk</strong><br/>امضاشده · Android 7.0+ · Apache-2.0</p>
+          <p class="install-cta-text"><strong>آخرین انتشار: Claude-Email-App.apk</strong><br/>امضاشده · Android 7.0+ · Apache-2.0</p>
           <a class="btn btn-primary"
              href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
              rel="noreferrer">

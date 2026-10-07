@@ -1,30 +1,312 @@
 <resources>
     <string name="app_name">Claude Email App</string>
 
-    <string name="steering_chip_status">Status</string>
-    <string name="steering_chip_cancel">Annullér</string>
-    <string name="steering_chip_cancel_confirm">Annullér · bekræft</string>
+    <!-- Shared actions -->
+    <string name="action_back">Tilbage</string>
+    <string name="action_cancel">Annullér</string>
+    <string name="action_resend_preview">Send den gemte forhåndsvisning igen</string>
+    <string name="pending_cancel_task">Annullér projektets opgave</string>
+    <string name="action_refresh">Opdatér</string>
+    <string name="action_send">Send</string>
+    <string name="action_sending">Sender…</string>
+    <string name="action_diagnostics">Diagnostik</string>
+    <string name="value_not_set">(ikke angivet)</string>
+
+    <!-- Top bar titles -->
+    <string name="title_home">Claude Email</string>
+    <string name="title_setup">Opsætning</string>
+    <string name="title_edit_credentials">Redigér loginoplysninger</string>
+    <string name="title_settings">Indstillinger</string>
+    <string name="title_conversation">Samtale</string>
+    <string name="title_compose">Ny kommando</string>
+    <string name="title_diagnostics">Diagnostik</string>
+    <string name="title_projects">Projekter</string>
+    <string name="title_about">Om</string>
+
+    <!-- Snackbars and toasts -->
+    <string name="snackbar_message_sent">Beskeden er sendt</string>
+    <string name="snackbar_send_failed">Kunne ikke sende: %1$s</string>
+    <string name="snackbar_archived">Arkiveret</string>
+    <string name="snackbar_unarchived">Fjernet fra arkivet</string>
+    <string name="snackbar_undo">Fortryd</string>
+    <string name="toast_copied_message">Beskeden er kopieret</string>
+
+    <!-- Steering bar -->
+    <string name="steering_chip_status">Bed om status</string>
+    <string name="steering_chip_cancel">Annullér projektets opgave</string>
+    <string name="steering_chip_cancel_confirm">Bekræft annullering</string>
     <string name="steering_chip_more">Mere</string>
     <string name="steering_chip_sending">Sender…</string>
 
     <string name="steering_templates_heading">Svarskabeloner</string>
-    <string name="template_continue">Ser godt ud, fortsæt</string>
-    <string name="template_abort">Afbryd og prøv igen</string>
-    <string name="template_explain">Forklar afvejningen mere detaljeret</string>
+    <string name="steering_template_quoted">“ %1$s ”</string>
 
+    <!-- Onboarding -->
     <string name="onboarding_skip">Spring over</string>
     <string name="onboarding_cta_next">Næste</string>
     <string name="onboarding_cta_start">Kom i gang</string>
 
     <string name="onboarding_p1_eyebrow">01 · KOMMANDO</string>
     <string name="onboarding_p1_title">Send Claude en mail. Den udfører opgaven.</string>
-    <string name="onboarding_p1_body">Send en kommando til din claude-email-tjeneste. Den starter en agent i det projekt, opgaven gælder, og svarer, når arbejdet er færdigt.</string>
+    <string name="onboarding_p1_body">Send en kommando til din claude-email-tjeneste. Tjenesten udfører arbejdet i det projekt, du angiver, og svarer, når det er færdigt.</string>
 
     <string name="onboarding_p2_eyebrow">02 · SAMTALER</string>
     <string name="onboarding_p2_title">Tråde, ikke en indbakke.</string>
-    <string name="onboarding_p2_body">Hver opgave er en samtale. Det aktive arbejde står øverst, så spørgsmål, der venter på dig, og færdige opgaver arkiverer du med et swipe.</string>
+    <string name="onboarding_p2_body">Hver opgave er en samtale. Skift mellem dem med fanerne Aktive, Venter og Arkiverede. Stryg en samtale mod venstre for at arkivere den.</string>
 
     <string name="onboarding_p3_eyebrow">03 · KRYPTERET</string>
-    <string name="onboarding_p3_title">Dine loginoplysninger bliver på enheden.</string>
-    <string name="onboarding_p3_body">Adgangskoderne til IMAP og SMTP ligger i Android Keystore. Intet forlader telefonen, undtagen den mail, du selv vælger at sende.</string>
+    <string name="onboarding_p3_title">Loginoplysninger gemt krypteret.</string>
+    <string name="onboarding_p3_body">Dine loginoplysninger gemmes krypteret med en nøgle i Android Keystore. Appen logger ind på dine egne mailservere og tjekker dem for svar. Hvis du angiver en delt hemmelighed, sendes den med dine kommandoer. Android kan tage backup af appens data.</string>
+
+    <!-- Home -->
+    <string name="home_inbox">Indbakke</string>
+    <string name="home_refreshing_status">Opdaterer…</string>
+    <string name="home_new_command">Ny kommando</string>
+    <string name="home_refreshing">Opdaterer…</string>
+    <string name="home_projects">Projekter</string>
+    <string name="home_settings">Indstillinger</string>
+    <string name="home_about">Om</string>
+    <string name="home_filter_active">Aktive</string>
+    <string name="home_filter_waiting">Venter</string>
+    <string name="home_filter_archived">Arkiverede</string>
+    <string name="home_filter_with_count">%1$s · %2$d</string>
+    <string name="home_refresh_failed">Kunne ikke opdatere</string>
+
+    <string name="empty_active_title">Intet aktivt</string>
+    <string name="empty_active_body">Send en kommando til din claude-email-tjeneste. Svaret vises her.</string>
+    <string name="empty_active_cta">Send din første kommando</string>
+    <string name="empty_waiting_title">Ingen samtaler venter på svar</string>
+    <string name="empty_waiting_body">Når en agent stiller dig et spørgsmål, vises samtalen her.</string>
+    <string name="empty_archived_title">Arkivet er tomt</string>
+    <string name="empty_archived_body">Stryg en samtale mod venstre for at arkivere den.</string>
+
+    <string name="swipe_archive">Arkivér</string>
+    <string name="swipe_unarchive">Fjern fra arkivet</string>
+
+    <!-- Conversation list and thread -->
+    <string name="conversation_unknown_sender">(ukendt afsender)</string>
+    <plurals name="conversation_message_count">
+        <item quantity="one">%1$d besked</item>
+        <item quantity="other">%1$d beskeder</item>
+    </plurals>
+    <plurals name="conversation_unread_count">
+        <item quantity="one">%1$d ulæst</item>
+        <item quantity="other">%1$d ulæste</item>
+    </plurals>
+    <string name="conversation_header_meta">%1$s · %2$s</string>
+    <string name="conversation_archive">Arkivér</string>
+    <string name="conversation_unarchive">Fjern fra arkivet</string>
+    <string name="conversation_you">Dig</string>
+    <string name="conversation_no_text">(ingen tekst)</string>
+    <string name="conversation_show_less">Vis mindre</string>
+    <plurals name="conversation_show_more">
+        <item quantity="one">Vis mere · %1$d tegn mere</item>
+        <item quantity="other">Vis mere · %1$d tegn mere</item>
+    </plurals>
+    <string name="conversation_task_number">opgave #%1$s</string>
+    <string name="conversation_reply_label">Svar</string>
+    <string name="conversation_send_reply">Send svar</string>
+    <string name="send_failed_title">Kunne ikke sende</string>
+
+    <!-- Time since a message, kept short -->
+    <string name="time_now">nu</string>
+    <string name="time_minutes">%1$d min</string>
+    <string name="time_hours">%1$d t</string>
+    <string name="time_days">%1$d d</string>
+
+    <!-- Message and status chips -->
+    <string name="kind_ack">modtaget af tjenesten</string>
+    <string name="kind_progress">kører</string>
+    <string name="kind_question">kræver svar</string>
+    <string name="kind_result">resultat</string>
+    <string name="kind_error">fejl</string>
+    <string name="kind_command">kommando</string>
+    <string name="kind_reply">svar</string>
+    <string name="status_awaiting_ack">venter på bekræftelse fra tjenesten</string>
+    <string name="status_queued">i kø</string>
+    <string name="status_running">kører</string>
+    <string name="status_awaiting_user">kræver svar</string>
+    <string name="status_stalled">gået i stå</string>
+    <string name="status_waiting_on_peer">venter på en anden agent</string>
+    <string name="status_done">færdig</string>
+    <string name="status_failed">mislykkedes</string>
+    <string name="status_error">fejl</string>
+    <string name="routed_via_agent">håndteres af en kørende agent</string>
+    <string name="routed_via_agent_queued">i kø hos en kørende agent</string>
+    <string name="routed_via_worker">håndteres af en ny baggrundsproces</string>
+
+    <!-- Pending commands -->
+    <string name="pending_title">Uafsluttede eller mislykkede kommandoer: %1$d</string>
+    <plurals name="pending_retry_in">
+        <item quantity="one">tjenesten opgiver måske om ca. %1$d sekund (efter seneste opdatering)</item>
+        <item quantity="other">tjenesten opgiver måske om ca. %1$d sekunder (efter seneste opdatering)</item>
+    </plurals>
+
+    <!-- Errors reported by the claude-email service -->
+    <string name="error_chip_no_project">intet projekt</string>
+    <string name="error_chip_unauthorized">ikke godkendt</string>
+    <string name="error_chip_rate_limited">for mange forespørgsler</string>
+    <string name="error_chip_not_implemented">ikke tilgængelig endnu</string>
+    <string name="error_chip_invalid_state">kan ikke køre nu</string>
+    <string name="error_chip_internal">fejl i tjenesten</string>
+    <string name="error_chip_agent">agentfejl</string>
+    <string name="error_title_unauthorized">Ikke godkendt</string>
+    <string name="error_title_project_not_found">Projektet blev ikke fundet</string>
+    <string name="error_title_not_implemented">Ikke tilgængelig endnu</string>
+    <string name="error_title_invalid_state">Kan ikke køre lige nu</string>
+    <string name="error_title_rate_limited">For mange forespørgsler</string>
+    <string name="error_title_service_problem">Tjenesten havde et problem</string>
+    <string name="error_title_unexpected">Tjenesten afviste forespørgslen</string>
+    <string name="error_hint_unauthorized">Åbn Indstillinger, tryk på Redigér loginoplysninger, og tjek den delte hemmelighed.</string>
+    <string name="error_hint_project_not_found">Tjek, at projektstien findes på din claude-email-tjeneste, og send derefter kommandoen igen.</string>
+    <plurals name="error_hint_retry_after">
+        <item quantity="one">Prøv igen om %1$d sekund.</item>
+        <item quantity="other">Prøv igen om %1$d sekunder.</item>
+    </plurals>
+    <string name="error_code">Fejlkode: %1$s</string>
+    <string name="error_action_open_settings">Åbn Indstillinger</string>
+    <string name="error_action_edit_command">Skriv en ny kommando</string>
+
+    <!-- Compose a command -->
+    <string name="compose_service_address">Adresse på claude-email-tjenesten</string>
+    <string name="compose_project_path">Projektsti på den computer, der kører claude-email</string>
+    <string name="compose_command">Kommando</string>
+
+    <!-- Setup -->
+    <string name="setup_header_title">Én postkasse</string>
+    <string name="setup_header_body">Appen bruger én postkasse. Den modtager mail via IMAP og sender mail via SMTP, de almindelige måder en mailapp taler med en mailudbyder på. Dine loginoplysninger gemmes krypteret på denne telefon med en nøgle i Android Keystore. Appen sender dem kun over krypterede forbindelser, når den logger ind på dine mailservere.</string>
+    <string name="setup_section_account">Konto</string>
+    <string name="setup_section_imap">IMAP-server (modtager mail)</string>
+    <string name="setup_section_smtp">SMTP-server (sender mail)</string>
+    <string name="setup_section_service">claude-email-tjeneste</string>
+    <string name="setup_display_name">Visningsnavn</string>
+    <string name="setup_email_address">Mailadresse</string>
+    <string name="setup_password">Adgangskode eller app-adgangskode</string>
+    <string name="setup_imap_host">IMAP-vært (servernavn)</string>
+    <string name="setup_smtp_host">SMTP-vært (servernavn)</string>
+    <string name="setup_port">Port</string>
+    <string name="setup_service_address">Tjenestens adresse (mail)</string>
+    <string name="setup_shared_secret">Delt hemmelighed, angivet på din claude-email-tjeneste</string>
+    <string name="setup_tls_starttls">STARTTLS (typisk port 587)</string>
+    <string name="setup_tls_implicit">Implicit TLS (typisk port 465)</string>
+    <string name="setup_tls_hint">STARTTLS begynder som en almindelig forbindelse og skifter derefter til en krypteret. Implicit TLS er krypteret fra start. Slå dette til, hvis din mailudbyder beder om STARTTLS.</string>
+    <string name="setup_submit">Test og gem</string>
+    <string name="setup_submit_running">Tester forbindelsen…</string>
+    <string name="setup_probe_success">Forbundet. IMAP og SMTP er bekræftet.</string>
+    <string name="setup_probe_failed_imap">IMAP mislykkedes</string>
+    <string name="setup_probe_failed_smtp">SMTP mislykkedes</string>
+    <string name="setup_probe_unknown_error">Ukendt fejl</string>
+
+    <!-- Settings -->
+    <string name="settings_section_account">Konto</string>
+    <string name="settings_display_name">Visningsnavn</string>
+    <string name="settings_email">Mailadresse</string>
+    <string name="settings_section_service">claude-email-tjeneste</string>
+    <string name="settings_host">Vært</string>
+    <string name="settings_port">Port</string>
+    <string name="settings_security">Sikkerhed</string>
+    <string name="settings_tls_implicit">Implicit TLS</string>
+    <string name="settings_tls_starttls">STARTTLS</string>
+    <string name="settings_address">Adresse</string>
+    <string name="settings_shared_secret">Delt hemmelighed</string>
+    <string name="settings_section_sync">Opdatering</string>
+    <string name="settings_sync_label">Opdatering i baggrunden</string>
+    <string name="settings_sync_manual">Manuel</string>
+    <string name="settings_sync_30s">30 sekunder</string>
+    <string name="settings_sync_1m">1 minut</string>
+    <string name="settings_sync_5m">5 minutter</string>
+    <string name="settings_sync_hint">Mens appen er åben, opdaterer den hvert 15. sekund, medmindre du vælger Manuel. Du kan altid opdatere ved at trække ned i Indbakken.</string>
+    <string name="settings_section_notifications">Notifikationer</string>
+    <string name="settings_notify_title">Giv besked om nye beskeder</string>
+    <string name="settings_notify_body">Vis en notifikation på denne telefon, når der kommer en ny besked, og appen ikke er åben på skærmen. Tjenestens korte bekræftelser af en kommando udløser ikke en notifikation. Når du ændrer denne kontakt, kan overvågningen i baggrunden beholde den gamle indstilling, indtil appen genstarter. Vil du stoppe alle notifikationer med det samme, så slå denne apps notifikationer fra i Androids indstillinger.</string>
+    <string name="settings_edit_credentials">Redigér loginoplysninger</string>
+    <string name="settings_sign_out">Log ud</string>
+
+    <!-- Projects -->
+    <string name="projects_loading">Indlæser…</string>
+    <string name="projects_none">Ingen projekter indlæst</string>
+    <plurals name="projects_found">
+        <item quantity="one">%1$d projekt fundet</item>
+        <item quantity="other">%1$d projekter fundet</item>
+    </plurals>
+    <string name="projects_load_failed">Kunne ikke indlæse projekter</string>
+    <string name="projects_empty_title">Ingen projekter endnu.</string>
+    <string name="projects_empty_body">Listen over projekter kommer fra din claude-email-tjeneste, og den har ikke sendt nogen endnu. Du kan sende en kommando nu eller trykke på Opdatér senere for at tjekke igen.</string>
+    <string name="projects_agent_online">agent online</string>
+    <string name="projects_agent_stale">agenten har ikke meldt sig for nylig</string>
+    <string name="projects_agent_offline">agent offline</string>
+    <string name="projects_agent_other">agent %1$s</string>
+    <string name="projects_task_with_ref">%1$s · #%2$s</string>
+    <string name="projects_task_working">arbejder</string>
+    <string name="projects_task_waiting">venter</string>
+    <string name="projects_task_completed">færdig</string>
+    <string name="projects_task_error">fejl</string>
+    <string name="projects_task_other">opgave %1$s</string>
+    <string name="projects_task_running">kører opgave #%1$s</string>
+    <string name="projects_task_queued">%1$d i kø</string>
+    <string name="projects_task_idle">inaktiv</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_section_refresh">Opdatering</string>
+    <string name="diag_last_refresh">Seneste opdatering</string>
+    <string name="diag_never">aldrig</string>
+    <string name="diag_status">Status</string>
+    <string name="diag_status_refreshing">opdaterer</string>
+    <string name="diag_status_stalled">gået i stå</string>
+    <string name="diag_status_idle">inaktiv</string>
+    <string name="diag_auto_refresh">Opdatering i baggrunden</string>
+    <string name="diag_auto_refresh_manual">Manuel</string>
+    <plurals name="diag_auto_refresh_every">
+        <item quantity="one">hvert sekund</item>
+        <item quantity="other">hvert %1$d. sekund</item>
+    </plurals>
+    <string name="diag_refresh_error">Fejl ved opdatering</string>
+    <string name="diag_messages_loaded">Indlæste beskeder</string>
+    <string name="diag_section_send">Afsendelse</string>
+    <string name="diag_last_send_error">Seneste fejl ved afsendelse</string>
+    <string name="diag_none">ingen</string>
+    <string name="diag_pending">Kommandoer i gang</string>
+    <string name="diag_failed_pending">Kommandoer, der mislykkedes</string>
+    <string name="diag_section_connection">Forbindelse</string>
+    <string name="diag_imap">IMAP</string>
+    <string name="diag_smtp">SMTP</string>
+    <string name="diag_smtp_starttls">%1$s:%2$d (STARTTLS)</string>
+    <string name="diag_smtp_tls">%1$s:%2$d (TLS)</string>
+    <string name="diag_service_address">Tjenestens adresse</string>
+    <string name="diag_no_credentials">ingen loginoplysninger</string>
+    <string name="diag_section_app">App</string>
+    <string name="diag_version">Version</string>
+    <string name="diag_package">Pakke</string>
+
+    <!-- Notifications -->
+    <string name="channel_replies_name">Nye beskeder</string>
+    <string name="channel_replies_description">Notifikationer, når der kommer en ny besked, og appen ikke er åben på skærmen.</string>
+    <string name="channel_watcher_name">Overvågning af indbakken</string>
+    <string name="channel_watcher_description">Holder en forbindelse til din mailserver åben, så nye beskeder kan nå dig, mens appen kører i baggrunden.</string>
+    <string name="watcher_notification_title">Overvåger indbakken</string>
+    <string name="watcher_notification_text">Lytter efter nye beskeder i baggrunden</string>
+
+    <!-- About -->
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_updates">Se den nyeste version</string>
+    <string name="about_update_note">Det åbner en webside i din browser. Appen leder aldrig selv efter opdateringer.</string>
+    <string name="about_what_title">Hvad appen gør</string>
+    <string name="about_what_body">Claude Email App sender dine kommandoer som mail til en claude-email-tjeneste og viser tjenestens svar, samlet i samtaler. Tjenesten er det program, der modtager dine kommandoer, starter en agent (et hjælpeprogram) for det projekt, du angiver, og svarer, når arbejdet er færdigt. Du indtaster din egen postkasse og tjenestens adresse under Opsætning.</string>
+    <string name="about_privacy_title">Privatliv</string>
+    <string name="about_privacy_nothing_to_cocode">Cocode modtager intet fra denne app. Den har ingen konto, ingen reklamer, ingen analyse og ingen fejlrapportering.</string>
+    <string name="about_privacy_servers">Appen forbinder kun til de to servere hos din mailudbyder, som du angiver under Opsætning: én til at modtage mail og én til at sende den.</string>
+    <string name="about_privacy_stored">Dine loginoplysninger, også mailadgangskoden og den delte hemmelighed, gemmes krypteret på denne telefon.</string>
+    <string name="about_privacy_commands">Dine kommandoer forlader telefonen som almindelig mail til den tjenesteadresse, du angiver.</string>
+    <string name="about_privacy_link">Læs privatlivspolitikken</string>
+    <string name="about_links_title">Links</string>
+    <string name="about_website">Åbn websitet</string>
+    <string name="about_source">Se kildekoden på GitHub</string>
+    <string name="about_report">Meld et problem på GitHub</string>
+    <string name="about_no_browser">Ingen app på denne telefon kan åbne linket. Installér en webbrowser, og prøv igen.</string>
+    <string name="about_credits">Tak og licenser</string>
+    <string name="about_credit_license">Claude Email App er fri software udgivet under Apache License 2.0. Den fulde tekst står i kildekoden på GitHub.</string>
+    <string name="about_credit_angus">Mail modtages og sendes med Angus Mail (EPL-2.0 eller GPL-2.0 med Classpath Exception).</string>
+    <string name="about_credit_androidx">Appen er bygget med AndroidX og Jetpack Compose (Apache-2.0).</string>
+    <string name="about_credit_fonts">Skrifttyperne er IBM Plex Sans og IBM Plex Mono (© IBM Corp.) og Space Grotesk (© The Space Grotesk Project Authors). Alle tre bruges under SIL Open Font License 1.1.</string>
+    <string name="about_made_by">Lavet af Cocode (cocode.dk)</string>
 </resources>
