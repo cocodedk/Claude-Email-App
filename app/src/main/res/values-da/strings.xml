@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Claude Email App</string>
+
+    <string name="steering_chip_status">Status</string>
+    <string name="steering_chip_cancel">Annullér</string>
+    <string name="steering_chip_cancel_confirm">Annullér · bekræft</string>
+    <string name="steering_chip_more">Mere</string>
+    <string name="steering_chip_sending">Sender…</string>
+
+    <string name="steering_templates_heading">Svarskabeloner</string>
+    <string name="template_continue">Ser godt ud, fortsæt</string>
+    <string name="template_abort">Afbryd og prøv igen</string>
+    <string name="template_explain">Forklar afvejningen mere detaljeret</string>
+
+    <string name="onboarding_skip">Spring over</string>
+    <string name="onboarding_cta_next">Næste</string>
+    <string name="onboarding_cta_start">Kom i gang</string>
+
+    <string name="onboarding_p1_eyebrow">01 · KOMMANDO</string>
+    <string name="onboarding_p1_title">Send Claude en mail. Den udfører opgaven.</string>
+    <string name="onboarding_p1_body">Send en kommando til din claude-email-tjeneste. Den starter en agent i det projekt, opgaven gælder, og svarer, når arbejdet er færdigt.</string>
+
+    <string name="onboarding_p2_eyebrow">02 · SAMTALER</string>
+    <string name="onboarding_p2_title">Tråde, ikke en indbakke.</string>
+    <string name="onboarding_p2_body">Hver opgave er en samtale. Det aktive arbejde står øverst, så spørgsmål, der venter på dig, og færdige opgaver arkiverer du med et swipe.</string>
+
+    <string name="onboarding_p3_eyebrow">03 · KRYPTERET</string>
+    <string name="onboarding_p3_title">Dine loginoplysninger bliver på enheden.</string>
+    <string name="onboarding_p3_body">Adgangskoderne til IMAP og SMTP ligger i Android Keystore. Intet forlader telefonen, undtagen den mail, du selv vælger at sende.</string>
+</resources>

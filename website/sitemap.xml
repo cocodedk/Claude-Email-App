@@ -3,11 +3,19 @@
   <url>
     <loc>https://cocodedk.github.io/Claude-Email-App/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://cocodedk.github.io/Claude-Email-App/"/>
+    <xhtml:link rel="alternate" hreflang="da" href="https://cocodedk.github.io/Claude-Email-App/da/"/>
+    <xhtml:link rel="alternate" hreflang="fa" href="https://cocodedk.github.io/Claude-Email-App/fa/"/>
+  </url>
+  <url>
+    <loc>https://cocodedk.github.io/Claude-Email-App/da/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cocodedk.github.io/Claude-Email-App/"/>
+    <xhtml:link rel="alternate" hreflang="da" href="https://cocodedk.github.io/Claude-Email-App/da/"/>
     <xhtml:link rel="alternate" hreflang="fa" href="https://cocodedk.github.io/Claude-Email-App/fa/"/>
   </url>
   <url>
     <loc>https://cocodedk.github.io/Claude-Email-App/fa/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://cocodedk.github.io/Claude-Email-App/"/>
+    <xhtml:link rel="alternate" hreflang="da" href="https://cocodedk.github.io/Claude-Email-App/da/"/>
     <xhtml:link rel="alternate" hreflang="fa" href="https://cocodedk.github.io/Claude-Email-App/fa/"/>
   </url>
 </urlset>

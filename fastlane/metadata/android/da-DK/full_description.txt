@@ -1,0 +1,14 @@
+Claude Email er en Android-klient til claude-email-backenden. Den logger ind på din egen IMAP/SMTP-mailkonto og viser din mail som samtaler, hvor du sender kommandoer til agenter og læser deres svar.
+
+Funktioner
+- IMAP/SMTP-mailtransport med Angus Mail.
+- Din mailadgangskode og din delte hemmelighed bliver gemt krypteret på enheden med Android Keystore, ikke i almindelige indstillinger. Adgangskoden sendes kun til din egen mailserver, så du kan logge ind.
+- Kommando- og svargrænseflade: send en kommando og læs agentens svar i en samtale.
+- Kommandoerne indeholder den delte hemmelighed, du har sat i appen, så claude-email-tjenesten kan tjekke dem.
+- Svarnotifikationer er slået til som standard og kan slås fra under Settings. En IMAP IDLE-forgrundstjeneste holder en forbindelse åben, så de virker i baggrunden.
+- Hurtigsvar: når en agent stiller et spørgsmål, kan du trykke på et foreslået svar for at sende det.
+- Fremdriftsbeskeder fra opgaver, der kører længe, viser en tekst og en fremdriftslinje, når opgaven oplyser, hvor stor en del der er færdig.
+- Projektoversigt med agent- og opgavestatus for hvert projekt, som claude-email-tjenesten melder. Tryk på et projekt for at starte en kommando til det.
+- Material 3-brugerflade med mørkt tema.
+
+Kræver Android 7.0 eller nyere. Kildekoden ligger på GitHub under Apache-2.0-licensen.

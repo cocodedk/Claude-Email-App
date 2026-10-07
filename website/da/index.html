@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#050506" />
+
+  <title>Claude Email: Android-mailklient til claude-email-agenter</title>
+  <meta name="description" content="Fokuseret Android-mailklient til claude-email-backenden. IMAP/SMTP, loginoplysninger gemt med Android Keystore og en brugerflade bygget om kommandoer og svar til agenter og opgaver." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cocodedk.github.io/Claude-Email-App/da/" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <link rel="alternate" hreflang="en"        href="https://cocodedk.github.io/Claude-Email-App/" />
+  <link rel="alternate" hreflang="da"        href="https://cocodedk.github.io/Claude-Email-App/da/" />
+  <link rel="alternate" hreflang="fa"        href="https://cocodedk.github.io/Claude-Email-App/fa/" />
+  <link rel="alternate" hreflang="x-default" href="https://cocodedk.github.io/Claude-Email-App/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Claude Email" />
+  <meta property="og:title" content="Claude Email: Android-mailklient til claude-email-agenter" />
+  <meta property="og:description" content="Fokuseret Android-mailklient til claude-email-backenden. IMAP/SMTP, krypteret lagring af loginoplysninger og en brugerflade bygget om kommandoer og svar." />
+  <meta property="og:url" content="https://cocodedk.github.io/Claude-Email-App/da/" />
+  <meta property="og:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Claude Email: Android-klient til claude-email-backenden" />
+  <meta property="og:locale" content="da_DK" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:locale:alternate" content="fa_IR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Claude Email: Android-mailklient til claude-email-agenter" />
+  <meta name="twitter:description" content="Fokuseret Android-mailklient til claude-email-backenden." />
+  <meta name="twitter:image" content="https://cocodedk.github.io/Claude-Email-App/og.png" />
+  <meta name="twitter:image:alt" content="Claude Email: Android-klient" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../css/shared-blocks.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Claude Email",
+    "inLanguage": "da",
+    "description": "Android-mailklient til claude-email-backenden. IMAP/SMTP, loginoplysninger gemt med Android Keystore og en brugerflade bygget om kommandoer og svar.",
+    "url": "https://cocodedk.github.io/Claude-Email-App/da/",
+    "downloadUrl": "https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk",
+    "applicationCategory": "CommunicationApplication",
+    "operatingSystem": "Android 7.0+",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": {
+      "@type": "Person",
+      "name": "Babak Bandpey",
+      "url": "https://cocode.dk",
+      "sameAs": ["https://linkedin.com/in/babakbandpey", "https://github.com/cocodedk"]
+    },
+    "codeRepository": "https://github.com/cocodedk/Claude-Email-App"
+  }
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav nav-shared">
+      <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/Claude-Email-App/css/cocode-nav.css">
+<a class="skip" href="#main">Spring til indhold</a>
+<nav class="cocode-nav" aria-label="Claude Email App">
+  <a class="brand" href="/Claude-Email-App/da/" data-nav="home" aria-current="page"><img src="/Claude-Email-App/img/icon.png" alt="" width="32" height="32">Claude Email App</a>
+  <a href="/Claude-Email-App/da/#how" data-nav="how">Sådan virker det</a>
+  <a href="/Claude-Email-App/da/#install" data-nav="install">Installér</a>
+  <a href="https://cocode.dk/" data-nav="more">Flere apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+      <a class="lang-switch" href="../fa/" hreflang="fa" lang="fa">فارسی</a>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow hero-eyebrow reveal d1">v1 · Android · Apache-2.0</p>
+          <h1 class="hero-title reveal d2">
+            Mail, tænkt forfra<br/>
+            til <span class="accent">agenter</span>.
+          </h1>
+          <p class="hero-sub reveal d3">
+            En fokuseret Android-klient til claude-email-backenden. Tænk i samtaler og kommandoer i stedet for mapper og headers, med IMAP/SMTP under motorhjelmen og loginoplysninger gemt krypteret i Android Keystore.
+          </p>
+          <div class="hero-cta reveal d3">
+            <a class="btn btn-primary"
+               href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
+               rel="noreferrer">
+              Hent APK-filen
+              <span class="arrow" aria-hidden="true">↓</span>
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer">
+              Se på GitHub
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="hero-meta reveal d4">
+            <span>Android 7.0+</span>
+            <span>Signeret udgivelse</span>
+            <span>IMAP · SMTP</span>
+          </div>
+        </div>
+
+        <aside class="hero-visual reveal d4" aria-hidden="true">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="terminal-dots">
+                <i class="terminal-dot is-amber"></i>
+                <i class="terminal-dot"></i>
+                <i class="terminal-dot"></i>
+              </span>
+              <span class="terminal-title">~/inbox &mdash; claude-email</span>
+              <span style="width:40px"></span>
+            </div>
+            <div class="terminal-body">
+              <div class="prompt-line">
+                <span class="p-sym">→</span>
+                <span class="p-cmd">ny kommando "refaktorér genforsøg ved login"</span>
+                <span class="cursor" aria-hidden="true"></span>
+              </div>
+
+              <article class="thread-card">
+                <span class="thread-dot" aria-label="ulæst"></span>
+                <div>
+                  <h3 class="thread-title">Refaktorér genforsøg ved login</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-fits</span>
+                    <span>venter på agent · for 2 min. siden</span>
+                  </p>
+                </div>
+                <span class="thread-time">2 min</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="læst"></span>
+                <div>
+                  <h3 class="thread-title">Skriv udgivelsesnoter til v0.4</h3>
+                  <p class="thread-meta">
+                    <span class="badge is-green">sendt</span>
+                    <span>i går · 18:04</span>
+                  </p>
+                </div>
+                <span class="thread-time">1 d</span>
+              </article>
+
+              <article class="thread-card">
+                <span class="thread-dot is-muted" aria-label="læst"></span>
+                <div>
+                  <h3 class="thread-title">Sortér indkommende mail fra ops@</h3>
+                  <p class="thread-meta">
+                    <span class="badge">agent-ops</span>
+                    <span>arkiveret · tirsdag</span>
+                  </p>
+                </div>
+                <span class="thread-time">tir</span>
+              </article>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="how">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">Funktioner</p>
+          <h2 class="section-title">Bygget til arbejde med kommandoer og svar.</h2>
+          <p class="section-lede">
+            Seks bevidste funktioner. Intet dekorativt og intet tungt virksomhedsværktøj. Kun det, en person, der arbejder med agenter, faktisk har brug for.
+          </p>
+        </header>
+
+        <div class="features">
+          <article class="feature">
+            <span class="feature-label">01 · IMAP + SMTP</span>
+            <h3 class="feature-title">Ægte mailtransport.</h3>
+            <p class="feature-desc">Standarder under motorhjelmen. Ingen proprietær indlåsning, ingen skræddersyet protokol og ingen konto, du ikke kan forlade.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">02 · Android Keystore</span>
+            <h3 class="feature-title">Loginoplysninger gemt krypteret.</h3>
+            <p class="feature-desc">Din adgangskode og din delte hemmelighed bliver gemt krypteret med Android Keystore. Adgangskoden går kun til din egen mailserver, så du kan logge ind.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">03 · Kommando og svar</span>
+            <h3 class="feature-title">Samtaler, ikke tråde.</h3>
+            <p class="feature-desc">Agenter og opgaver står i centrum. Titel, agentmærke og status kan læses med ét blik.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">04 · Delt hemmelighed</span>
+            <h3 class="feature-title">Godkend uden adgangskoder.</h3>
+            <p class="feature-desc">Send kommandoer til claude-email-tjenesten med en delt hemmelighed. Agenterne forbliver afgrænsede og kan tilbagekaldes.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">05 · Notifikationer</span>
+            <h3 class="feature-title">Få svar i baggrunden.</h3>
+            <p class="feature-desc">Svarnotifikationer er slået til som standard og kan slås fra under Settings. En IMAP IDLE-forgrundstjeneste holder en forbindelse åben.</p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-label">06 · Mørkt tema først</span>
+            <h3 class="feature-title">Material 3, finjusteret til fokus.</h3>
+            <p class="feature-desc">Roligere end Slack, mere læsevenlig end Outlook. Bygget til lange stunder med læsning, ikke til almindelig forbrugerchat.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture strip -->
+    <section class="arch" aria-label="Bygget med">
+      <div class="container">
+        <ul class="arch-list">
+          <li>Kotlin</li>
+          <li>Jetpack Compose</li>
+          <li>Material 3</li>
+          <li>Android Keystore</li>
+          <li>Angus Mail</li>
+          <li>Coroutines</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="section" id="install">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow section-eyebrow">Installér</p>
+          <h2 class="section-title">Tre trin til din første kommando.</h2>
+          <p class="section-lede">
+            Der er ingen konto at oprette. Det er dig, der har nøglerne, og appen bruger dem bare.
+          </p>
+        </header>
+
+        <ol class="install-grid" role="list">
+          <li class="step">
+            <span class="step-number">01 / Hent</span>
+            <h3 class="step-title">Tag den signerede APK-fil.</h3>
+            <p class="step-body">Hent den nyeste udgivelse direkte fra GitHub. Den er reproducerbar, signeret og har en kontrolsum.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">02 / Installér</span>
+            <h3 class="step-title">Installér på Android 7.0 eller nyere.</h3>
+            <p class="step-body">Tillad &raquo;Installér ukendte apps&laquo; for din filhåndtering én gang. Resten klarer Android.</p>
+          </li>
+          <li class="step">
+            <span class="step-number">03 / Opsæt</span>
+            <h3 class="step-title">Indtast loginoplysninger til IMAP/SMTP.</h3>
+            <p class="step-body">Loginoplysningerne bliver gemt krypteret af Keystore. Adgangskoden sendes kun til din egen mailserver, så du kan logge ind.</p>
+          </li>
+        </ol>
+
+        <div class="install-box">
+          <!-- cocode-apps:install:start -->
+<ul class="install" role="list">
+  <li><p class="fdroid-soon">Kommer på F-Droid</p></li>
+  <li><a href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk">Hent APK-filen fra GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/Claude-Email-App">Opdatér GitHub-APK&#x27;en automatisk med Obtainium</a></li>
+</ul>
+<!-- cocode-apps:install:end -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="site-footer">
+    <div class="container">
+      <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/Claude-Email-App">Kildekode</a> ·
+  Licens: Apache-2.0 ·
+  <a href="https://cocode.dk/">Lavet af Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
+    </div>
+  </div>
+
+</body>
+</html>

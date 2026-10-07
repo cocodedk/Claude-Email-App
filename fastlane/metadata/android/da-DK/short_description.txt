@@ -1,0 +1,1 @@
+Android-mailklient til claude-email-backenden, bygget på IMAP og SMTP
