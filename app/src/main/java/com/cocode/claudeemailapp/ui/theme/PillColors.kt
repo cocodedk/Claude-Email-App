@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 
 /** WCAG AA for normal-size text. */
-const val MIN_TEXT_CONTRAST = 4.5
+const val MIN_TEXT_CONTRAST: Double = 4.5
 
 /** WCAG 2.x contrast ratio between two opaque colours. */
 fun contrastRatio(a: Color, b: Color): Double {
