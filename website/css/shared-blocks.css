@@ -1,0 +1,105 @@
+/* Shared cocode-apps blocks (navigation, install, footer), in this site's look.
+   The blocks are written by cocode-apps' render between their markers; only the styling is ours.
+   Loaded after styles.css, which holds the palette variables used here. */
+
+/* Navigation */
+.nav-shared { flex-wrap: wrap; }
+.nav-shared .cocode-nav {
+  flex: 1 1 auto;
+  gap: 0 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.nav-shared .cocode-nav a { color: var(--snow-muted); transition: color .15s; }
+.nav-shared .cocode-nav a:hover,
+.nav-shared .cocode-nav a[aria-current="page"] { color: var(--snow); }
+.nav-shared .cocode-nav .brand { gap: 10px; font-size: 14px; color: var(--snow); }
+.nav-shared .cocode-nav .brand img { width: 32px; height: 32px; border-radius: 7px; }
+/* The Persian version's switch sits beside the shared navigation; same touch target as its links. */
+.nav-shared .lang-switch { display: inline-flex; align-items: center; min-height: 44px; }
+.nav-shared .skip:focus {
+  background: var(--signal-amber);
+  color: var(--pitch-black);
+  border-radius: var(--radius);
+}
+
+/* Install block */
+.install-box {
+  margin-top: 48px;
+  padding: 28px 32px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(240, 179, 90, 0.04), transparent 70%),
+    var(--carbon);
+}
+.install-box .install {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.install-box .install li { margin: 0; }
+.install-box .install a,
+.install-box .install .fdroid-soon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 22px;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--snow);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  transition: background-color .15s, border-color .15s;
+}
+.install-box .install .fdroid-soon { color: var(--snow-muted); border-style: dashed; }
+.install-box .install a:hover { border-color: var(--snow); background: var(--graphite); }
+/* The second item is always the GitHub APK: F-Droid comes first, Obtainium last. */
+.install-box .install li:nth-child(2) a {
+  background: var(--signal-amber);
+  border-color: var(--signal-amber);
+  color: var(--pitch-black);
+}
+.install-box .install li:nth-child(2) a:hover { background: #FFC672; border-color: #FFC672; }
+
+/* Footer */
+.site-footer .cocode-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 0.6ch;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--snow-muted);
+  text-align: center;
+}
+.site-footer .cocode-footer a {
+  padding: 0 6px;
+  color: var(--snow);
+  border-bottom: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 4px;
+}
+.site-footer .cocode-footer a:hover { color: var(--signal-amber); text-decoration-color: var(--signal-amber); }
+
+@media (max-width: 720px) {
+  .install-box { padding: 24px 20px; }
+}
+@media (max-width: 480px) {
+  .install-box .install { flex-direction: column; align-items: stretch; }
+  .install-box .install a,
+  .install-box .install .fdroid-soon { width: 100%; }
+}

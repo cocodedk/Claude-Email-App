@@ -39,6 +39,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/shared-blocks.css" />
 
   <script type="application/ld+json">
   {
@@ -64,20 +65,18 @@
 <body>
 
   <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="/Claude-Email-App/" aria-label="Claude Email — home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
-            <rect x="3" y="6" width="18" height="12"/>
-            <path d="M3 6l9 6 9-6"/>
-          </svg>
-        </span>
-        <span class="brand-name">claude-email</span><span class="brand-slash">/</span><span class="brand-suffix">app</span>
-      </a>
-      <div class="nav-actions">
-        <a class="btn-ghost btn" href="https://github.com/cocodedk/Claude-Email-App" target="_blank" rel="noreferrer" aria-label="View repository on GitHub">GitHub</a>
-        <a class="lang-switch" href="fa/" hreflang="fa" lang="fa">فارسی</a>
-      </div>
+    <div class="container nav nav-shared">
+      <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/Claude-Email-App/css/cocode-nav.css">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="cocode-nav" aria-label="Claude Email App">
+  <a class="brand" href="/Claude-Email-App/" data-nav="home" aria-current="page"><img src="/Claude-Email-App/img/icon.png" alt="" width="32" height="32">Claude Email App</a>
+  <a href="/Claude-Email-App/#how" data-nav="how">How it works</a>
+  <a href="/Claude-Email-App/#install" data-nav="install">Install</a>
+  <a href="https://cocode.dk/" data-nav="more">More apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+      <a class="lang-switch" href="fa/" hreflang="fa" lang="fa">فارسی</a>
     </div>
   </header>
 
@@ -174,7 +173,7 @@
     </section>
 
     <!-- Features -->
-    <section class="section" id="features">
+    <section class="section" id="how">
       <div class="container">
         <header class="section-head">
           <p class="eyebrow section-eyebrow">Features</p>
@@ -193,8 +192,8 @@
 
           <article class="feature">
             <span class="feature-label">02 · Android Keystore</span>
-            <h3 class="feature-title">Credentials sealed to the device.</h3>
-            <p class="feature-desc">Passwords are encrypted by hardware-backed keys. They never sync and never leave the phone.</p>
+            <h3 class="feature-title">Credentials stored encrypted.</h3>
+            <p class="feature-desc">Your password and shared secret are stored encrypted with the Android Keystore. The password goes only to your own mail server, to sign in.</p>
           </article>
 
           <article class="feature">
@@ -210,9 +209,9 @@
           </article>
 
           <article class="feature">
-            <span class="feature-label">05 · Offline queue</span>
-            <h3 class="feature-title">Send now, deliver when ready.</h3>
-            <p class="feature-desc">Commands compose offline and queue locally. They fire the moment the network returns.</p>
+            <span class="feature-label">05 · Notifications</span>
+            <h3 class="feature-title">Hear back in the background.</h3>
+            <p class="feature-desc">Reply notifications are on by default and can be switched off in Settings. A foreground IMAP IDLE service keeps a connection open.</p>
           </article>
 
           <article class="feature">
@@ -245,7 +244,7 @@
           <p class="eyebrow section-eyebrow">Install</p>
           <h2 class="section-title">Three steps to first command.</h2>
           <p class="section-lede">
-            No store listing. No account to create. You hold the keys &mdash; the app just uses them.
+            No account to create. You hold the keys &mdash; the app just uses them.
           </p>
         </header>
 
@@ -263,29 +262,35 @@
           <li class="step">
             <span class="step-number">03 / Configure</span>
             <h3 class="step-title">Enter IMAP/SMTP credentials.</h3>
-            <p class="step-body">Credentials are encrypted locally by the Keystore. They never leave the device.</p>
+            <p class="step-body">Credentials are stored encrypted by the Keystore. The password is sent only to your own mail server, to sign in.</p>
           </li>
         </ol>
 
-        <div class="install-cta">
-          <p class="install-cta-text"><strong>Latest release &mdash; Claude-Email-App.apk</strong><br/>Signed · Android 7.0+ · Apache-2.0</p>
-          <a class="btn btn-primary"
-             href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk"
-             rel="noreferrer">
-            Download APK
-            <span class="arrow" aria-hidden="true">↓</span>
-          </a>
+        <div class="install-box">
+          <!-- cocode-apps:install:start -->
+<ul class="install" role="list">
+  <li><p class="fdroid-soon">Coming to F-Droid</p></li>
+  <li><a href="https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk">Download the APK from GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/Claude-Email-App">Auto-update the GitHub APK with Obtainium</a></li>
+</ul>
+<!-- cocode-apps:install:end -->
         </div>
       </div>
     </section>
 
   </main>
 
-  <footer class="site-footer">
+  <div class="site-footer">
     <div class="container">
-      <p>Apache-2.0 &nbsp;|&nbsp; © 2026 <a href="https://cocode.dk" target="_blank" rel="noreferrer">Cocode</a> &nbsp;|&nbsp; Created by <a href="https://linkedin.com/in/babakbandpey" target="_blank" rel="noreferrer">Babak Bandpey</a></p>
+      <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/Claude-Email-App">Source code</a> ·
+  License: Apache-2.0 ·
+  <a href="https://cocode.dk/">Made by Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
     </div>
-  </footer>
+  </div>
 
 </body>
 </html>

@@ -1,0 +1,14 @@
+Claude Email is an Android client for the claude-email backend. It signs in to your own IMAP/SMTP mail account and shows your mail as conversations, where you send commands to agents and read their replies.
+
+Features
+- IMAP/SMTP mail transport, powered by Angus Mail.
+- Your mail password and shared secret are stored encrypted on the device with the Android Keystore, not in plain preferences. The password is sent only to your own mail server, to sign in.
+- Command-and-reply interface: send a command and read the agent's replies in a conversation.
+- Commands carry the shared secret you set in the app, for the claude-email service to check.
+- Reply notifications are on by default and can be switched off in Settings. A foreground IMAP IDLE service keeps a connection open so they work in the background.
+- Quick-reply chips: when an agent asks a question, tap a suggested answer to send it.
+- Progress messages from long-running tasks show a label and, when the task reports a fraction, a progress bar.
+- Projects view with the agent and task status of each project the claude-email service reports. Tap a project to start a command for it.
+- Material 3 interface with a dark theme.
+
+Requires Android 7.0 or newer. The source code is on GitHub under the Apache-2.0 license.
