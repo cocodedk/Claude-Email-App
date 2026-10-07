@@ -1,30 +1,322 @@
 <resources>
     <string name="app_name">Claude Email App</string>
 
-    <string name="steering_chip_status">Status</string>
-    <string name="steering_chip_cancel">Cancel</string>
-    <string name="steering_chip_cancel_confirm">Cancel · confirm</string>
+    <!-- Shared actions -->
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_resend_preview">Send saved preview again</string>
+    <string name="pending_cancel_task">Cancel project task</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_send">Send</string>
+    <string name="action_sending">Sending…</string>
+    <string name="action_diagnostics">Diagnostics</string>
+    <string name="value_not_set">(not set)</string>
+
+    <!-- Top bar titles -->
+    <string name="title_home">Claude Email</string>
+    <string name="title_setup">Setup</string>
+    <string name="title_edit_credentials">Edit credentials</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_conversation">Conversation</string>
+    <string name="title_compose">New command</string>
+    <string name="title_diagnostics">Diagnostics</string>
+    <string name="title_projects">Projects</string>
+    <string name="title_about">About</string>
+
+    <!-- Snackbars and toasts -->
+    <string name="snackbar_message_sent">Message sent</string>
+    <string name="snackbar_send_failed">Couldn\'t send: %1$s</string>
+    <string name="snackbar_archived">Archived</string>
+    <string name="snackbar_unarchived">Unarchived</string>
+    <string name="snackbar_undo">Undo</string>
+    <string name="toast_copied_message">Message copied</string>
+
+    <!-- Steering bar -->
+    <string name="steering_chip_status">Request status</string>
+    <string name="steering_chip_cancel">Cancel project task</string>
+    <string name="steering_chip_cancel_confirm">Confirm cancel</string>
     <string name="steering_chip_more">More</string>
     <string name="steering_chip_sending">Sending…</string>
 
     <string name="steering_templates_heading">Reply templates</string>
-    <string name="template_continue">Looks good, continue</string>
-    <string name="template_abort">Abort and retry</string>
-    <string name="template_explain">Explain the tradeoff in more detail</string>
+    <string name="steering_template_quoted">“ %1$s ”</string>
+    <!--
+        The three templates below are sent word for word as the reply text to the claude-email
+        agent, so they must stay in English: they are an instruction to the agent, not text for
+        the screen only. The app does not set or follow a locale for them, so they are not
+        translatable.
+    -->
+    <string name="template_continue" translatable="false">Looks good, continue</string>
+    <string name="template_abort" translatable="false">Abort and retry</string>
+    <string name="template_explain" translatable="false">Explain the tradeoff in more detail</string>
 
+    <!-- Onboarding -->
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_cta_next">Next</string>
     <string name="onboarding_cta_start">Get started</string>
 
     <string name="onboarding_p1_eyebrow">01 · COMMAND</string>
     <string name="onboarding_p1_title">Email Claude. It runs the task.</string>
-    <string name="onboarding_p1_body">Send a command to your claude-email service. It spawns an agent in the target project and replies when the work is done.</string>
+    <string name="onboarding_p1_body">Send a command to your claude-email service. The service does the work in the project you name and replies when it is done.</string>
 
     <string name="onboarding_p2_eyebrow">02 · CONVERSATIONS</string>
     <string name="onboarding_p2_title">Threads, not an inbox.</string>
-    <string name="onboarding_p2_body">Each task is a conversation. Active work up top, questions waiting for you next, finished tasks archived on a swipe.</string>
+    <string name="onboarding_p2_body">Each task is a conversation. Use the Active, Waiting and Archived tabs to switch between them. Swipe a conversation left to archive it.</string>
 
     <string name="onboarding_p3_eyebrow">03 · ENCRYPTED</string>
-    <string name="onboarding_p3_title">Credentials stay on device.</string>
-    <string name="onboarding_p3_body">IMAP and SMTP passwords sit in the Android Keystore. Nothing leaves the phone except mail you explicitly send.</string>
+    <string name="onboarding_p3_title">Sign-in details stored encrypted.</string>
+    <string name="onboarding_p3_body">Your sign-in details are stored encrypted, with a key kept in the Android Keystore. The app signs in to your own mail servers and checks them for replies. If you set a shared secret, it is sent with your commands. Android may back up the app\'s data.</string>
+
+    <!-- Home -->
+    <string name="home_inbox">Inbox</string>
+    <string name="home_refreshing_status">Refreshing…</string>
+    <string name="home_new_command">New command</string>
+    <string name="home_refreshing">Refreshing…</string>
+    <string name="home_projects">Projects</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_about">About</string>
+    <string name="home_filter_active">Active</string>
+    <string name="home_filter_waiting">Waiting</string>
+    <string name="home_filter_archived">Archived</string>
+    <string name="home_filter_with_count">%1$s · %2$d</string>
+    <string name="home_refresh_failed">Couldn\'t refresh</string>
+
+    <string name="empty_active_title">Nothing active</string>
+    <string name="empty_active_body">Send a command to your claude-email service. Its reply will appear here.</string>
+    <string name="empty_active_cta">Send your first command</string>
+    <string name="empty_waiting_title">No conversations need a reply</string>
+    <string name="empty_waiting_body">When an agent asks you a question, the conversation will appear here.</string>
+    <string name="empty_archived_title">Archive is empty</string>
+    <string name="empty_archived_body">Swipe a conversation left to archive it.</string>
+
+    <string name="swipe_archive">Archive</string>
+    <string name="swipe_unarchive">Unarchive</string>
+
+    <!-- Conversation list and thread -->
+    <string name="conversation_unknown_sender">(unknown sender)</string>
+    <plurals name="conversation_message_count">
+        <item quantity="one">%1$d message</item>
+        <item quantity="other">%1$d messages</item>
+    </plurals>
+    <plurals name="conversation_unread_count">
+        <item quantity="one">%1$d unread</item>
+        <item quantity="other">%1$d unread</item>
+    </plurals>
+    <string name="conversation_header_meta">%1$s · %2$s</string>
+    <string name="conversation_archive">Archive</string>
+    <string name="conversation_unarchive">Unarchive</string>
+    <string name="conversation_you">You</string>
+    <string name="conversation_no_text">(no text content)</string>
+    <string name="conversation_show_less">Show less</string>
+    <plurals name="conversation_show_more">
+        <item quantity="one">Show more · %1$d more character</item>
+        <item quantity="other">Show more · %1$d more characters</item>
+    </plurals>
+    <string name="conversation_task_number">task #%1$s</string>
+    <string name="conversation_reply_label">Reply</string>
+    <string name="conversation_send_reply">Send reply</string>
+    <string name="send_failed_title">Couldn\'t send</string>
+
+    <!-- Time since a message, kept short -->
+    <string name="time_now">now</string>
+    <string name="time_minutes">%1$dm</string>
+    <string name="time_hours">%1$dh</string>
+    <string name="time_days">%1$dd</string>
+
+    <!-- Message and status chips -->
+    <string name="kind_ack">received by service</string>
+    <string name="kind_progress">running</string>
+    <string name="kind_question">needs reply</string>
+    <string name="kind_result">result</string>
+    <string name="kind_error">error</string>
+    <string name="kind_command">command</string>
+    <string name="kind_reply">reply</string>
+    <string name="status_awaiting_ack">waiting for the service to confirm</string>
+    <string name="status_queued">queued</string>
+    <string name="status_running">running</string>
+    <string name="status_awaiting_user">needs reply</string>
+    <string name="status_stalled">stalled</string>
+    <string name="status_waiting_on_peer">waiting for another agent</string>
+    <string name="status_done">done</string>
+    <string name="status_failed">failed</string>
+    <string name="status_error">error</string>
+    <string name="routed_via_agent">handled by a running agent</string>
+    <string name="routed_via_agent_queued">queued for a running agent</string>
+    <string name="routed_via_worker">handled by a new background worker</string>
+
+    <!-- Pending commands -->
+    <string name="pending_title">Unfinished or failed commands: %1$d</string>
+    <plurals name="pending_retry_in">
+        <item quantity="one">service may give up in about %1$d second (as of the last update)</item>
+        <item quantity="other">service may give up in about %1$d seconds (as of the last update)</item>
+    </plurals>
+
+    <!-- Errors reported by the claude-email service -->
+    <string name="error_chip_no_project">no project</string>
+    <string name="error_chip_unauthorized">not authorized</string>
+    <string name="error_chip_rate_limited">too many requests</string>
+    <string name="error_chip_not_implemented">not available yet</string>
+    <string name="error_chip_invalid_state">can\'t run now</string>
+    <string name="error_chip_internal">service problem</string>
+    <string name="error_chip_agent">agent error</string>
+    <string name="error_title_unauthorized">Not authorized</string>
+    <string name="error_title_project_not_found">Project not found</string>
+    <string name="error_title_not_implemented">Not available yet</string>
+    <string name="error_title_invalid_state">Can\'t run right now</string>
+    <string name="error_title_rate_limited">Too many requests</string>
+    <string name="error_title_service_problem">The service had a problem</string>
+    <string name="error_title_unexpected">The service rejected the request</string>
+    <string name="error_hint_unauthorized">Open Settings, tap Edit credentials, and check the shared secret.</string>
+    <string name="error_hint_project_not_found">Check that the project path exists on your claude-email service, then send the command again.</string>
+    <plurals name="error_hint_retry_after">
+        <item quantity="one">Try again in %1$d second.</item>
+        <item quantity="other">Try again in %1$d seconds.</item>
+    </plurals>
+    <string name="error_code">Error code: %1$s</string>
+    <string name="error_action_open_settings">Open Settings</string>
+    <string name="error_action_edit_command">Write a new command</string>
+
+    <!-- Compose a command -->
+    <string name="compose_service_address">claude-email service address</string>
+    <string name="compose_project_path">Project path on the computer running claude-email</string>
+    <string name="compose_command">Command</string>
+
+    <!-- Setup -->
+    <string name="setup_header_title">Single mailbox</string>
+    <string name="setup_header_body">The app uses one mailbox. It receives mail over IMAP and sends mail over SMTP, the standard ways a mail app talks to a mail provider. Your sign-in details (credentials) are stored encrypted on this phone, with a key kept in the Android Keystore. The app sends them only over encrypted connections, to sign in to your mail servers.</string>
+    <string name="setup_section_account">Account</string>
+    <string name="setup_section_imap">IMAP server (receives mail)</string>
+    <string name="setup_section_smtp">SMTP server (sends mail)</string>
+    <string name="setup_section_service">claude-email service</string>
+    <string name="setup_display_name">Display name</string>
+    <string name="setup_email_address">Email address</string>
+    <string name="setup_password">Password or app password</string>
+    <string name="setup_imap_host">IMAP host (server name)</string>
+    <string name="setup_smtp_host">SMTP host (server name)</string>
+    <string name="setup_port">Port</string>
+    <string name="setup_service_address">Service address (email)</string>
+    <string name="setup_shared_secret">Shared secret set on your claude-email service</string>
+    <string name="setup_tls_starttls">STARTTLS (typical port 587)</string>
+    <string name="setup_tls_implicit">Implicit TLS (typical port 465)</string>
+    <string name="setup_tls_hint">STARTTLS starts as an ordinary connection and then switches to an encrypted one. Implicit TLS is encrypted from the start. Turn this on if your mail provider asks for STARTTLS.</string>
+    <string name="setup_submit">Test and save</string>
+    <string name="setup_submit_running">Testing connection…</string>
+    <string name="setup_probe_success">Connected. IMAP and SMTP verified.</string>
+    <string name="setup_probe_failed_imap">IMAP failed</string>
+    <string name="setup_probe_failed_smtp">SMTP failed</string>
+    <string name="setup_probe_unknown_error">Unknown error</string>
+
+    <!-- Settings -->
+    <string name="settings_section_account">Account</string>
+    <string name="settings_display_name">Display name</string>
+    <string name="settings_email">Email</string>
+    <string name="settings_section_service">claude-email service</string>
+    <string name="settings_host">Host</string>
+    <string name="settings_port">Port</string>
+    <string name="settings_security">Security</string>
+    <string name="settings_tls_implicit">Implicit TLS</string>
+    <string name="settings_tls_starttls">STARTTLS</string>
+    <string name="settings_address">Address</string>
+    <string name="settings_shared_secret">Shared secret</string>
+    <string name="settings_section_sync">Refresh</string>
+    <string name="settings_sync_label">Background refresh</string>
+    <string name="settings_sync_manual">Manual</string>
+    <string name="settings_sync_30s">30 seconds</string>
+    <string name="settings_sync_1m">1 minute</string>
+    <string name="settings_sync_5m">5 minutes</string>
+    <string name="settings_sync_hint">While the app is open, it refreshes every 15 seconds, unless you choose Manual. Pulling down on the Inbox refreshes at any time.</string>
+    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_notify_title">Notify on new messages</string>
+    <string name="settings_notify_body">Show a notification on this phone when a new message arrives and the app is not open on screen. The service\'s short confirmations of a command do not trigger one. After you change this switch, the background watcher may keep its old setting until the app restarts. To stop all alerts at once, turn off this app\'s notifications in Android settings.</string>
+    <string name="settings_edit_credentials">Edit credentials</string>
+    <string name="settings_sign_out">Sign out</string>
+
+    <!-- Projects -->
+    <string name="projects_loading">Loading…</string>
+    <string name="projects_none">No projects loaded</string>
+    <plurals name="projects_found">
+        <item quantity="one">%1$d project found</item>
+        <item quantity="other">%1$d projects found</item>
+    </plurals>
+    <string name="projects_load_failed">Couldn\'t load projects</string>
+    <string name="projects_empty_title">No projects yet.</string>
+    <string name="projects_empty_body">The list of projects comes from your claude-email service, and it has not shared one yet. You can send a command now, or tap Refresh later to check again.</string>
+    <string name="projects_agent_online">agent online</string>
+    <string name="projects_agent_stale">agent has not checked in recently</string>
+    <string name="projects_agent_offline">agent offline</string>
+    <string name="projects_agent_other">agent %1$s</string>
+    <string name="projects_task_with_ref">%1$s · #%2$s</string>
+    <string name="projects_task_working">working</string>
+    <string name="projects_task_waiting">waiting</string>
+    <string name="projects_task_completed">completed</string>
+    <string name="projects_task_error">error</string>
+    <string name="projects_task_other">task %1$s</string>
+    <string name="projects_task_running">running task #%1$s</string>
+    <string name="projects_task_queued">queued %1$d</string>
+    <string name="projects_task_idle">idle</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_section_refresh">Refresh</string>
+    <string name="diag_last_refresh">Last refresh</string>
+    <string name="diag_never">never</string>
+    <string name="diag_status">Status</string>
+    <string name="diag_status_refreshing">refreshing</string>
+    <string name="diag_status_stalled">stalled</string>
+    <string name="diag_status_idle">idle</string>
+    <string name="diag_auto_refresh">Background refresh</string>
+    <string name="diag_auto_refresh_manual">Manual</string>
+    <plurals name="diag_auto_refresh_every">
+        <item quantity="one">every %1$d second</item>
+        <item quantity="other">every %1$d seconds</item>
+    </plurals>
+    <string name="diag_refresh_error">Refresh error</string>
+    <string name="diag_messages_loaded">Messages loaded</string>
+    <string name="diag_section_send">Send</string>
+    <string name="diag_last_send_error">Last send error</string>
+    <string name="diag_none">none</string>
+    <string name="diag_pending">Commands in progress</string>
+    <string name="diag_failed_pending">Commands that failed</string>
+    <string name="diag_section_connection">Connection</string>
+    <string name="diag_imap">IMAP</string>
+    <string name="diag_smtp">SMTP</string>
+    <string name="diag_smtp_starttls">%1$s:%2$d (STARTTLS)</string>
+    <string name="diag_smtp_tls">%1$s:%2$d (TLS)</string>
+    <string name="diag_service_address">Service address</string>
+    <string name="diag_no_credentials">no credentials</string>
+    <string name="diag_section_app">App</string>
+    <string name="diag_version">Version</string>
+    <string name="diag_package">Package</string>
+
+    <!-- Notifications -->
+    <string name="channel_replies_name">New messages</string>
+    <string name="channel_replies_description">Notifications when a new message arrives and the app is not open on screen.</string>
+    <string name="channel_watcher_name">Inbox watcher</string>
+    <string name="channel_watcher_description">Keeps a connection to your mail server open, so new messages can reach you while the app is in the background.</string>
+    <string name="watcher_notification_title">Watching inbox</string>
+    <string name="watcher_notification_text">Listening for new messages in the background</string>
+
+    <!-- About -->
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_updates">See the latest version</string>
+    <string name="about_update_note">This opens a web page in your browser. The app never checks for updates by itself.</string>
+    <string name="about_what_title">What the app does</string>
+    <string name="about_what_body">Claude Email App sends your commands by email to a claude-email service and shows you its replies, grouped into conversations. The service is the program that receives your commands, has an agent (a helper program) do the work in the project you name, and replies when it is done. You enter your own mailbox and the service\'s address in Setup.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_nothing_to_cocode">Cocode receives nothing from this app. It has no account, no ads, no analytics and no crash reporting.</string>
+    <string name="about_privacy_servers">The app connects only to your mail provider\'s two servers that you enter in Setup, one to receive mail and one to send it.</string>
+    <string name="about_privacy_stored">Your sign-in details, including the mail password and the shared secret, are stored encrypted on this phone.</string>
+    <string name="about_privacy_commands">Your commands leave the phone as ordinary email to the service address you enter.</string>
+    <string name="about_privacy_browser">The buttons on this screen hand a web address to your phone\'s browser. The app itself loads nothing from those sites.</string>
+    <string name="about_privacy_link">Read the privacy policy</string>
+    <string name="about_links_title">Links</string>
+    <string name="about_website">Open the website</string>
+    <string name="about_source">See the source code on GitHub</string>
+    <string name="about_report">Report a problem on GitHub</string>
+    <string name="about_no_browser">No app on this phone can open the link. Install a web browser, then try again.</string>
+    <string name="about_credits">Credits and licenses</string>
+    <string name="about_credit_license">Claude Email App is free software, released under the Apache License 2.0. The full text is in the source code on GitHub.</string>
+    <string name="about_credit_angus">Mail is received and sent with Angus Mail (EPL-2.0 or GPL-2.0 with the Classpath Exception).</string>
+    <string name="about_credit_androidx">The app is built with AndroidX and Jetpack Compose (Apache-2.0).</string>
+    <string name="about_credit_fonts">The fonts are IBM Plex Sans and IBM Plex Mono (© IBM Corp.) and Space Grotesk (© The Space Grotesk Project Authors). All three are used under the SIL Open Font License 1.1.</string>
+    <string name="about_made_by">Made by Cocode (cocode.dk)</string>
 </resources>

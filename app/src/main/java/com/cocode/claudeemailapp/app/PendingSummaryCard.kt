@@ -2,7 +2,7 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,8 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingStatus
 
@@ -40,7 +43,7 @@ internal fun PendingSummary(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Pending — ${visible.size}",
+                text = stringResource(R.string.pending_title, visible.size),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
@@ -58,7 +61,13 @@ private fun PendingRow(
     onCancel: (PendingCommand) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        // The status label can be long ("waiting for the service to confirm"), so the status and the
+        // task number sit on their own line and the command preview gets the full width below.
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
             StatusChip(status = p.status)
             p.taskId?.let {
                 Text(
@@ -67,14 +76,15 @@ private fun PendingRow(
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
-            Text(
-                text = p.bodyPreview.take(80).replace('\n', ' '),
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
         }
+        Text(
+            text = p.bodyPreview.take(80).replace('\n', ' '),
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.fillMaxWidth().testTag("pending_preview_${p.messageId}")
+        )
         pendingReasonLine(p.reason, p.retryAfterSeconds)?.let { line ->
             Text(
                 text = line,
@@ -102,8 +112,9 @@ internal fun isRetryable(p: PendingCommand): Boolean = p.status in RETRYABLE_STA
 internal fun isCancellable(p: PendingCommand): Boolean =
     p.status in CANCELLABLE_STATUSES && p.taskId != null
 
+@Composable
 internal fun pendingReasonLine(reason: String?, retryAfterSeconds: Int?): String? {
-    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { "retry in ${it}s" }
+    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.pending_retry_in, it, it) }
     return listOfNotNull(reason?.takeIf(String::isNotBlank), countdown)
         .takeIf { it.isNotEmpty() }
         ?.joinToString(" · ")
@@ -118,18 +129,18 @@ private fun PendingRowActions(
     val retry = isRetryable(p)
     val cancel = isCancellable(p)
     if (!retry && !cancel) return
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (retry) {
             TextButton(
                 onClick = { onRetry(p) },
                 modifier = Modifier.testTag("pending_retry_${p.messageId}")
-            ) { Text("Retry") }
+            ) { Text(stringResource(R.string.action_resend_preview)) }
         }
         if (cancel) {
             TextButton(
                 onClick = { onCancel(p) },
                 modifier = Modifier.testTag("pending_cancel_${p.messageId}")
-            ) { Text("Cancel") }
+            ) { Text(stringResource(R.string.pending_cancel_task)) }
         }
     }
 }

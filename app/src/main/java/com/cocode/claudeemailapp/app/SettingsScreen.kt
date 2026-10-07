@@ -1,5 +1,6 @@
 package com.cocode.claudeemailapp.app
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -25,16 +26,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.MailCredentials
 
-data class SyncOption(val ms: Long, val label: String)
+data class SyncOption(val ms: Long, @StringRes val labelRes: Int)
 
 val SyncOptions = listOf(
-    SyncOption(0L, "Manual"),
-    SyncOption(30_000L, "30 sec"),
-    SyncOption(60_000L, "1 min"),
-    SyncOption(300_000L, "5 min")
+    SyncOption(0L, R.string.settings_sync_manual),
+    SyncOption(30_000L, R.string.settings_sync_30s),
+    SyncOption(60_000L, R.string.settings_sync_1m),
+    SyncOption(300_000L, R.string.settings_sync_5m)
 )
 
 @Composable
@@ -49,6 +52,11 @@ fun SettingsScreen(
     onEdit: () -> Unit,
     onOpenDiagnostics: () -> Unit
 ) {
+    val notSet = stringResource(R.string.value_not_set)
+    val implicitTls = stringResource(R.string.settings_tls_implicit)
+    val host = stringResource(R.string.settings_host)
+    val port = stringResource(R.string.settings_port)
+    val security = stringResource(R.string.settings_security)
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag("settings_screen"),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -57,47 +65,53 @@ fun SettingsScreen(
         item {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(onClick = onBack, modifier = Modifier.testTag("settings_back")) {
-                    Text("Back")
+                    Text(stringResource(R.string.action_back))
                 }
             }
         }
-        item { SectionCard("Account") {
-            Entry("Display name", credentials.displayName.ifBlank { "(not set)" })
-            Entry("Email", credentials.emailAddress)
+        item { SectionCard(stringResource(R.string.settings_section_account)) {
+            Entry(stringResource(R.string.settings_display_name), credentials.displayName.ifBlank { notSet })
+            Entry(stringResource(R.string.settings_email), credentials.emailAddress)
         } }
-        item { SectionCard("IMAP") {
-            Entry("Host", credentials.imapHost)
-            Entry("Port", credentials.imapPort.toString())
-            Entry("Security", "Implicit TLS")
+        item { SectionCard(stringResource(R.string.setup_section_imap)) {
+            Entry(host, credentials.imapHost)
+            Entry(port, credentials.imapPort.toString())
+            Entry(security, implicitTls)
         } }
-        item { SectionCard("SMTP") {
-            Entry("Host", credentials.smtpHost)
-            Entry("Port", credentials.smtpPort.toString())
-            Entry("Security", if (credentials.smtpUseStartTls) "STARTTLS" else "Implicit TLS")
+        item { SectionCard(stringResource(R.string.setup_section_smtp)) {
+            Entry(host, credentials.smtpHost)
+            Entry(port, credentials.smtpPort.toString())
+            Entry(
+                security,
+                if (credentials.smtpUseStartTls) stringResource(R.string.settings_tls_starttls) else implicitTls
+            )
         } }
-        item { SectionCard("claude-email service") {
-            Entry("Address", credentials.serviceAddress.ifBlank { "(not set)" })
-            Entry("Shared secret", if (credentials.sharedSecret.isBlank()) "(not set)" else "••••••")
+        item { SectionCard(stringResource(R.string.settings_section_service)) {
+            Entry(stringResource(R.string.settings_address), credentials.serviceAddress.ifBlank { notSet })
+            Entry(
+                stringResource(R.string.settings_shared_secret),
+                if (credentials.sharedSecret.isBlank()) notSet else "••••••"
+            )
         } }
-        item { SectionCard("Sync") {
+        item { SectionCard(stringResource(R.string.settings_section_sync)) {
             SyncIntervalPicker(selectedMs = syncIntervalMs, onSelect = onSyncIntervalChange)
         } }
-        item { SectionCard("Notifications") {
+        item { SectionCard(stringResource(R.string.settings_section_notifications)) {
             NotificationsToggle(
                 enabled = notificationsEnabled,
                 onChange = onNotificationsEnabledChange
             )
         } }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(onClick = onEdit, modifier = Modifier.testTag("settings_edit")) {
-                    Text("Edit credentials")
+                    Text(stringResource(R.string.settings_edit_credentials))
                 }
                 OutlinedButton(onClick = onOpenDiagnostics, modifier = Modifier.testTag("settings_diagnostics")) {
-                    Text("Diagnostics")
+                    Text(stringResource(R.string.action_diagnostics))
                 }
                 TextButton(onClick = onSignOut, modifier = Modifier.testTag("settings_signout")) {
-                    Text("Sign out")
+                    Text(stringResource(R.string.settings_sign_out))
                 }
             }
         }
@@ -132,7 +146,7 @@ private fun ColumnScope.Entry(label: String, value: String) {
 @Composable
 private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) -> Unit) {
     Text(
-        text = "Background refresh",
+        text = stringResource(R.string.settings_sync_label),
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -141,14 +155,14 @@ private fun ColumnScope.SyncIntervalPicker(selectedMs: Long, onSelect: (Long) ->
             FilterChip(
                 selected = opt.ms == selectedMs,
                 onClick = { onSelect(opt.ms) },
-                label = { Text(opt.label) },
+                label = { Text(stringResource(opt.labelRes)) },
                 colors = FilterChipDefaults.filterChipColors(),
                 modifier = Modifier.testTag("settings_sync_${opt.ms}")
             )
         }
     }
     Text(
-        text = "Foreground refreshes every 15 s. Pull-to-refresh works regardless.",
+        text = stringResource(R.string.settings_sync_hint),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -161,13 +175,13 @@ private fun ColumnScope.NotificationsToggle(enabled: Boolean, onChange: (Boolean
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(modifier = Modifier.padding(end = 12.dp)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
             Text(
-                text = "Notify on replies",
+                text = stringResource(R.string.settings_notify_title),
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
-                text = "Get a device notification when an agent reply arrives. Stops when you close the app.",
+                text = stringResource(R.string.settings_notify_body),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

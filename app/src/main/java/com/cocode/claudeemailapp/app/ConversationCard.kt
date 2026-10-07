@@ -16,10 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.Conversation
 
 @Composable
@@ -71,7 +74,7 @@ private fun HeaderRow(conversation: Conversation) {
     ) {
         AvatarChip(displayName = conversation.agentDisplay, email = conversation.agentEmail)
         Text(
-            text = conversation.agentDisplay.takeIf(String::isNotBlank) ?: "(unknown sender)",
+            text = conversation.agentDisplay.takeIf(String::isNotBlank) ?: stringResource(R.string.conversation_unknown_sender),
             style = MaterialTheme.typography.titleSmall,
             fontFamily = FontFamily.Monospace,
             color = MaterialTheme.colorScheme.secondary,
@@ -100,13 +103,17 @@ private fun FooterRow(conversation: Conversation) {
         env?.let { KindChip(kind = it.kind) }
         if (showCount) {
             ChipPill(
-                label = "${conversation.messageCount} msgs",
+                label = pluralStringResource(R.plurals.conversation_message_count, conversation.messageCount, conversation.messageCount),
                 accent = MaterialTheme.colorScheme.outline
             )
         }
         if (showUnread) {
             ChipPill(
-                label = "${conversation.unreadCount} unread",
+                label = pluralStringResource(
+                    R.plurals.conversation_unread_count,
+                    conversation.unreadCount,
+                    conversation.unreadCount
+                ),
                 accent = MaterialTheme.colorScheme.tertiary
             )
         }

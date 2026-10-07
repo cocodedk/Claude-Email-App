@@ -101,8 +101,12 @@ class InboxIdleService : Service() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (nm.getNotificationChannel(CHANNEL_ID) != null) return
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_MIN)
-                .apply { description = CHANNEL_DESC; setShowBadge(false) }
+            NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.channel_watcher_name),
+                NotificationManager.IMPORTANCE_MIN
+            )
+                .apply { description = getString(R.string.channel_watcher_description); setShowBadge(false) }
         )
     }
 
@@ -114,8 +118,8 @@ class InboxIdleService : Service() {
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle("Watching inbox")
-            .setContentText("Listening for replies in the background")
+            .setContentTitle(getString(R.string.watcher_notification_title))
+            .setContentText(getString(R.string.watcher_notification_text))
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setOngoing(true)
             .setContentIntent(tap)
@@ -124,9 +128,6 @@ class InboxIdleService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "inbox_watcher"
-        private const val CHANNEL_NAME = "Inbox watcher"
-        private const val CHANNEL_DESC =
-            "Keeps an IMAP IDLE connection open so reply notifications work in the background."
         private const val NOTIF_ID = 4_201
         private const val FETCH_BATCH = 10
 

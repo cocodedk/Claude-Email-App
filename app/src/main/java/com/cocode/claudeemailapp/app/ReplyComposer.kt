@@ -18,8 +18,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 
 @Composable
 internal fun ReplyComposer(
@@ -42,7 +44,7 @@ internal fun ReplyComposer(
             TextField(
                 value = reply,
                 onValueChange = onReplyChange,
-                label = { Text("Reply") },
+                label = { Text(stringResource(R.string.conversation_reply_label)) },
                 modifier = Modifier.fillMaxWidth().height(110.dp).testTag("conversation_reply_field"),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 colors = TextFieldDefaults.colors(
@@ -59,7 +61,7 @@ internal fun ReplyComposer(
                     enabled = reply.isNotBlank() && !sending,
                     modifier = Modifier.testTag("conversation_send_button")
                 ) {
-                    Text(if (sending) "Sending…" else "Send reply")
+                    Text(stringResource(if (sending) R.string.action_sending else R.string.conversation_send_reply))
                 }
             }
         }

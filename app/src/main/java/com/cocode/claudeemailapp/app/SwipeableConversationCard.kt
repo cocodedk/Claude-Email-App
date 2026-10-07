@@ -16,11 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.ui.theme.SignalCyan
 import com.cocode.claudeemailapp.ui.theme.SignalGreen
@@ -49,7 +51,7 @@ internal fun SwipeableConversationCard(
     SwipeToDismissBox(
         state = state,
         modifier = Modifier.testTag("swipeable_conversation_card"),
-        backgroundContent = { SwipeBackground(label = if (inArchivedView) "Unarchive" else "Archive") },
+        backgroundContent = { SwipeBackground(unarchive = inArchivedView) },
         enableDismissFromStartToEnd = false
     ) {
         ConversationCard(conversation = conversation, onClick = onOpen)
@@ -57,8 +59,9 @@ internal fun SwipeableConversationCard(
 }
 
 @Composable
-private fun SwipeBackground(label: String) {
-    val color = if (label == "Unarchive") SignalCyan else SignalGreen
+private fun SwipeBackground(unarchive: Boolean) {
+    val color = if (unarchive) SignalCyan else SignalGreen
+    val label = stringResource(if (unarchive) R.string.swipe_unarchive else R.string.swipe_archive)
     Box(
         modifier = Modifier
             .fillMaxSize()

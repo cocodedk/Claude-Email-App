@@ -27,10 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import com.cocode.claudeemailapp.protocol.Kinds
 
@@ -51,7 +54,8 @@ internal fun ThreadMessageCard(
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     var expanded by remember(message.messageId) { mutableStateOf(false) }
-    val body = message.body.ifBlank { "(no text content)" }
+    val copiedText = stringResource(R.string.toast_copied_message)
+    val body = message.body.ifBlank { stringResource(R.string.conversation_no_text) }
     val isLong = body.length > LONG_BODY_THRESHOLD
     val visible = if (isLong && !expanded) body.take(LONG_BODY_PREVIEW_CHARS) else body
     val envError = message.envelope?.error
@@ -77,7 +81,7 @@ internal fun ThreadMessageCard(
                     onClick = {},
                     onLongClick = {
                         clipboard.setText(AnnotatedString(message.body))
-                        Toast.makeText(context, "Copied message", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, copiedText, Toast.LENGTH_SHORT).show()
                     }
                 )
         ) {
@@ -102,7 +106,16 @@ internal fun ThreadMessageCard(
                         TextButton(
                             onClick = { expanded = !expanded },
                             modifier = Modifier.testTag("thread_message_expand_toggle")
-                        ) { Text(if (expanded) "Collapse" else "Expand · ${body.length - LONG_BODY_PREVIEW_CHARS} more chars") }
+                        ) {
+                            Text(
+                                if (expanded) {
+                                    stringResource(R.string.conversation_show_less)
+                                } else {
+                                    val hidden = body.length - LONG_BODY_PREVIEW_CHARS
+                                    pluralStringResource(R.plurals.conversation_show_more, hidden, hidden)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -112,7 +125,7 @@ internal fun ThreadMessageCard(
 
 @Composable
 private fun HeaderRow(message: FetchedMessage, isFromSelf: Boolean) {
-    val name = if (isFromSelf) "You" else message.fromName?.takeIf(String::isNotBlank) ?: message.from
+    val name = if (isFromSelf) stringResource(R.string.conversation_you) else message.fromName?.takeIf(String::isNotBlank) ?: message.from
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -145,15 +158,15 @@ private fun EnvelopeRow(message: FetchedMessage) {
             // a tertiary-toned "agent error" chip so users don't misread the
             // worker's reply as a delivery problem.
             ChipPill(
-                label = envelopeErrorChipLabel(env.error),
+                label = stringResource(envelopeErrorChipLabel(env.error)),
                 accent = MaterialTheme.colorScheme.tertiary
             )
         } else {
             KindChip(kind = env.kind)
         }
-        env.taskId?.let { Text(text = "task #$it", style = MaterialTheme.typography.labelMedium) }
-        routedViaChipLabel(env.meta.routedVia)?.let { label ->
-            ChipPill(label = label, accent = MaterialTheme.colorScheme.onSurfaceVariant)
+        env.taskId?.let { Text(text = stringResource(R.string.conversation_task_number, it), style = MaterialTheme.typography.labelMedium) }
+        routedViaChipLabel(env.meta.routedVia)?.let { labelRes ->
+            ChipPill(label = stringResource(labelRes), accent = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

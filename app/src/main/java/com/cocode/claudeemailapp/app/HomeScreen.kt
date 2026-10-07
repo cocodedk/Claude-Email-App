@@ -14,7 +14,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.PendingCommand
 
@@ -31,7 +33,8 @@ fun HomeScreen(
     onArchiveToggle: (Conversation) -> Unit,
     onRetryPending: (PendingCommand) -> Unit = {},
     onCancelPending: (PendingCommand) -> Unit = {},
-    onOpenProjects: () -> Unit = {}
+    onOpenProjects: () -> Unit = {},
+    onOpenAbout: () -> Unit = {}
 ) {
     var filter by rememberSaveable { mutableStateOf(AppViewModel.HomeFilter.ACTIVE) }
     val visible = buckets[filter]
@@ -48,14 +51,15 @@ fun HomeScreen(
                     onCompose = onCompose,
                     onRefresh = onRefresh,
                     onOpenSettings = onOpenSettings,
-                    onOpenProjects = onOpenProjects
+                    onOpenProjects = onOpenProjects,
+                    onOpenAbout = onOpenAbout
                 )
             }
             item { HomeFilterTabs(selected = filter, counts = buckets, onSelect = { filter = it }) }
             state.error?.let {
                 item {
                     StatusCard(
-                        title = "Sync failed",
+                        title = stringResource(R.string.home_refresh_failed),
                         message = it,
                         cornerRadius = 20.dp,
                         horizontalPadding = 18.dp,

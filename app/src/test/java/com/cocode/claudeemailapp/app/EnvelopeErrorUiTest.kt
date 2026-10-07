@@ -1,10 +1,10 @@
 package com.cocode.claudeemailapp.app
 
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.protocol.EnvelopeError
 import com.cocode.claudeemailapp.protocol.ErrorCodes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -17,14 +17,13 @@ class EnvelopeErrorUiTest {
             EnvelopeError(ErrorCodes.UNAUTHORIZED, "bad secret", retryable = false, hint = "Open Settings and check the shared secret.")
         )
         assertEquals(UiErrorAction.OpenSettings, ui.action)
-        assertEquals("Open Settings and check the shared secret.", ui.hint)
+        assertEquals(UiHint.FromService("Open Settings and check the shared secret."), ui.hint)
     }
 
     @Test
     fun unauthorized_missingServerHint_fallsBackToClientCopy() {
         val ui = describeEnvelopeError(EnvelopeError(ErrorCodes.UNAUTHORIZED, "bad secret", retryable = false))
-        assertNotNull(ui.hint)
-        assertTrue(ui.hint!!.contains("Settings"))
+        assertEquals(UiHint.FromApp(R.string.error_hint_unauthorized), ui.hint)
     }
 
     @Test
@@ -39,7 +38,7 @@ class EnvelopeErrorUiTest {
             EnvelopeError(ErrorCodes.RATE_LIMITED, "slow down", retryable = true, retryAfterSeconds = 30)
         )
         assertEquals(UiErrorAction.Retry, ui.action)
-        assertEquals("Retry after 30s.", ui.hint)
+        assertEquals(UiHint.RetryAfter(30), ui.hint)
     }
 
     @Test

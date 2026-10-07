@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 
 @Composable
 internal fun HeroCard(
@@ -27,7 +29,8 @@ internal fun HeroCard(
     onCompose: () -> Unit,
     onRefresh: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenProjects: () -> Unit = {}
+    onOpenProjects: () -> Unit = {},
+    onOpenAbout: () -> Unit = {}
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(24.dp),
@@ -37,10 +40,10 @@ internal fun HeroCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(text = "Inbox", style = MaterialTheme.typography.headlineSmall)
+            Text(text = stringResource(R.string.home_inbox), style = MaterialTheme.typography.headlineSmall)
             if (loading) {
                 Text(
-                    text = "Syncing…",
+                    text = stringResource(R.string.home_refreshing_status),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -52,18 +55,21 @@ internal fun HeroCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Button(onClick = onCompose, modifier = Modifier.testTag("home_new_message_button")) {
-                    Text("New command")
+                    Text(stringResource(R.string.home_new_command))
                 }
                 OutlinedButton(
                     onClick = onRefresh,
                     enabled = !loading,
                     modifier = Modifier.testTag("home_refresh_button")
-                ) { Text(if (loading) "Refreshing…" else "Refresh") }
+                ) { Text(stringResource(if (loading) R.string.home_refreshing else R.string.action_refresh)) }
                 TextButton(onClick = onOpenProjects, modifier = Modifier.testTag("home_projects_button")) {
-                    Text("Projects")
+                    Text(stringResource(R.string.home_projects))
                 }
                 TextButton(onClick = onOpenSettings, modifier = Modifier.testTag("home_settings_button")) {
-                    Text("Settings")
+                    Text(stringResource(R.string.home_settings))
+                }
+                TextButton(onClick = onOpenAbout, modifier = Modifier.testTag("home_about_button")) {
+                    Text(stringResource(R.string.home_about))
                 }
             }
         }
@@ -72,13 +78,15 @@ internal fun HeroCard(
 
 @Composable
 private fun HeroCounters(buckets: AppViewModel.HomeBuckets) {
-    Row(
+    // Wraps by whole counter: at large text a label such as "ARCHIVED" must not break mid-word.
+    FlowRow(
         modifier = Modifier.fillMaxWidth().testTag("home_counters"),
-        horizontalArrangement = Arrangement.spacedBy(18.dp)
+        horizontalArrangement = Arrangement.spacedBy(18.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        HeroCounter(label = "Active", value = buckets.active.size, accent = MaterialTheme.colorScheme.primary)
-        HeroCounter(label = "Waiting", value = buckets.waiting.size, accent = MaterialTheme.colorScheme.secondary)
-        HeroCounter(label = "Archived", value = buckets.archived.size, accent = MaterialTheme.colorScheme.onSurfaceVariant)
+        HeroCounter(label = stringResource(R.string.home_filter_active), value = buckets.active.size, accent = MaterialTheme.colorScheme.primary)
+        HeroCounter(label = stringResource(R.string.home_filter_waiting), value = buckets.waiting.size, accent = MaterialTheme.colorScheme.secondary)
+        HeroCounter(label = stringResource(R.string.home_filter_archived), value = buckets.archived.size, accent = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

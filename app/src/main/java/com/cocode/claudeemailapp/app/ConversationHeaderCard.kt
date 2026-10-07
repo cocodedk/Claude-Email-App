@@ -15,7 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.app.steering.SteeringChip
 import com.cocode.claudeemailapp.app.steering.SteeringChipVariant
 import com.cocode.claudeemailapp.data.Conversation
@@ -47,17 +50,21 @@ internal fun ConversationHeaderCard(
                     modifier = Modifier.weight(1f).testTag("conversation_subject")
                 )
                 OutlinedButton(onClick = onBack, modifier = Modifier.testTag("conversation_back")) {
-                    Text("Back")
+                    Text(stringResource(R.string.action_back))
                 }
             }
             Text(
-                text = "${conversation.agentDisplay} · ${conversation.messageCount} ${if (conversation.messageCount == 1) "message" else "messages"}",
+                text = stringResource(
+                    R.string.conversation_header_meta,
+                    conversation.agentDisplay,
+                    pluralStringResource(R.plurals.conversation_message_count, conversation.messageCount, conversation.messageCount)
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row(modifier = Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SteeringChip(
-                    label = if (isArchived) "Unarchive" else "Archive",
+                    label = stringResource(if (isArchived) R.string.conversation_unarchive else R.string.conversation_archive),
                     onClick = onArchiveToggle,
                     variant = SteeringChipVariant.Default,
                     modifier = Modifier.testTag("conversation_archive")

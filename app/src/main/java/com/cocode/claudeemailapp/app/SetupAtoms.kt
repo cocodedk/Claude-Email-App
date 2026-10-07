@@ -11,8 +11,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.mail.ProbeResult
 
 @Composable
@@ -25,10 +27,9 @@ internal fun SetupHeaderCard() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Single mailbox", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.setup_header_title), style = MaterialTheme.typography.titleMedium)
             Text(
-                text = "This app connects to one mailbox only. Receive over IMAP, send over SMTP. " +
-                    "Credentials stay on this device, encrypted with the Android Keystore.",
+                text = stringResource(R.string.setup_header_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -58,7 +59,7 @@ internal fun ProbeStatusView(result: ProbeResult?) {
                 )
             ) {
                 Text(
-                    text = "Connected. IMAP and SMTP verified.",
+                    text = stringResource(R.string.setup_probe_success),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
@@ -77,12 +78,17 @@ internal fun ProbeStatusView(result: ProbeResult?) {
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = "${result.stage.name} failed",
+                        text = stringResource(
+                            when (result.stage) {
+                                ProbeResult.Stage.IMAP -> R.string.setup_probe_failed_imap
+                                ProbeResult.Stage.SMTP -> R.string.setup_probe_failed_smtp
+                            }
+                        ),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
                     Text(
-                        text = result.message.ifBlank { "Unknown error" },
+                        text = result.message.ifBlank { stringResource(R.string.setup_probe_unknown_error) },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )

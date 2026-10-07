@@ -2,10 +2,12 @@ package com.cocode.claudeemailapp
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -195,6 +197,7 @@ class AppRootTest {
         composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("home_settings_button").performClick()
+        composeRule.onNodeWithTag("settings_screen").performScrollToNode(hasTestTag("settings_signout"))
         composeRule.onNodeWithTag("settings_signout").performClick()
         composeRule.onNodeWithTag("setup_screen").assertIsDisplayed()
     }
@@ -205,9 +208,29 @@ class AppRootTest {
         composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
         composeRule.waitForIdle()
         composeRule.onNodeWithTag("home_settings_button").performClick()
+        composeRule.onNodeWithTag("settings_screen").performScrollToNode(hasTestTag("settings_edit"))
         composeRule.onNodeWithTag("settings_edit").performClick()
         composeRule.onNodeWithTag("setup_screen").assertIsDisplayed()
         composeRule.onNodeWithText("me@ex.com").assertIsDisplayed()
+    }
+
+    @Test
+    fun home_about_opensAbout() {
+        val vm = buildViewModel(store = FakeStore(creds()))
+        composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("home_about_button").performClick()
+        composeRule.onNodeWithTag("about_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun about_back_returnsHome() {
+        val vm = buildViewModel(store = FakeStore(creds()))
+        composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("home_about_button").performClick()
+        composeRule.onNodeWithTag("about_back").performClick()
+        composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
     }
 
     @Test
