@@ -291,12 +291,13 @@
     <string name="about_check_updates">Se den nyeste version</string>
     <string name="about_update_note">Det åbner en webside i din browser. Appen leder aldrig selv efter opdateringer.</string>
     <string name="about_what_title">Hvad appen gør</string>
-    <string name="about_what_body">Claude Email App sender dine kommandoer som mail til en claude-email-tjeneste og viser tjenestens svar, samlet i samtaler. Tjenesten er det program, der modtager dine kommandoer, starter en agent (et hjælpeprogram) for det projekt, du angiver, og svarer, når arbejdet er færdigt. Du indtaster din egen postkasse og tjenestens adresse under Opsætning.</string>
+    <string name="about_what_body">Claude Email App sender dine kommandoer som mail til en claude-email-tjeneste og viser tjenestens svar, samlet i samtaler. Tjenesten er det program, der modtager dine kommandoer, lader en agent (et hjælpeprogram) udføre arbejdet i det projekt, du angiver, og svarer, når det er færdigt. Du indtaster din egen postkasse og tjenestens adresse under Opsætning.</string>
     <string name="about_privacy_title">Privatliv</string>
     <string name="about_privacy_nothing_to_cocode">Cocode modtager intet fra denne app. Den har ingen konto, ingen reklamer, ingen analyse og ingen fejlrapportering.</string>
     <string name="about_privacy_servers">Appen forbinder kun til de to servere hos din mailudbyder, som du angiver under Opsætning: én til at modtage mail og én til at sende den.</string>
     <string name="about_privacy_stored">Dine loginoplysninger, også mailadgangskoden og den delte hemmelighed, gemmes krypteret på denne telefon.</string>
     <string name="about_privacy_commands">Dine kommandoer forlader telefonen som almindelig mail til den tjenesteadresse, du angiver.</string>
+    <string name="about_privacy_browser">Knapperne på denne skærm giver din telefons browser en webadresse. Selve appen henter ikke noget fra de websteder.</string>
     <string name="about_privacy_link">Læs privatlivspolitikken</string>
     <string name="about_links_title">Links</string>
     <string name="about_website">Åbn websitet</string>
