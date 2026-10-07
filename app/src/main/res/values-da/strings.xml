@@ -138,8 +138,8 @@
     <!-- Pending commands -->
     <string name="pending_title">Uafsluttede eller mislykkede kommandoer: %1$d</string>
     <plurals name="pending_retry_in">
-        <item quantity="one">tjenesten opgiver måske om ca. %1$d sekund (efter seneste opdatering)</item>
-        <item quantity="other">tjenesten opgiver måske om ca. %1$d sekunder (efter seneste opdatering)</item>
+        <item quantity="one">tjenesten opgiver måske om ca. %1$d sekund (ifølge den seneste opdatering)</item>
+        <item quantity="other">tjenesten opgiver måske om ca. %1$d sekunder (ifølge den seneste opdatering)</item>
     </plurals>
 
     <!-- Errors reported by the claude-email service -->
