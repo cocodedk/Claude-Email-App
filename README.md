@@ -12,7 +12,11 @@ Android email client for the `claude-email` backend. Claude Email pairs a standa
 
 ## Download
 
-**[Download the latest APK](https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk)**
+<!-- cocode-apps:install:start -->
+- Coming to F-Droid
+- [Download the APK from GitHub](https://github.com/cocodedk/Claude-Email-App/releases/latest/download/Claude-Email-App.apk)
+- [Auto-update the GitHub APK with Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/Claude-Email-App)
+<!-- cocode-apps:install:end -->
 
 Install on any Android device running API 24 or newer.
 
@@ -29,7 +33,11 @@ Install on any Android device running API 24 or newer.
 - **Projects view** — list of registered projects with their live agent status, so you can route a new command to a project that already has a worker attached.
 - **Dark-first UI** — Material 3 with a dark-first palette and typography tuned for focused operator work.
 
-## Build from Source
+## Privacy
+
+Credentials are encrypted at rest by the Android Keystore, never kept in plain preferences, and they never sync and never leave the phone. Outbound messages wait in a local queue on the device until connectivity returns, and inbox notifications are opt-in.
+
+## Build
 
 Prerequisites:
 
@@ -72,7 +80,7 @@ app/src/main/java/com/cocode/claudeemailapp/
 | Storage         | Android Keystore + encrypted datastore  |
 | Testing         | JUnit + AndroidX instrumented tests     |
 
-## Development
+## Contributing
 
 - [`CLAUDE.md`](CLAUDE.md) — project guidance for Claude Code sessions.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution workflow, branch and commit conventions.

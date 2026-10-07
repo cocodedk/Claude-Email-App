@@ -1,0 +1,17 @@
+Claude Email is an Android email client for the claude-email backend. It pairs standard IMAP/SMTP mail transport with Android Keystore credential storage and a command-and-reply interaction model, for people who send structured requests and wait for structured answers.
+
+It is not a general-purpose inbox. It is made for focused workflows where messages flow between trusted peers, credentials stay on the device, and the interface stays out of the way.
+
+Features
+- IMAP/SMTP transport powered by Angus Mail. No proprietary relay is required.
+- Credentials are encrypted at rest by the Android Keystore, not kept in plain preferences.
+- Command-and-reply interface: send a request and read the structured response, instead of browsing threads.
+- Shared-secret authentication of messages, in addition to transport security.
+- Offline queue: outgoing messages are stored on the phone and retried when the connection returns.
+- Optional notifications for incoming replies, delivered by a foreground IMAP IDLE service.
+- Quick-reply chips: when an agent asks a question, tap a suggested answer to send it.
+- Live progress for long-running tasks, shown inline so you see their state without opening the message.
+- Projects view with the live agent status of each registered project.
+- Dark-first Material 3 design.
+
+Requires Android 7.0 or newer. The source code is on GitHub under the Apache-2.0 license.
