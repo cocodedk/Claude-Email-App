@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -154,11 +155,17 @@ private fun LinkButton(@StringRes labelRes: Int, tag: String, onClick: () -> Uni
     }
 }
 
-/** Hands a link to the phone's browser. False when no app can open it. */
+/**
+ * Hands a link to the phone's browser. False when no app can open it. The website and privacy
+ * pages are in the language the app shows now.
+ */
 @Composable
 fun rememberLinkOpener(): (AboutLink) -> Boolean {
     val context = LocalContext.current
-    return remember(context) { { link -> aboutUrl(link)?.let { openWebPage(context, it) } ?: false } }
+    val language = LocalConfiguration.current.locales[0].language
+    return remember(context, language) {
+        { link -> aboutUrl(link, language)?.let { openWebPage(context, it) } ?: false }
+    }
 }
 
 private fun openWebPage(context: Context, url: String): Boolean = try {
