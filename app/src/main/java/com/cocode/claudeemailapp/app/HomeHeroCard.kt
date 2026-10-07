@@ -78,9 +78,11 @@ internal fun HeroCard(
 
 @Composable
 private fun HeroCounters(buckets: AppViewModel.HomeBuckets) {
-    Row(
+    // Wraps by whole counter: at large text a label such as "ARCHIVED" must not break mid-word.
+    FlowRow(
         modifier = Modifier.fillMaxWidth().testTag("home_counters"),
-        horizontalArrangement = Arrangement.spacedBy(18.dp)
+        horizontalArrangement = Arrangement.spacedBy(18.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         HeroCounter(label = stringResource(R.string.home_filter_active), value = buckets.active.size, accent = MaterialTheme.colorScheme.primary)
         HeroCounter(label = stringResource(R.string.home_filter_waiting), value = buckets.waiting.size, accent = MaterialTheme.colorScheme.secondary)

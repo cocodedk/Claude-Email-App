@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.PendingStatus
 import com.cocode.claudeemailapp.protocol.Kinds
+import com.cocode.claudeemailapp.ui.theme.pillColors
 import java.text.DateFormat
 import java.util.Date
 
@@ -63,15 +64,17 @@ fun StatusChip(status: String) {
 
 @Composable
 fun ChipPill(label: String, accent: Color) {
+    val scheme = MaterialTheme.colorScheme
+    val colors = pillColors(accent, scheme.surface, mutedText = scheme.onSurfaceVariant, mutedLine = scheme.outline)
     Row(
         modifier = Modifier
             .clip(CircleShape)
-            .background(accent.copy(alpha = 0.15f))
-            .border(1.dp, accent.copy(alpha = 0.35f), CircleShape)
+            .background(colors.fill)
+            .border(1.dp, colors.border, CircleShape)
             .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = accent)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = colors.text)
     }
 }
 

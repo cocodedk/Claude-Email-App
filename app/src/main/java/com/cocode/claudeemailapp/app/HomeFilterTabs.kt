@@ -1,7 +1,12 @@
 package com.cocode.claudeemailapp.app
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -21,10 +26,17 @@ internal fun HomeFilterTabs(
     counts: AppViewModel.HomeBuckets,
     onSelect: (AppViewModel.HomeFilter) -> Unit
 ) {
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().testTag("home_filter_tabs")) {
-        FilterButton(0, AppViewModel.HomeFilter.ACTIVE, R.string.home_filter_active, counts.active.size, selected, onSelect)
-        FilterButton(1, AppViewModel.HomeFilter.WAITING, R.string.home_filter_waiting, counts.waiting.size, selected, onSelect)
-        FilterButton(2, AppViewModel.HomeFilter.ARCHIVED, R.string.home_filter_archived, counts.archived.size, selected, onSelect)
+    // The row fills the screen at normal text. At large text the three equal tabs, each as wide as the
+    // longest word, no longer fit, so the row scrolls sideways instead of breaking "Archived" mid-word.
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val fullWidth = maxWidth
+        Box(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.widthIn(min = fullWidth).testTag("home_filter_tabs")) {
+                FilterButton(0, AppViewModel.HomeFilter.ACTIVE, R.string.home_filter_active, counts.active.size, selected, onSelect)
+                FilterButton(1, AppViewModel.HomeFilter.WAITING, R.string.home_filter_waiting, counts.waiting.size, selected, onSelect)
+                FilterButton(2, AppViewModel.HomeFilter.ARCHIVED, R.string.home_filter_archived, counts.archived.size, selected, onSelect)
+            }
+        }
     }
 }
 
