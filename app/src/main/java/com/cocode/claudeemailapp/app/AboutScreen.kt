@@ -102,6 +102,7 @@ fun AboutScreen(
             AboutBody(R.string.about_credit_license)
             AboutBody(R.string.about_credit_angus)
             AboutBody(R.string.about_credit_androidx)
+            AboutBody(R.string.about_credit_fonts)
         }
         AboutSection(stringResource(R.string.about_made_by)) {}
         // Support slot (see cocode-apps standard/support.md): nothing is shown here until the

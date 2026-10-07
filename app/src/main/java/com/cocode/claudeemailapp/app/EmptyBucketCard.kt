@@ -34,7 +34,7 @@ internal fun EmptyBucketCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(heading, style = MaterialTheme.typography.titleMedium)
+            Text(heading, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (filter == AppViewModel.HomeFilter.ACTIVE) {
                 Button(

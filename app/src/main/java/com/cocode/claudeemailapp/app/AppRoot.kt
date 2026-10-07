@@ -1,14 +1,12 @@
 package com.cocode.claudeemailapp.app
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -31,11 +29,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.cocode.claudeemailapp.BuildConfig
 import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.MailCredentials
-import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
 enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics, Projects, About }
@@ -147,6 +143,7 @@ fun ClaudeEmailApp(
 
     Scaffold(
         containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -181,268 +178,3 @@ fun ClaudeEmailApp(
         }
     }
 }
-
-@Composable
-private fun AppNavHost(
-    screen: Screen,
-    onScreenChange: (Screen) -> Unit,
-    credentials: com.cocode.claudeemailapp.data.MailCredentials?,
-    inbox: AppViewModel.InboxState,
-    conversations: List<Conversation>,
-    homeBuckets: AppViewModel.HomeBuckets,
-    archived: Set<String>,
-    pending: List<com.cocode.claudeemailapp.data.PendingCommand>,
-    send: AppViewModel.SendState,
-    probe: AppViewModel.ProbeState,
-    editingCredentials: Boolean,
-    onEditCredentials: () -> Unit,
-    selectedConversationId: String?,
-    onSelectConversation: (String?) -> Unit,
-    onArchiveToggle: (Conversation) -> Unit,
-    syncIntervalMs: Long,
-    viewModel: AppViewModel,
-    prefill: MailCredentials?,
-    selectedComposeProject: String?,
-    onSelectComposeProject: (String?) -> Unit
-) {
-    val reduceMotion = rememberReduceMotion()
-    Crossfade(
-        targetState = screen,
-        animationSpec = if (reduceMotion) snap() else tween(durationMillis = 220),
-        label = "screen"
-    ) { current -> AppScreenContent(
-        screen = current,
-        onScreenChange = onScreenChange,
-        credentials = credentials,
-        inbox = inbox,
-        conversations = conversations,
-        homeBuckets = homeBuckets,
-        archived = archived,
-        pending = pending,
-        send = send,
-        probe = probe,
-        editingCredentials = editingCredentials,
-        onEditCredentials = onEditCredentials,
-        selectedConversationId = selectedConversationId,
-        onSelectConversation = onSelectConversation,
-        onArchiveToggle = onArchiveToggle,
-        syncIntervalMs = syncIntervalMs,
-        viewModel = viewModel,
-        prefill = prefill,
-        selectedComposeProject = selectedComposeProject,
-        onSelectComposeProject = onSelectComposeProject
-    ) }
-}
-
-@Composable
-private fun AppScreenContent(
-    screen: Screen,
-    onScreenChange: (Screen) -> Unit,
-    credentials: com.cocode.claudeemailapp.data.MailCredentials?,
-    inbox: AppViewModel.InboxState,
-    conversations: List<Conversation>,
-    homeBuckets: AppViewModel.HomeBuckets,
-    archived: Set<String>,
-    pending: List<com.cocode.claudeemailapp.data.PendingCommand>,
-    send: AppViewModel.SendState,
-    probe: AppViewModel.ProbeState,
-    editingCredentials: Boolean,
-    onEditCredentials: () -> Unit,
-    selectedConversationId: String?,
-    onSelectConversation: (String?) -> Unit,
-    onArchiveToggle: (Conversation) -> Unit,
-    syncIntervalMs: Long,
-    viewModel: AppViewModel,
-    prefill: MailCredentials?,
-    selectedComposeProject: String?,
-    onSelectComposeProject: (String?) -> Unit
-) {
-    when (screen) {
-        Screen.Onboarding -> OnboardingScreen(
-            onFinish = {
-                viewModel.markOnboardingSeen()
-                onScreenChange(if (credentials == null) Screen.Setup else Screen.Home)
-            }
-        )
-        Screen.Setup -> SetupScreen(
-            viewModel = viewModel,
-            initial = if (editingCredentials) credentials else prefill
-        )
-        Screen.Home -> HomeScreen(
-            state = inbox,
-            buckets = homeBuckets,
-            pending = pending,
-            onRefresh = { viewModel.refreshInbox() },
-            onOpenConversation = {
-                onSelectConversation(it.id)
-                onScreenChange(Screen.Conversation)
-            },
-            onCompose = {
-                onSelectComposeProject(null)
-                onScreenChange(Screen.Compose)
-            },
-            onOpenSettings = { onScreenChange(Screen.Settings) },
-            onArchiveToggle = onArchiveToggle,
-            onRetryPending = { p ->
-                viewModel.sendCommand(to = p.to, project = p.project.orEmpty(), body = p.bodyPreview)
-            },
-            onCancelPending = { p ->
-                viewModel.dispatchSteering(p, com.cocode.claudeemailapp.app.steering.SteeringIntent.Cancel)
-            },
-            onOpenProjects = {
-                viewModel.refreshProjects()
-                onScreenChange(Screen.Projects)
-            },
-            onOpenAbout = { onScreenChange(Screen.About) }
-        )
-        Screen.Projects -> {
-            val projects by viewModel.projects.collectAsState()
-            ProjectsScreen(
-                state = projects,
-                onRefresh = { viewModel.refreshProjects() },
-                onProjectTap = { p ->
-                    onSelectComposeProject(p.path)
-                    onScreenChange(Screen.Compose)
-                },
-                onCompose = {
-                    onSelectComposeProject(null)
-                    onScreenChange(Screen.Compose)
-                }
-            )
-        }
-        Screen.Settings -> credentials?.let {
-            val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
-            SettingsScreen(
-                credentials = it,
-                syncIntervalMs = syncIntervalMs,
-                onSyncIntervalChange = { viewModel.setSyncIntervalMs(it) },
-                notificationsEnabled = notificationsEnabled,
-                onNotificationsEnabledChange = { viewModel.setNotificationsEnabled(it) },
-                onBack = { onScreenChange(Screen.Home) },
-                onSignOut = {
-                    viewModel.signOut()
-                    onScreenChange(Screen.Setup)
-                },
-                onEdit = {
-                    onEditCredentials()
-                    onScreenChange(Screen.Setup)
-                },
-                onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
-            )
-        }
-        Screen.About -> AboutScreen(
-            version = BuildConfig.VERSION_NAME,
-            showPrivacyLink = aboutUrl(AboutLink.Privacy) != null,
-            onOpenLink = rememberLinkOpener(),
-            onBack = { onScreenChange(Screen.Home) }
-        )
-        Screen.Diagnostics -> DiagnosticsScreen(
-            credentials = credentials,
-            inbox = inbox,
-            sendError = send.lastError,
-            pending = pending,
-            syncIntervalMs = syncIntervalMs,
-            onBack = { onScreenChange(Screen.Settings) }
-        )
-        Screen.Conversation -> {
-            val conversation = conversations.firstOrNull { it.id == selectedConversationId }
-            val matchedPending = conversation?.let { matchPendingForConversation(it, pending) }
-            if (conversation == null) {
-                onScreenChange(Screen.Home)
-            } else {
-                ConversationScreen(
-                    conversation = conversation,
-                    selfEmail = credentials?.emailAddress.orEmpty(),
-                    isArchived = conversation.id in archived,
-                    sending = send.sending,
-                    sendError = send.lastError,
-                    onBack = { onScreenChange(Screen.Home) },
-                    onSendReply = { body ->
-                        val latest = conversation.lastMessage
-                        viewModel.sendMessage(
-                            to = replyTo(latest, credentials?.emailAddress),
-                            subject = replySubject(conversation.title, credentials?.sharedSecret),
-                            body = body,
-                            inReplyTo = latest.messageId.takeIf(String::isNotBlank),
-                            references = buildReferences(latest)
-                        )
-                    },
-                    onArchiveToggle = { onArchiveToggle(conversation) },
-                    pending = matchedPending,
-                    onSteeringIntent = { intent ->
-                        matchedPending?.let { viewModel.dispatchSteering(it, intent) }
-                    },
-                    onRetryCommand = {
-                        matchedPending?.let { p ->
-                            viewModel.sendCommand(
-                                to = p.to,
-                                project = p.project.orEmpty(),
-                                body = p.bodyPreview
-                            )
-                        }
-                    },
-                    onOpenSettings = { onScreenChange(Screen.Settings) },
-                    onEditCommand = {
-                        onSelectComposeProject(null)
-                        onScreenChange(Screen.Compose)
-                    },
-                    onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) },
-                    onMarkRead = { viewModel.markConversationRead(conversation.id) }
-                )
-            }
-        }
-        Screen.Compose -> ComposeMessageScreen(
-            defaultTo = credentials?.serviceAddress.orEmpty(),
-            defaultProject = selectedComposeProject.orEmpty(),
-            sending = send.sending,
-            sendError = send.lastError,
-            onCancel = {
-                onSelectComposeProject(null)
-                onScreenChange(Screen.Home)
-            },
-            onSend = { to, project, body ->
-                viewModel.sendCommand(to = to, project = project, body = body)
-                onSelectComposeProject(null)
-            }
-        )
-    }
-}
-
-internal fun matchPendingForConversation(
-    conversation: Conversation,
-    pendings: List<com.cocode.claudeemailapp.data.PendingCommand>
-): com.cocode.claudeemailapp.data.PendingCommand? {
-    if (pendings.isEmpty()) return null
-    val ids = conversation.messages.map { it.messageId }.toSet()
-    pendings.firstOrNull { it.messageId in ids }?.let { return it }
-    for (m in conversation.messages) {
-        m.inReplyTo?.let { irt -> pendings.firstOrNull { it.messageId == irt }?.let { return it } }
-        if (m.references.isNotEmpty()) {
-            pendings.firstOrNull { it.messageId in m.references }?.let { return it }
-        }
-    }
-    val taskIds = conversation.messages.mapNotNull { it.envelope?.taskId }.toSet()
-    return pendings.firstOrNull { it.taskId in taskIds }
-}
-
-private fun replyTo(message: FetchedMessage, selfAddress: String?): String {
-    val from = message.from
-    if (from.isNotBlank() && !from.equals(selfAddress, ignoreCase = true)) return from
-    return message.to.firstOrNull { !it.equals(selfAddress, ignoreCase = true) } ?: from
-}
-
-private fun replySubject(title: String, sharedSecret: String?): String {
-    val base = if (title.trim().startsWith("Re:", ignoreCase = true)) title else "Re: $title"
-    return when {
-        sharedSecret.isNullOrBlank() -> base
-        base.contains("AUTH:") -> base
-        else -> "AUTH:$sharedSecret $base"
-    }
-}
-
-private fun buildReferences(message: FetchedMessage): List<String> {
-    val refs = message.references.toMutableList()
-    if (message.messageId.isNotBlank() && message.messageId !in refs) refs.add(message.messageId)
-    return refs
-}
-

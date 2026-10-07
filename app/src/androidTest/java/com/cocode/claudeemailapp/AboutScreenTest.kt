@@ -99,6 +99,15 @@ class AboutScreenTest {
     }
 
     @Test
+    fun credits_nameTheBundledFontsAndTheirLicence() {
+        render()
+        composeRule.onNodeWithText("The fonts are IBM Plex Sans", substring = true)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("SIL Open Font License 1.1", substring = true).assertIsDisplayed()
+    }
+
+    @Test
     fun whenNoAppCanOpenALink_theScreenSaysSo() {
         render(canOpen = false)
         composeRule.onNodeWithTag("about_update").performClick()

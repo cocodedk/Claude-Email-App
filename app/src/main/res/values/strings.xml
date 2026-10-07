@@ -316,5 +316,6 @@
     <string name="about_credit_license">Claude Email App is free software, released under the Apache License 2.0. The full text is in the source code on GitHub.</string>
     <string name="about_credit_angus">Mail is received and sent with Angus Mail (EPL-2.0 or GPL-2.0 with the Classpath Exception).</string>
     <string name="about_credit_androidx">The app is built with AndroidX and Jetpack Compose (Apache-2.0).</string>
+    <string name="about_credit_fonts">The fonts are IBM Plex Sans and IBM Plex Mono (© IBM Corp.) and Space Grotesk (© The Space Grotesk Project Authors). All three are used under the SIL Open Font License 1.1.</string>
     <string name="about_made_by">Made by Cocode (cocode.dk)</string>
 </resources>
