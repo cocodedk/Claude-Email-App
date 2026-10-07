@@ -300,9 +300,9 @@
     <string name="about_privacy_browser">Knapperne på denne skærm giver din telefons browser en webadresse. Selve appen henter ikke noget fra de websteder.</string>
     <string name="about_privacy_link">Læs privatlivspolitikken</string>
     <string name="about_links_title">Links</string>
-    <string name="about_website">Åbn websitet</string>
+    <string name="about_website">Åbn hjemmesiden</string>
     <string name="about_source">Se kildekoden på GitHub</string>
-    <string name="about_report">Meld et problem på GitHub</string>
+    <string name="about_report">Meld en fejl på GitHub</string>
     <string name="about_no_browser">Ingen app på denne telefon kan åbne linket. Installér en webbrowser, og prøv igen.</string>
     <string name="about_credits">Tak og licenser</string>
     <string name="about_credit_license">Claude Email App er fri software udgivet under Apache License 2.0. Den fulde tekst står i kildekoden på GitHub.</string>
