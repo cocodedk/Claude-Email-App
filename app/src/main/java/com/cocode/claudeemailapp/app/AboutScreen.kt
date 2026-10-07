@@ -3,7 +3,6 @@ package com.cocode.claudeemailapp.app
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +37,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.cocode.claudeemailapp.R
 
 /**
@@ -160,7 +160,7 @@ fun rememberLinkOpener(): (AboutLink) -> Boolean {
 }
 
 private fun openWebPage(context: Context, url: String): Boolean = try {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     true
 } catch (_: ActivityNotFoundException) {
     false
