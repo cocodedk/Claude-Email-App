@@ -81,7 +81,7 @@ private fun TemplateButton(
 ) {
     val shape = RoundedCornerShape(12.dp)
     Text(
-        text = "\u201C $text \u201D",
+        text = stringResource(R.string.steering_template_quoted, text),
         style = TemplateTextStyle,
         color = Snow,
         modifier = modifier

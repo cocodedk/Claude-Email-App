@@ -21,7 +21,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.MailCredentials
 
 @Composable
@@ -116,9 +118,9 @@ private fun SubmitButton(running: Boolean, enabled: Boolean, onSubmit: () -> Uni
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Testing connection…")
+            Text(stringResource(R.string.setup_submit_running))
         } else {
-            Text("Test and save")
+            Text(stringResource(R.string.setup_submit))
         }
     }
 }

@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 
 internal fun LazyListScope.accountSection(
     displayName: String,
@@ -26,12 +28,12 @@ internal fun LazyListScope.accountSection(
     password: String,
     onPasswordChange: (String) -> Unit
 ) {
-    item { SetupSectionLabel("Account") }
+    item { SetupSectionLabel(stringResource(R.string.setup_section_account)) }
     item {
         OutlinedTextField(
             value = displayName,
             onValueChange = onDisplayNameChange,
-            label = { Text("Display name") },
+            label = { Text(stringResource(R.string.setup_display_name)) },
             modifier = Modifier.fillMaxWidth().testTag("setup_display_name"),
             singleLine = true
         )
@@ -40,7 +42,7 @@ internal fun LazyListScope.accountSection(
         OutlinedTextField(
             value = email,
             onValueChange = { onEmailChange(it.trim()) },
-            label = { Text("Email address") },
+            label = { Text(stringResource(R.string.setup_email_address)) },
             modifier = Modifier.fillMaxWidth().testTag("setup_email"),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -50,7 +52,7 @@ internal fun LazyListScope.accountSection(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Password or app password") },
+            label = { Text(stringResource(R.string.setup_password)) },
             modifier = Modifier.fillMaxWidth().testTag("setup_password"),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -65,8 +67,13 @@ internal fun LazyListScope.imapSection(
     port: String,
     onPortChange: (String) -> Unit
 ) {
-    item { SetupSectionLabel("IMAP (receive)") }
-    item { HostPortRow(host, onHostChange, "setup_imap_host", port, onPortChange, "setup_imap_port", "IMAP host") }
+    item { SetupSectionLabel(stringResource(R.string.setup_section_imap)) }
+    item {
+        HostPortRow(
+            host, onHostChange, "setup_imap_host", port, onPortChange, "setup_imap_port",
+            stringResource(R.string.setup_imap_host)
+        )
+    }
 }
 
 internal fun LazyListScope.smtpSection(
@@ -77,8 +84,13 @@ internal fun LazyListScope.smtpSection(
     startTls: Boolean,
     onStartTlsChange: (Boolean) -> Unit
 ) {
-    item { SetupSectionLabel("SMTP (send)") }
-    item { HostPortRow(host, onHostChange, "setup_smtp_host", port, onPortChange, "setup_smtp_port", "SMTP host") }
+    item { SetupSectionLabel(stringResource(R.string.setup_section_smtp)) }
+    item {
+        HostPortRow(
+            host, onHostChange, "setup_smtp_host", port, onPortChange, "setup_smtp_port",
+            stringResource(R.string.setup_smtp_host)
+        )
+    }
     item { SmtpStartTlsToggle(startTls, onStartTlsChange) }
 }
 
@@ -88,12 +100,12 @@ internal fun LazyListScope.serviceSection(
     sharedSecret: String,
     onSharedSecretChange: (String) -> Unit
 ) {
-    item { SetupSectionLabel("claude-email service") }
+    item { SetupSectionLabel(stringResource(R.string.setup_section_service)) }
     item {
         OutlinedTextField(
             value = address,
             onValueChange = { onAddressChange(it.trim()) },
-            label = { Text("Service address (email)") },
+            label = { Text(stringResource(R.string.setup_service_address)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("setup_service_address"),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -103,7 +115,7 @@ internal fun LazyListScope.serviceSection(
         OutlinedTextField(
             value = sharedSecret,
             onValueChange = onSharedSecretChange,
-            label = { Text("Shared secret") },
+            label = { Text(stringResource(R.string.setup_shared_secret)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth().testTag("setup_shared_secret")
@@ -132,7 +144,7 @@ private fun HostPortRow(
         OutlinedTextField(
             value = port,
             onValueChange = { onPortChange(it.filter(Char::isDigit)) },
-            label = { Text("Port") },
+            label = { Text(stringResource(R.string.setup_port)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.weight(1f).testTag(portTestTag)
@@ -150,11 +162,11 @@ private fun SmtpStartTlsToggle(checked: Boolean, onCheckedChange: (Boolean) -> U
         )
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
-                text = if (checked) "STARTTLS (typical port 587)" else "Implicit TLS (typical port 465)",
+                text = stringResource(if (checked) R.string.setup_tls_starttls else R.string.setup_tls_implicit),
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Toggle if your SMTP server uses STARTTLS instead of implicit TLS.",
+                text = stringResource(R.string.setup_tls_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

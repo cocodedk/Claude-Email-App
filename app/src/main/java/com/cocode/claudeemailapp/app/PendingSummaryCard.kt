@@ -15,8 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingStatus
 
@@ -40,7 +44,7 @@ internal fun PendingSummary(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Pending — ${visible.size}",
+                text = stringResource(R.string.pending_title, visible.size),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
@@ -102,8 +106,9 @@ internal fun isRetryable(p: PendingCommand): Boolean = p.status in RETRYABLE_STA
 internal fun isCancellable(p: PendingCommand): Boolean =
     p.status in CANCELLABLE_STATUSES && p.taskId != null
 
+@Composable
 internal fun pendingReasonLine(reason: String?, retryAfterSeconds: Int?): String? {
-    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { "retry in ${it}s" }
+    val countdown = retryAfterSeconds?.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.pending_retry_in, it, it) }
     return listOfNotNull(reason?.takeIf(String::isNotBlank), countdown)
         .takeIf { it.isNotEmpty() }
         ?.joinToString(" · ")
@@ -123,13 +128,13 @@ private fun PendingRowActions(
             TextButton(
                 onClick = { onRetry(p) },
                 modifier = Modifier.testTag("pending_retry_${p.messageId}")
-            ) { Text("Retry") }
+            ) { Text(stringResource(R.string.action_retry)) }
         }
         if (cancel) {
             TextButton(
                 onClick = { onCancel(p) },
                 modifier = Modifier.testTag("pending_cancel_${p.messageId}")
-            ) { Text("Cancel") }
+            ) { Text(stringResource(R.string.action_cancel)) }
         }
     }
 }

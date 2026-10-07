@@ -1,5 +1,6 @@
 package com.cocode.claudeemailapp.app
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -10,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import com.cocode.claudeemailapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,9 +22,9 @@ internal fun HomeFilterTabs(
     onSelect: (AppViewModel.HomeFilter) -> Unit
 ) {
     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().testTag("home_filter_tabs")) {
-        FilterButton(0, AppViewModel.HomeFilter.ACTIVE, "Active", counts.active.size, selected, onSelect)
-        FilterButton(1, AppViewModel.HomeFilter.WAITING, "Waiting", counts.waiting.size, selected, onSelect)
-        FilterButton(2, AppViewModel.HomeFilter.ARCHIVED, "Archived", counts.archived.size, selected, onSelect)
+        FilterButton(0, AppViewModel.HomeFilter.ACTIVE, R.string.home_filter_active, counts.active.size, selected, onSelect)
+        FilterButton(1, AppViewModel.HomeFilter.WAITING, R.string.home_filter_waiting, counts.waiting.size, selected, onSelect)
+        FilterButton(2, AppViewModel.HomeFilter.ARCHIVED, R.string.home_filter_archived, counts.archived.size, selected, onSelect)
     }
 }
 
@@ -30,11 +33,12 @@ internal fun HomeFilterTabs(
 private fun androidx.compose.material3.SingleChoiceSegmentedButtonRowScope.FilterButton(
     index: Int,
     filter: AppViewModel.HomeFilter,
-    label: String,
+    @StringRes label: Int,
     count: Int,
     selected: AppViewModel.HomeFilter,
     onSelect: (AppViewModel.HomeFilter) -> Unit
 ) {
+    val text = stringResource(label)
     SegmentedButton(
         selected = selected == filter,
         onClick = { onSelect(filter) },
@@ -42,7 +46,7 @@ private fun androidx.compose.material3.SingleChoiceSegmentedButtonRowScope.Filte
         modifier = Modifier.testTag("home_filter_${filter.name.lowercase()}")
     ) {
         Text(
-            text = if (count > 0) "$label · $count" else label,
+            text = if (count > 0) stringResource(R.string.home_filter_with_count, text, count) else text,
             style = MaterialTheme.typography.labelLarge
         )
     }

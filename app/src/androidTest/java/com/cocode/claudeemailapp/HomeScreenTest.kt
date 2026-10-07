@@ -65,7 +65,8 @@ class HomeScreenTest {
         onArchiveToggle: (Conversation) -> Unit = {},
         onCompose: () -> Unit = {},
         onRefresh: () -> Unit = {},
-        onOpenSettings: () -> Unit = {}
+        onOpenSettings: () -> Unit = {},
+        onOpenAbout: () -> Unit = {}
     ) {
         composeRule.setContent {
             ClaudeEmailAppTheme {
@@ -77,7 +78,8 @@ class HomeScreenTest {
                     onOpenConversation = onOpenConversation,
                     onCompose = onCompose,
                     onOpenSettings = onOpenSettings,
-                    onArchiveToggle = onArchiveToggle
+                    onArchiveToggle = onArchiveToggle,
+                    onOpenAbout = onOpenAbout
                 )
             }
         }
@@ -99,7 +101,7 @@ class HomeScreenTest {
     @Test
     fun errorState_showsErrorCard() {
         render(state = AppViewModel.InboxState(error = "Bad creds"))
-        composeRule.onNodeWithText("Sync failed").assertIsDisplayed()
+        composeRule.onNodeWithText("Couldn't refresh").assertIsDisplayed()
         composeRule.onNodeWithText("Bad creds").assertIsDisplayed()
     }
 
@@ -131,17 +133,21 @@ class HomeScreenTest {
         var composed = false
         var refreshed = false
         var settingsOpened = false
+        var aboutOpened = false
         render(
             onCompose = { composed = true },
             onRefresh = { refreshed = true },
-            onOpenSettings = { settingsOpened = true }
+            onOpenSettings = { settingsOpened = true },
+            onOpenAbout = { aboutOpened = true }
         )
         composeRule.onNodeWithTag("home_new_message_button").performClick()
         composeRule.onNodeWithTag("home_refresh_button").performClick()
         composeRule.onNodeWithTag("home_settings_button").performClick()
+        composeRule.onNodeWithTag("home_about_button").performClick()
         assert(composed)
         assert(refreshed)
         assert(settingsOpened)
+        assert(aboutOpened)
     }
 
     @Test

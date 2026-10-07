@@ -19,7 +19,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.app.steering.SteeringBar
 import com.cocode.claudeemailapp.app.steering.SteeringBarController
 import com.cocode.claudeemailapp.app.steering.SteeringBarState
@@ -99,7 +101,7 @@ fun ConversationScreen(
                 )
             }
             sendError?.let {
-                item(key = "error") { StatusCard(title = "Send failed", message = it) }
+                item(key = "error") { StatusCard(title = stringResource(R.string.send_failed_title), message = it) }
             }
         }
         val suggestedReplies = pickSuggestedReplies(conversation.messages)

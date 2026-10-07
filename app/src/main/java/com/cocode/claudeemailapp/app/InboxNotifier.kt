@@ -57,9 +57,6 @@ class InboxNotifier(
 
     companion object {
         const val CHANNEL_ID = "replies"
-        private const val CHANNEL_NAME = "Replies"
-        private const val CHANNEL_DESC =
-            "Notifications when an agent replies to one of your commands."
 
         fun registerChannel(context: Context) {
             // Notification channels are an Oreo+ concept. On API 24/25 the system
@@ -68,8 +65,12 @@ class InboxNotifier(
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (nm.getNotificationChannel(CHANNEL_ID) != null) return
             nm.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-                    .apply { description = CHANNEL_DESC }
+                NotificationChannel(
+                    CHANNEL_ID,
+                    context.getString(R.string.channel_replies_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                    .apply { description = context.getString(R.string.channel_replies_description) }
             )
         }
 

@@ -9,16 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,18 +26,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cocode.claudeemailapp.BuildConfig
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.Conversation
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.mail.FetchedMessage
 import kotlinx.coroutines.launch
 
-enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics, Projects }
+enum class Screen { Onboarding, Home, Setup, Settings, Conversation, Compose, Diagnostics, Projects, About }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClaudeEmailApp(
     viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory),
@@ -73,6 +70,7 @@ fun ClaudeEmailApp(
     var selectedComposeProject by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val resources = LocalResources.current
 
     LaunchedEffect(credentials, hasSeenOnboarding) {
         val target = when {
@@ -85,7 +83,7 @@ fun ClaudeEmailApp(
     }
 
     val backTarget: Screen? = when (screen) {
-        Screen.Conversation, Screen.Compose, Screen.Settings, Screen.Projects -> Screen.Home
+        Screen.Conversation, Screen.Compose, Screen.Settings, Screen.Projects, Screen.About -> Screen.Home
         Screen.Diagnostics -> Screen.Settings
         Screen.Setup -> if (editingCredentials) Screen.Settings else null
         Screen.Onboarding, Screen.Home -> null
@@ -124,19 +122,25 @@ fun ClaudeEmailApp(
 
     LaunchedEffect(send.justSentMessageId, send.lastError) {
         send.justSentMessageId?.let {
-            scope.launch { snackbarHostState.showSnackbar("Message sent") }
+            scope.launch { snackbarHostState.showSnackbar(resources.getString(R.string.snackbar_message_sent)) }
             viewModel.clearSendResult()
             if (screen == Screen.Compose) screen = Screen.Home
         }
-        send.lastError?.let { scope.launch { snackbarHostState.showSnackbar("Send failed: $it") } }
+        send.lastError?.let {
+            scope.launch { snackbarHostState.showSnackbar(resources.getString(R.string.snackbar_send_failed, it)) }
+        }
     }
 
     fun toggleArchiveWithUndo(conversation: Conversation) {
         val wasArchived = conversation.id in archived
         viewModel.setConversationArchived(conversation.id, !wasArchived)
         scope.launch {
-            val msg = if (wasArchived) "Unarchived" else "Archived"
-            val result = snackbarHostState.showSnackbar(message = msg, actionLabel = "Undo", duration = SnackbarDuration.Short)
+            val msg = resources.getString(if (wasArchived) R.string.snackbar_unarchived else R.string.snackbar_archived)
+            val result = snackbarHostState.showSnackbar(
+                message = msg,
+                actionLabel = resources.getString(R.string.snackbar_undo),
+                duration = SnackbarDuration.Short
+            )
             if (result == SnackbarResult.ActionPerformed) viewModel.setConversationArchived(conversation.id, wasArchived)
         }
     }
@@ -176,29 +180,6 @@ fun ClaudeEmailApp(
             )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AppTopBar(screen: Screen, editingCredentials: Boolean) {
-    TopAppBar(
-        title = {
-            Text(
-                text = when (screen) {
-                    Screen.Onboarding -> ""
-                    Screen.Setup -> if (editingCredentials) "Edit credentials" else "Setup"
-                    Screen.Home -> "Claude Email"
-                    Screen.Settings -> "Settings"
-                    Screen.Conversation -> "Conversation"
-                    Screen.Compose -> "New command"
-                    Screen.Diagnostics -> "Diagnostics"
-                    Screen.Projects -> "Projects"
-                },
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        windowInsets = WindowInsets.statusBars
-    )
 }
 
 @Composable
@@ -311,7 +292,8 @@ private fun AppScreenContent(
             onOpenProjects = {
                 viewModel.refreshProjects()
                 onScreenChange(Screen.Projects)
-            }
+            },
+            onOpenAbout = { onScreenChange(Screen.About) }
         )
         Screen.Projects -> {
             val projects by viewModel.projects.collectAsState()
@@ -348,6 +330,12 @@ private fun AppScreenContent(
                 onOpenDiagnostics = { onScreenChange(Screen.Diagnostics) }
             )
         }
+        Screen.About -> AboutScreen(
+            version = BuildConfig.VERSION_NAME,
+            showPrivacyLink = aboutUrl(AboutLink.Privacy) != null,
+            onOpenLink = rememberLinkOpener(),
+            onBack = { onScreenChange(Screen.Home) }
+        )
         Screen.Diagnostics -> DiagnosticsScreen(
             credentials = credentials,
             inbox = inbox,

@@ -19,8 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingStatus
@@ -43,31 +46,69 @@ fun DiagnosticsScreen(
     ) {
         item {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                OutlinedButton(onClick = onBack, modifier = Modifier.testTag("diagnostics_back")) { Text("Back") }
+                OutlinedButton(onClick = onBack, modifier = Modifier.testTag("diagnostics_back")) {
+                    Text(stringResource(R.string.action_back))
+                }
             }
         }
-        item { DiagSection("Sync") {
-            DiagRow("Last sync", formatTimestamp(inbox.lastFetchedAt?.let(::Date)).ifBlank { "never" })
-            DiagRow("Status", if (inbox.loading) "syncing" else if (inbox.error != null) "stalled" else "idle")
-            DiagRow("Auto-refresh", if (syncIntervalMs <= 0) "manual only" else "every ${syncIntervalMs / 1000}s")
-            inbox.error?.let { DiagRow("Sync error", it) }
-            DiagRow("Messages cached", inbox.messages.size.toString())
+        item { DiagSection(stringResource(R.string.diag_section_refresh)) {
+            DiagRow(
+                stringResource(R.string.diag_last_refresh),
+                formatTimestamp(inbox.lastFetchedAt?.let(::Date)).ifBlank { stringResource(R.string.diag_never) }
+            )
+            DiagRow(
+                stringResource(R.string.diag_status),
+                stringResource(
+                    when {
+                        inbox.loading -> R.string.diag_status_refreshing
+                        inbox.error != null -> R.string.diag_status_stalled
+                        else -> R.string.diag_status_idle
+                    }
+                )
+            )
+            DiagRow(
+                stringResource(R.string.diag_auto_refresh),
+                if (syncIntervalMs <= 0) {
+                    stringResource(R.string.diag_auto_refresh_manual)
+                } else {
+                    val seconds = (syncIntervalMs / 1000).toInt()
+                    pluralStringResource(R.plurals.diag_auto_refresh_every, seconds, seconds)
+                }
+            )
+            inbox.error?.let { DiagRow(stringResource(R.string.diag_refresh_error), it) }
+            DiagRow(stringResource(R.string.diag_messages_loaded), inbox.messages.size.toString())
         } }
-        item { DiagSection("Send") {
-            DiagRow("Last send error", sendError ?: "none")
-            DiagRow("Pending tasks", pending.count { it.status !in setOf(PendingStatus.DONE, PendingStatus.FAILED, PendingStatus.ERROR) }.toString())
-            DiagRow("Failed pending", pending.count { it.status == PendingStatus.FAILED || it.status == PendingStatus.ERROR }.toString())
+        item { DiagSection(stringResource(R.string.diag_section_send)) {
+            DiagRow(stringResource(R.string.diag_last_send_error), sendError ?: stringResource(R.string.diag_none))
+            DiagRow(
+                stringResource(R.string.diag_pending),
+                pending.count { it.status !in setOf(PendingStatus.DONE, PendingStatus.FAILED, PendingStatus.ERROR) }.toString()
+            )
+            DiagRow(
+                stringResource(R.string.diag_failed_pending),
+                pending.count { it.status == PendingStatus.FAILED || it.status == PendingStatus.ERROR }.toString()
+            )
         } }
-        item { DiagSection("Connection") {
+        item { DiagSection(stringResource(R.string.diag_section_connection)) {
             credentials?.let { c ->
-                DiagRow("IMAP", "${c.imapHost}:${c.imapPort}")
-                DiagRow("SMTP", "${c.smtpHost}:${c.smtpPort} ${if (c.smtpUseStartTls) "(STARTTLS)" else "(TLS)"}")
-                DiagRow("Service address", c.serviceAddress.ifBlank { "(not set)" })
-            } ?: DiagRow("Status", "no credentials")
+                DiagRow(stringResource(R.string.diag_imap), "${c.imapHost}:${c.imapPort}")
+                DiagRow(
+                    stringResource(R.string.diag_smtp),
+                    stringResource(
+                        if (c.smtpUseStartTls) R.string.diag_smtp_starttls else R.string.diag_smtp_tls,
+                        c.smtpHost,
+                        c.smtpPort
+                    )
+                )
+                DiagRow(
+                    stringResource(R.string.diag_service_address),
+                    c.serviceAddress.ifBlank { stringResource(R.string.value_not_set) }
+                )
+            } ?: DiagRow(stringResource(R.string.diag_status), stringResource(R.string.diag_no_credentials))
         } }
-        item { DiagSection("App") {
-            DiagRow("Version", appVersion(context))
-            DiagRow("Package", context.packageName)
+        item { DiagSection(stringResource(R.string.diag_section_app)) {
+            DiagRow(stringResource(R.string.diag_version), appVersion(context))
+            DiagRow(stringResource(R.string.diag_package), context.packageName)
         } }
     }
 }

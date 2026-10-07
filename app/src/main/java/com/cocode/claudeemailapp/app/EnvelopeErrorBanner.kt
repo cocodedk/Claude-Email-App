@@ -16,7 +16,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.protocol.EnvelopeError
 
 @Composable
@@ -38,7 +40,7 @@ fun EnvelopeErrorBanner(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = ui.title,
+                text = stringResource(ui.titleRes),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
@@ -49,7 +51,7 @@ fun EnvelopeErrorBanner(
             )
             ui.hint?.let {
                 Text(
-                    text = it,
+                    text = hintText(it),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
@@ -68,12 +70,12 @@ fun EnvelopeErrorBanner(
                         onClick = onOpenDiagnostics,
                         modifier = Modifier.testTag("envelope_error_diagnostics")
                     ) {
-                        Text("Diagnostics")
+                        Text(stringResource(R.string.action_diagnostics))
                     }
                 }
             }
             Text(
-                text = "code: ${error.code}",
+                text = stringResource(R.string.error_code, error.code),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
@@ -96,7 +98,7 @@ private fun BannerAction(
                 contentColor = MaterialTheme.colorScheme.errorContainer
             ),
             modifier = Modifier.testTag("envelope_error_retry")
-        ) { Text("Retry") }
+        ) { Text(stringResource(R.string.action_retry)) }
         UiErrorAction.OpenSettings -> Button(
             onClick = onOpenSettings,
             colors = ButtonDefaults.buttonColors(
@@ -104,7 +106,7 @@ private fun BannerAction(
                 contentColor = MaterialTheme.colorScheme.errorContainer
             ),
             modifier = Modifier.testTag("envelope_error_open_settings")
-        ) { Text("Open Settings") }
+        ) { Text(stringResource(R.string.error_action_open_settings)) }
         UiErrorAction.EditCommand -> Button(
             onClick = onEditCommand,
             colors = ButtonDefaults.buttonColors(
@@ -112,7 +114,7 @@ private fun BannerAction(
                 contentColor = MaterialTheme.colorScheme.errorContainer
             ),
             modifier = Modifier.testTag("envelope_error_edit")
-        ) { Text("Edit command") }
+        ) { Text(stringResource(R.string.error_action_edit_command)) }
         UiErrorAction.Dismiss -> Unit
     }
 }

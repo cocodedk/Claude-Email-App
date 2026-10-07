@@ -23,9 +23,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 
 @Composable
 fun ComposeMessageScreen(
@@ -53,7 +55,7 @@ fun ComposeMessageScreen(
         item {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.testTag("compose_cancel")) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         }
@@ -61,7 +63,7 @@ fun ComposeMessageScreen(
             OutlinedTextField(
                 value = to,
                 onValueChange = { to = it.trim() },
-                label = { Text("claude-email service address") },
+                label = { Text(stringResource(R.string.compose_service_address)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("compose_to"),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -71,7 +73,7 @@ fun ComposeMessageScreen(
             OutlinedTextField(
                 value = project,
                 onValueChange = { project = it.trim() },
-                label = { Text("Project path") },
+                label = { Text(stringResource(R.string.compose_project_path)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("compose_project")
             )
@@ -80,7 +82,7 @@ fun ComposeMessageScreen(
             TextField(
                 value = body,
                 onValueChange = { body = it },
-                label = { Text("Command") },
+                label = { Text(stringResource(R.string.compose_command)) },
                 modifier = Modifier.fillMaxWidth().height(220.dp).testTag("compose_body"),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 colors = TextFieldDefaults.colors(
@@ -90,7 +92,7 @@ fun ComposeMessageScreen(
             )
         }
         sendError?.let {
-            item { StatusCard(title = "Send failed", message = it) }
+            item { StatusCard(title = stringResource(R.string.send_failed_title), message = it) }
         }
         item {
             Button(
@@ -98,7 +100,7 @@ fun ComposeMessageScreen(
                 enabled = canSend,
                 modifier = Modifier.fillMaxWidth().testTag("compose_send")
             ) {
-                Text(if (sending) "Sending…" else "Send")
+                Text(stringResource(if (sending) R.string.action_sending else R.string.action_send))
             }
         }
     }

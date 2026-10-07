@@ -20,15 +20,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.data.ProjectSummary
 import com.cocode.claudeemailapp.protocol.AgentStatusValues
 import com.cocode.claudeemailapp.protocol.TaskStateValues
@@ -49,7 +51,7 @@ fun ProjectsScreen(
     ) {
         item { ProjectsHeader(state = state, onRefresh = onRefresh) }
         if (state.error != null) {
-            item { StatusCard(title = "Couldn't load projects", message = state.error) }
+            item { StatusCard(title = stringResource(R.string.projects_load_failed), message = state.error) }
         }
         if (state.projects.isEmpty() && !state.loading && state.error == null) {
             item { ProjectsEmpty(onCompose = onCompose) }
@@ -69,21 +71,21 @@ private fun ProjectsHeader(state: AppViewModel.ProjectsState, onRefresh: () -> U
     ) {
         Column {
             Text(
-                text = "Projects",
+                text = stringResource(R.string.title_projects),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold
             )
             val sub = when {
-                state.loading -> "Loading…"
-                state.projects.isEmpty() -> "No projects"
-                else -> "${state.projects.size} discoverable"
+                state.loading -> stringResource(R.string.projects_loading)
+                state.projects.isEmpty() -> stringResource(R.string.projects_none)
+                else -> pluralStringResource(R.plurals.projects_found, state.projects.size, state.projects.size)
             }
             Text(text = sub, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (state.loading) {
             CircularProgressIndicator(modifier = Modifier.padding(8.dp), strokeWidth = 2.dp)
         } else {
-            TextButton(onClick = onRefresh, modifier = Modifier.testTag("projects_refresh")) { Text("Refresh") }
+            TextButton(onClick = onRefresh, modifier = Modifier.testTag("projects_refresh")) { Text(stringResource(R.string.action_refresh)) }
         }
     }
 }
@@ -99,14 +101,14 @@ private fun ProjectsEmpty(onCompose: () -> Unit) {
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("No projects discovered yet.", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.projects_empty_title), style = MaterialTheme.typography.titleSmall)
             Text(
-                "The list comes from the claude-email service. Send a command to get started, or pull Refresh once the backend exposes the project list.",
+                stringResource(R.string.projects_empty_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Button(onClick = onCompose, modifier = Modifier.testTag("projects_empty_compose")) {
-                Text("New command")
+                Text(stringResource(R.string.home_new_command))
             }
         }
     }
@@ -145,7 +147,7 @@ private fun ProjectRow(project: ProjectSummary, onTap: () -> Unit) {
                     )
                 }
                 project.lastActivityAt?.let { ts ->
-                    val formatted = remember(ts) { formatTimestamp(parseIso(ts)) }
+                    val formatted = formatTimestamp(parseIso(ts))
                     Text(
                         text = formatted,
                         style = MaterialTheme.typography.labelSmall,
@@ -167,31 +169,34 @@ private fun ProjectStatePills(project: ProjectSummary) {
     }
 }
 
+@Composable
 private fun agentPill(status: String?, c: ColorScheme): Pair<String, Color>? = when (status) {
-    AgentStatusValues.ONLINE, AgentStatusValues.CONNECTED -> "agent online" to c.tertiary
-    AgentStatusValues.STALE -> "agent stale" to c.outline
+    AgentStatusValues.ONLINE, AgentStatusValues.CONNECTED -> stringResource(R.string.projects_agent_online) to c.tertiary
+    AgentStatusValues.STALE -> stringResource(R.string.projects_agent_stale) to c.outline
     AgentStatusValues.OFFLINE, AgentStatusValues.DISCONNECTED, AgentStatusValues.ABSENT ->
-        "agent offline" to c.outlineVariant
+        stringResource(R.string.projects_agent_offline) to c.outlineVariant
     null -> null
-    else -> "agent $status" to c.outline
+    else -> stringResource(R.string.projects_agent_other, status) to c.outline
 }
 
+@Composable
 private fun taskPill(p: ProjectSummary, c: ColorScheme): Pair<String, Color>? {
     val taskRef = p.runningTaskId?.let { " · #$it" } ?: ""
     return when (p.taskState) {
-        TaskStateValues.WORKING -> "working$taskRef" to c.primary
-        TaskStateValues.WAITING -> "waiting$taskRef" to c.secondary
-        TaskStateValues.COMPLETED -> "completed$taskRef" to c.tertiary
-        TaskStateValues.ERROR -> "error$taskRef" to c.error
+        TaskStateValues.WORKING -> stringResource(R.string.projects_task_working) + taskRef to c.primary
+        TaskStateValues.WAITING -> stringResource(R.string.projects_task_waiting) + taskRef to c.secondary
+        TaskStateValues.COMPLETED -> stringResource(R.string.projects_task_completed) + taskRef to c.tertiary
+        TaskStateValues.ERROR -> stringResource(R.string.projects_task_error) + taskRef to c.error
         null -> v1FallbackPill(p, c)
-        else -> "task ${p.taskState}$taskRef" to c.outline
+        else -> stringResource(R.string.projects_task_other, p.taskState) + taskRef to c.outline
     }
 }
 
+@Composable
 private fun v1FallbackPill(p: ProjectSummary, c: ColorScheme): Pair<String, Color>? = when {
-    p.runningTaskId != null -> "running task #${p.runningTaskId}" to c.primary
-    p.queueDepth > 0 -> "queued ${p.queueDepth}" to c.secondary
-    else -> "idle" to c.outline
+    p.runningTaskId != null -> stringResource(R.string.projects_task_running, p.runningTaskId) to c.primary
+    p.queueDepth > 0 -> stringResource(R.string.projects_task_queued, p.queueDepth) to c.secondary
+    else -> stringResource(R.string.projects_task_idle) to c.outline
 }
 
 private fun parseIso(iso: String): Date? = runCatching { Date.from(Instant.parse(iso)) }.getOrNull()

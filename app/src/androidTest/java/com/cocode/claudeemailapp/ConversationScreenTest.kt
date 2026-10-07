@@ -124,7 +124,7 @@ class ConversationScreenTest {
     @Test
     fun errorState_showsErrorCard() {
         render(sendError = "smtp rejected")
-        composeRule.onNodeWithText("Send failed").assertIsDisplayed()
+        composeRule.onNodeWithText("Couldn't send").assertIsDisplayed()
         composeRule.onNodeWithText("smtp rejected").assertIsDisplayed()
     }
 

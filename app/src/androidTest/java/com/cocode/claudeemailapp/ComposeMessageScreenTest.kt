@@ -133,7 +133,7 @@ class ComposeMessageScreenTest {
                 onSend = { _, _, _ -> }
             )
         } }
-        composeRule.onNodeWithText("Send failed").assertIsDisplayed()
+        composeRule.onNodeWithText("Couldn't send").assertIsDisplayed()
         composeRule.onNodeWithText("smtp down").assertIsDisplayed()
     }
 

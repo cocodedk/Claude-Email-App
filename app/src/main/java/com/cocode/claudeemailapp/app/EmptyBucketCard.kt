@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cocode.claudeemailapp.R
 
 @Composable
 internal fun EmptyBucketCard(
@@ -20,9 +22,12 @@ internal fun EmptyBucketCard(
     onCompose: () -> Unit = {}
 ) {
     val (heading, body) = when (filter) {
-        AppViewModel.HomeFilter.ACTIVE -> "Nothing active" to "Send a command to your claude-email service and the reply will land here."
-        AppViewModel.HomeFilter.WAITING -> "No conversations need a reply" to "When the agent asks a question, it will show up here."
-        AppViewModel.HomeFilter.ARCHIVED -> "Archive is empty" to "Swipe a conversation left to archive it."
+        AppViewModel.HomeFilter.ACTIVE ->
+            stringResource(R.string.empty_active_title) to stringResource(R.string.empty_active_body)
+        AppViewModel.HomeFilter.WAITING ->
+            stringResource(R.string.empty_waiting_title) to stringResource(R.string.empty_waiting_body)
+        AppViewModel.HomeFilter.ARCHIVED ->
+            stringResource(R.string.empty_archived_title) to stringResource(R.string.empty_archived_body)
     }
     Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) {
         Column(
@@ -35,7 +40,7 @@ internal fun EmptyBucketCard(
                 Button(
                     onClick = onCompose,
                     modifier = Modifier.testTag("empty_active_send_cta")
-                ) { Text("Send first command") }
+                ) { Text(stringResource(R.string.empty_active_cta)) }
             }
         }
     }

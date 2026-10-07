@@ -211,6 +211,25 @@ class AppRootTest {
     }
 
     @Test
+    fun home_about_opensAbout() {
+        val vm = buildViewModel(store = FakeStore(creds()))
+        composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("home_about_button").performClick()
+        composeRule.onNodeWithTag("about_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun about_back_returnsHome() {
+        val vm = buildViewModel(store = FakeStore(creds()))
+        composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag("home_about_button").performClick()
+        composeRule.onNodeWithTag("about_back").performClick()
+        composeRule.onNodeWithTag("home_screen").assertIsDisplayed()
+    }
+
+    @Test
     fun compose_cancel_returnsHome() {
         val vm = buildViewModel(store = FakeStore(creds()))
         composeRule.setContent { ClaudeEmailAppTheme { ClaudeEmailApp(viewModel = vm) } }

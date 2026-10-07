@@ -1,5 +1,10 @@
 package com.cocode.claudeemailapp.app
 
+import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.cocode.claudeemailapp.R
 import com.cocode.claudeemailapp.protocol.EnvelopeError
 import com.cocode.claudeemailapp.protocol.ErrorCodes
 
@@ -10,30 +15,47 @@ import com.cocode.claudeemailapp.protocol.ErrorCodes
  * ("unknown codes → treat as `internal`").
  */
 data class UiError(
-    val title: String,
+    @StringRes val titleRes: Int,
     val message: String,
-    val hint: String?,
+    val hint: UiHint?,
     val action: UiErrorAction,
     val showDiagnostics: Boolean
 )
 
+/** The line under an error: the service's own text, or one of the app's. */
+sealed interface UiHint {
+    data class FromService(val text: String) : UiHint
+    data class FromApp(@StringRes val res: Int) : UiHint
+    data class RetryAfter(val seconds: Int) : UiHint
+}
+
+@Composable
+fun hintText(hint: UiHint): String = when (hint) {
+    is UiHint.FromService -> hint.text
+    is UiHint.FromApp -> stringResource(hint.res)
+    is UiHint.RetryAfter -> pluralStringResource(R.plurals.error_hint_retry_after, hint.seconds, hint.seconds)
+}
+
 enum class UiErrorAction { Retry, OpenSettings, EditCommand, Dismiss }
 
 /**
- * Short chip-friendly label for an envelope error. Reads as "the agent
+ * Short chip-friendly label (a string resource) for an envelope error. Reads as "the agent
  * replied with an error" rather than "transport failed" — paired with
  * [tertiary] coloring at the call site so it doesn't look like the red
  * "send failed" status the user sees on actual SMTP/IMAP failures.
  */
-fun envelopeErrorChipLabel(error: EnvelopeError?): String = when (error?.code) {
-    ErrorCodes.PROJECT_NOT_FOUND -> "no project"
-    ErrorCodes.UNAUTHORIZED -> "auth"
-    ErrorCodes.RATE_LIMITED -> "throttled"
-    ErrorCodes.NOT_IMPLEMENTED -> "not built"
-    ErrorCodes.INVALID_STATE -> "bad state"
-    ErrorCodes.INTERNAL -> "server"
-    else -> "agent error"
+@StringRes
+fun envelopeErrorChipLabel(error: EnvelopeError?): Int = when (error?.code) {
+    ErrorCodes.PROJECT_NOT_FOUND -> R.string.error_chip_no_project
+    ErrorCodes.UNAUTHORIZED -> R.string.error_chip_unauthorized
+    ErrorCodes.RATE_LIMITED -> R.string.error_chip_rate_limited
+    ErrorCodes.NOT_IMPLEMENTED -> R.string.error_chip_not_implemented
+    ErrorCodes.INVALID_STATE -> R.string.error_chip_invalid_state
+    ErrorCodes.INTERNAL -> R.string.error_chip_internal
+    else -> R.string.error_chip_agent
 }
+
+private fun serviceHint(error: EnvelopeError): UiHint? = error.hint?.let(UiHint::FromService)
 
 /**
  * Map [EnvelopeError] → [UiError]. Falls back to [UiErrorAction.Retry] when the
@@ -44,58 +66,58 @@ fun describeEnvelopeError(error: EnvelopeError): UiError {
     val retryable = error.retryable ?: (error.code == ErrorCodes.INTERNAL || error.code == ErrorCodes.RATE_LIMITED)
     return when (error.code) {
         ErrorCodes.UNAUTHORIZED -> UiError(
-            title = "Not authorized",
+            titleRes = R.string.error_title_unauthorized,
             message = error.message,
-            hint = error.hint ?: "Open Settings → Edit credentials and re-check the shared secret.",
+            hint = serviceHint(error) ?: UiHint.FromApp(R.string.error_hint_unauthorized),
             action = UiErrorAction.OpenSettings,
             showDiagnostics = false
         )
         ErrorCodes.PROJECT_NOT_FOUND -> UiError(
-            title = "Project not found",
+            titleRes = R.string.error_title_project_not_found,
             message = error.message,
-            hint = error.hint ?: "Check the project path on your claude-email service and resend.",
+            hint = serviceHint(error) ?: UiHint.FromApp(R.string.error_hint_project_not_found),
             action = UiErrorAction.EditCommand,
             showDiagnostics = false
         )
         ErrorCodes.NOT_IMPLEMENTED -> UiError(
-            title = "Not available yet",
+            titleRes = R.string.error_title_not_implemented,
             message = error.message,
-            hint = error.hint,
+            hint = serviceHint(error),
             action = UiErrorAction.Dismiss,
             showDiagnostics = false
         )
         ErrorCodes.INVALID_STATE -> UiError(
-            title = "Can't run right now",
+            titleRes = R.string.error_title_invalid_state,
             message = error.message,
-            hint = error.hint,
+            hint = serviceHint(error),
             action = UiErrorAction.Dismiss,
             showDiagnostics = false
         )
         ErrorCodes.RATE_LIMITED -> UiError(
-            title = "Rate limited",
+            titleRes = R.string.error_title_rate_limited,
             message = error.message,
-            hint = error.hint ?: error.retryAfterSeconds?.let { "Retry after ${it}s." },
+            hint = serviceHint(error) ?: error.retryAfterSeconds?.let(UiHint::RetryAfter),
             action = UiErrorAction.Retry,
             showDiagnostics = false
         )
         ErrorCodes.INTERNAL -> UiError(
-            title = "Server hiccup",
+            titleRes = R.string.error_title_service_problem,
             message = error.message,
-            hint = error.hint,
+            hint = serviceHint(error),
             action = UiErrorAction.Retry,
             showDiagnostics = true
         )
         ErrorCodes.BAD_ENVELOPE, ErrorCodes.UNKNOWN_KIND, ErrorCodes.FORBIDDEN -> UiError(
-            title = "Unexpected response",
+            titleRes = R.string.error_title_unexpected,
             message = error.message,
-            hint = error.hint,
+            hint = serviceHint(error),
             action = UiErrorAction.Dismiss,
             showDiagnostics = true
         )
         else -> UiError(
-            title = "Server hiccup",
+            titleRes = R.string.error_title_service_problem,
             message = error.message,
-            hint = error.hint,
+            hint = serviceHint(error),
             action = if (retryable) UiErrorAction.Retry else UiErrorAction.Dismiss,
             showDiagnostics = true
         )
