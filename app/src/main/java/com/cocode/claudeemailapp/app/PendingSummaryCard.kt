@@ -2,6 +2,7 @@ package com.cocode.claudeemailapp.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,7 +62,13 @@ private fun PendingRow(
     onCancel: (PendingCommand) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        // The status label can be long ("waiting for the service to confirm"), so the status and the
+        // task number sit on their own line and the command preview gets the full width below.
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
             StatusChip(status = p.status)
             p.taskId?.let {
                 Text(
@@ -71,14 +77,15 @@ private fun PendingRow(
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
-            Text(
-                text = p.bodyPreview.take(80).replace('\n', ' '),
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
         }
+        Text(
+            text = p.bodyPreview.take(80).replace('\n', ' '),
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.fillMaxWidth().testTag("pending_preview_${p.messageId}")
+        )
         pendingReasonLine(p.reason, p.retryAfterSeconds)?.let { line ->
             Text(
                 text = line,
