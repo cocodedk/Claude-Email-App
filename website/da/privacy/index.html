@@ -47,19 +47,22 @@
 
 <main id="main" class="container policy" tabindex="-1">
   <h1>Privatlivspolitik: Claude Email App</h1>
-  <p class="meta">Gældende fra <time datetime="2026-10-07">7. oktober 2026</time>. Politikken gælder Claude Email App til Android (<code>com.cocode.claudeemailapp</code>). Appen er på engelsk, så knapperne og menuerne står her, som de hedder i appen.</p>
+  <p class="meta">Gældende fra <time datetime="2026-10-07">7. oktober 2026</time>. Politikken gælder Claude Email App til Android (<code>com.cocode.claudeemailapp</code>). Appen findes kun på engelsk, så knapper og menuer står her med deres engelske navne.</p>
 
   <section>
     <h2>Resumé</h2>
-    <p>Claude Email App er en mailklient til din egen postkasse og din egen claude-email-tjeneste. Den har ingen konto, ingen server hos os, ingen reklamer, ingen analyse og ingen fejlrapportering, og Cocode, der har lavet appen, modtager ingenting fra den. Appen opretter forbindelse til IMAP- og SMTP-serverne hos din mailudbyder, som du selv angiver i Setup, og til ingen andre servere. Din adgangskode til mailen går til de to servere, så du kan logge ind. Dine kommandoer og din delte hemmelighed, hvis du har sat en, forlader telefonen som almindelig mail til den claude-email-adresse, du har skrevet ind. Hvad der sker med dem derefter, ligger uden for appen. Alt andet bliver på telefonen.</p>
+    <p>Claude Email App sender dine kommandoer som mail til en claude-email-tjeneste og viser dig svarene. Tjenesten er den, der modtager dine kommandoer, starter en agent til det projekt, du angiver, og svarer, når arbejdet er gjort. Du skriver selv din postkasse og tjenestens adresse ind.</p>
+    <p>Cocode, der har lavet appen, modtager ingenting fra den. Appen har ingen konto, ingen server hos os, ingen reklamer, ingen analyse og ingen fejlrapportering.</p>
+    <p>Appen opretter kun forbindelse til de to servere hos din mailudbyder, som du angiver i Setup. Den ene modtager din mail (en IMAP-server), og den anden sender den (en SMTP-server). Din adgangskode til mailen går til dem, så du kan logge ind.</p>
+    <p>Dine kommandoer forlader telefonen som almindelig mail til den tjenesteadresse, du har skrevet ind. Har du sat en delt hemmelighed, en adgangskode som tjenesten tjekker, følger den med. Hvad tjenesten gør med en kommando, ligger uden for appen. Alt andet bliver på telefonen.</p>
   </section>
 
   <section>
     <h2>Hvad der indsamles</h2>
-    <p>Cocode indsamler ingenting: appen har ingen server hos os at sende noget til. Det her håndterer appen selv:</p>
+    <p>Cocode indsamler ingenting, fordi appen ikke har nogen server hos os at sende noget til. Det her håndterer appen selv:</p>
     <ul>
-      <li><strong>Det, du taster ind i Setup.</strong> Dit visningsnavn, din mailadresse og adgangskode til mailen, IMAP- og SMTP-værten og portene, om SMTP bruger STARTTLS, claude-email-tjenestens adresse og, hvis du har sat en, den delte hemmelighed.</li>
-      <li><strong>Din mail.</strong> Appen læser de 50 nyeste beskeder i din indbakke (INBOX) på din IMAP-server: afsender, emne, tekst, om beskeden er læst, og de hovedfelter, der binder svar sammen til tråde. Den læser al mail i den mappe, ikke kun tjenestens svar, og viser hver besked i sin samtaleliste. Appen holder beskederne i hukommelsen og gemmer dem ikke i sin lagerplads. En postkasse, der kun bruges til tjenesten, holder anden mail ude af appen.</li>
+      <li><strong>Det, du taster ind i Setup.</strong> Dit visningsnavn, din mailadresse og adgangskode til mailen. Værten (serverens navn) og porten (forbindelsens nummer) til din IMAP- og SMTP-server. Om SMTP bruger STARTTLS. Claude-email-tjenestens adresse og, hvis du har sat en, den delte hemmelighed.</li>
+      <li><strong>Din mail.</strong> Appen læser de 50 nyeste beskeder i din indbakke (mappen INBOX på din IMAP-server). Fra hver besked læser den afsender, emne, tekst, om den er læst, og de hovedfelter, der binder svar sammen til tråde. Den læser al mail i mappen, ikke kun tjenestens svar, og viser hver besked i sin samtaleliste. Vil du holde anden mail ude af appen, så brug en postkasse, du kun bruger til tjenesten. Appen holder beskederne i hukommelsen og gemmer dem ikke i sin lagerplads.</li>
       <li><strong>Det, du skriver.</strong> De kommandoer og svar, du sender, projektstien og de forespørgsler om status, annullering, nulstilling og projektliste, som appen sender, når du trykker på de tilsvarende knapper.</li>
     </ul>
     <p>Når du åbner en samtale, markerer appen dens ulæste beskeder som læst på din mailserver. Den sletter og flytter ingenting.</p>
@@ -67,46 +70,48 @@
 
   <section>
     <h2>Servere appen kontakter</h2>
-    <p>Din mailudbyders to servere og ingen andre. Appen har ingen indbygget serveradresse, åbner ingen weblinks og henter ikke andet fra internettet end mail.</p>
+    <p>Appen kontakter de to servere hos din mailudbyder og ingen andre. Den har ingen indbygget serveradresse, åbner ingen weblinks og henter ikke andet fra internettet end mail.</p>
 
-    <h3>Din IMAP-server: modtagelse</h3>
-    <p>Værten og porten kommer fra Setup, og porten er 993, medmindre du ændrer den. Forbindelsen er altid krypteret (TLS), og appen tjekker serverens navn mod dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind, og derefter appens forespørgsler: åbn indbakken, hent de 50 nyeste beskeder og markér beskeder som læst.</p>
-    <p>Vælger du ikke "Manual" under Settings, Background refresh, tjekker appen for ny mail hvert 15. sekund, mens den er åben, og hvert 30. sekund, hvert minut eller hvert 5. minut, som du vælger, mens den er i baggrunden. Når appen starter med din konto gemt, starter den også en baggrundstjeneste, der holder én forbindelse til din IMAP-server åben (IMAP IDLE), så ny mail opdages hurtigt. Android viser den som den lavt prioriterede notifikation "Watching inbox". Når forbindelsen melder ny mail, henter appen de 10 nyeste beskeder for at afgøre, om der skal vises notifikationer.</p>
+    <h3>Din IMAP-server: modtagelse af mail</h3>
+    <p>Serveren har din indbakke. IMAP er den almindelige måde, en app læser mail på, som ligger på en mailserver. Du skriver serverens vært og port ind i Setup, og porten er 993, medmindre du ændrer den. Forbindelsen er altid krypteret med TLS, og appen tjekker, at serverens navn passer til dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind. Derefter får den appens forespørgsler: åbn indbakken, hent de 50 nyeste beskeder og markér beskeder som læst.</p>
+    <p><strong>Hvor ofte appen tjekker.</strong> Vælger du ikke "Manual" under Settings, Background refresh, tjekker appen for ny mail hvert 15. sekund, mens den er åben. Mens den er i baggrunden, tjekker den hvert 30. sekund, hvert minut eller hvert 5. minut, som du vælger under samme indstilling.</p>
+    <p><strong>Baggrundsforbindelsen.</strong> Når appen starter med din konto gemt, starter den også en baggrundstjeneste. Tjenesten holder én forbindelse til din IMAP-server åben (IMAP IDLE, en almindelig måde, hvorpå en mailserver melder ny mail, så snart den kommer), så du hurtigt hører om ny mail. Android kræver, at sådan en tjeneste viser en notifikation, så du ser en lavt prioriteret med teksten "Watching inbox". Når serveren melder ny mail, henter appen de 10 nyeste beskeder for at afgøre, om du skal have en notifikation.</p>
 
-    <h3>Din SMTP-server: afsendelse</h3>
-    <p>Værten og porten kommer fra Setup, og porten er 465, medmindre du ændrer den. Forbindelsen er krypteret fra første byte (TLS), eller, hvis du vælger STARTTLS i Setup, kræver appen STARTTLS. Begge dele tjekker serverens navn mod dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind, og hver besked, du sender.</p>
+    <h3>Din SMTP-server: afsendelse af mail</h3>
+    <p>Serveren sender din mail. SMTP er den almindelige måde, en app sender mail på gennem en mailserver. Du skriver vært og port ind i Setup, og porten er 465, medmindre du ændrer den. Forbindelsen er krypteret fra første byte (TLS). Vælger du STARTTLS i Setup, en metode der starter som en almindelig forbindelse og så skifter til krypteret, kræver appen den. I begge tilfælde tjekker appen, at serverens navn passer til dens certifikat. Serveren får din mailadresse og adgangskode, så du kan logge ind, og hver besked, du sender.</p>
 
     <h3>Test and save</h3>
-    <p>Når du trykker på "Test and save", logger appen ind én gang på hver af de to servere for at tjekke dine oplysninger, og gemmer dem kun, hvis begge logins virker.</p>
+    <p>Når du trykker på "Test and save", logger appen ind én gang på hver af de to servere for at tjekke dine oplysninger. Den gemmer dem kun, hvis begge logins virker.</p>
 
     <h3>Claude-email-tjenesten</h3>
-    <p>Det er en mailadresse og ikke en server, appen forbinder til. Appen sender mail til den gennem din SMTP-server og læser svarene i din indbakke. En kommando er en JSON-besked med din tekst, projektstien, et tip om, hvordan opgaven skal dirigeres, klientnavnet <code>cocode-android/1.0</code>, afsendelsestidspunktet og, hvis du har sat en, din delte hemmelighed. Det samme gælder forespørgslerne om status, annullering, nulstilling og projektliste. Et svar, du skriver i en samtale, sendes som ren tekst med den delte hemmelighed forrest i emnelinjen som <code>AUTH:</code> efterfulgt af hemmeligheden. Kommandoer går til den tjenesteadresse, du angav i Setup. På skærmen, hvor du skriver en kommando, kan du taste en anden adresse, og så går de dertil.</p>
-    <p>Mail er ikke ende-til-ende-krypteret. Appen beskytter forbindelsen mellem telefonen og dine mailservere. Når din SMTP-server har sendt en besked videre, afhænger det af de mailsystemer, den kommer forbi, og din mailudbyder kan læse den delte hemmelighed i beskeden og i emnelinjen. Behandl hemmeligheden som en adgangskode til tjenesten, ikke som noget, din udbyder ikke kan se.</p>
-    <p>Hvad tjenesten gør med en kommando, hvilken AI den bruger, og hvad den gemmer, bestemmer den, der driver den. Appen kan ikke se det, og politikken her dækker det ikke.</p>
+    <p>Appen forbinder ikke direkte til tjenesten. Tjenesten er en mailadresse, som du skriver ind i Setup. Appen sender mail til den gennem din SMTP-server og læser svarene i din indbakke.</p>
+    <p>En kommando er en besked i JSON, et dataformat i ren tekst. Den indeholder din tekst, projektstien, et tip om, hvordan opgaven skal dirigeres, klientnavnet <code>cocode-android/1.0</code>, tidspunktet for afsendelsen og, hvis du har sat en, din delte hemmelighed. Forespørgsler om status, annullering, nulstilling og projektliste bruger det samme format. Et svar, du skriver i en samtale, sendes som ren tekst med den delte hemmelighed forrest i emnelinjen som <code>AUTH:</code> efterfulgt af hemmeligheden. Kommandoer går til den tjenesteadresse, du skrev i Setup. På skærmen, hvor du skriver en kommando, kan du taste en anden adresse, og så går kommandoen dertil.</p>
+    <p>Mail er ikke ende-til-ende-krypteret. Appen beskytter forbindelsen mellem telefonen og dine mailservere. Når din SMTP-server har sendt en besked videre, afhænger beskyttelsen af de mailsystemer, den kommer forbi. Din mailudbyder kan læse den delte hemmelighed i beskeden og i emnelinjen. Behandl hemmeligheden som en adgangskode til tjenesten og ikke som noget, din udbyder ikke kan se.</p>
+    <p>Den, der driver tjenesten, bestemmer, hvad den gør med en kommando, hvilken AI den bruger, og hvad den gemmer. Appen kan ikke se det, og politikken her dækker det ikke.</p>
   </section>
 
   <section>
     <h2>Tilladelser</h2>
     <ul>
       <li><strong>Internet.</strong> For at nå din IMAP- og SMTP-server.</li>
-      <li><strong>Netværksstatus.</strong> Appen angiver tilladelsen, men dens egen kode bruger den ikke.</li>
-      <li><strong>Notifikationer.</strong> Appen beder om den på Android 13 og nyere, så den kan give dig besked, når der kommer mail. Svarnotifikationer er slået til som standard og kan slås fra under Settings, Notifications. En notifikation viser afsender og emne på en ny besked, og appen laver en for hver ny besked i din indbakke, ikke kun for tjenestens svar, bortset fra tjenestens korte "ack"-kvitteringer.</li>
-      <li><strong>Forgrundstjeneste til datasynkronisering.</strong> For at holde baggrundsforbindelsen til din IMAP-server åben, som beskrevet ovenfor.</li>
+      <li><strong>Netværksstatus.</strong> Tilladelsen lader en app se, om telefonen er online. Appen angiver den, men dens egen kode bruger den ikke.</li>
+      <li><strong>Notifikationer.</strong> Appen beder om den på Android 13 og nyere, så den kan give dig besked, når der kommer mail. Svarnotifikationer er slået til som standard. Vil du slå dem fra, så gå til Settings, Notifications. En notifikation viser afsender og emne på den nye besked. Appen laver en for hver ny besked i din indbakke, ikke kun for tjenestens svar. Undtagelsen er tjenestens korte "ack"-kvitteringer.</li>
+      <li><strong>Forgrundstjeneste til datasynkronisering.</strong> Den lader appen holde baggrundsforbindelsen til din IMAP-server åben, som beskrevet ovenfor.</li>
     </ul>
     <p>Appen beder ikke om andre tilladelser: hverken kontakter, placering, kamera, mikrofon, filer eller telefonstatus.</p>
   </section>
 
   <section>
     <h2>Hvad der bliver på telefonen</h2>
-    <p>Appen gemmer følgende i sin egen private lagerplads:</p>
+    <p>Appen gemmer følgende i sin egen private lagerplads på telefonen:</p>
     <ul>
-      <li><strong>Dine loginoplysninger, krypteret.</strong> Alt, hvad du tastede i Setup, også adgangskoden og den delte hemmelighed, ligger i en krypteret fil. En nøgle i Android Keystore beskytter den. Passer nøglen ikke længere til filen, sletter appen filen og viser Setup igen.</li>
+      <li><strong>Dine loginoplysninger, krypteret.</strong> Alt, hvad du tastede i Setup, også adgangskoden og den delte hemmelighed, ligger i en krypteret fil. Nøglen til den ligger i Android Keystore, den del af Android, der opbevarer krypteringsnøgler. Passer nøglen ikke længere til filen, sletter appen filen og viser Setup igen.</li>
       <li><strong>En oversigt over de kommandoer, du har sendt, ikke krypteret.</strong> For hver kommando: adressen, den gik til, tidspunktet, første linje (op til 80 tegn), de første 200 tegn af teksten, projektet og det, tjenesten melder tilbage om den: status, opgavenummer, branchnavn og fejltekst.</li>
       <li><strong>Små indstillinger, ikke krypteret.</strong> Hvilke samtaler du har arkiveret, opdateringsintervallet, de fem senest brugte projektnavne, om du har set introduktionen, og til/fra-knappen til notifikationer.</li>
     </ul>
     <p>Trykker du længe på en besked for at kopiere den, havner teksten i Androids udklipsholder, som andre apps også kan se.</p>
-    <p>"Sign out" under Settings stopper baggrundstjenesten og sletter dine loginoplysninger, oversigten over sendte kommandoer, listen over arkiverede samtaler, opdateringsintervallet og de senest brugte projektnavne. Til/fra-knappen til notifikationer og markeringen af introduktionen bliver, indtil du rydder appens data i Androids indstillinger eller afinstallerer appen, hvilket fjerner alt, hvad appen gemmer.</p>
-    <p>Appen tillader Androids egen sikkerhedskopiering af sine data og har ingen undtagelser. Er sikkerhedskopiering slået til på din telefon, kan filerne ovenfor være med, også de ukrypterede. Android kopierer ikke Keystore-nøgler til en anden enhed, så den krypterede loginfil bør ikke kunne åbnes på en anden telefon. Hvor en sikkerhedskopi havner, bestemmer din telefon og ikke appen.</p>
+    <p><strong>Vil du fjerne det, appen gemmer,</strong> så tryk på "Sign out" under Settings. Det stopper baggrundstjenesten og sletter dine loginoplysninger, oversigten over sendte kommandoer, listen over arkiverede samtaler, opdateringsintervallet og de senest brugte projektnavne. Til/fra-knappen til notifikationer og markeringen af introduktionen bliver. Vil du fjerne dem også, så ryd appens data i Androids indstillinger eller afinstaller appen. Det fjerner alt, hvad appen gemmer.</p>
+    <p><strong>Sikkerhedskopi.</strong> Appen tillader Androids egen sikkerhedskopiering af sine data og har ingen undtagelser. Er sikkerhedskopiering slået til på din telefon, kan filerne ovenfor være med, også de ukrypterede. Android kopierer ikke Keystore-nøgler til en anden enhed, så den krypterede loginfil bør ikke kunne åbnes på en anden telefon. Din telefon bestemmer, hvor en sikkerhedskopi havner, og ikke appen.</p>
   </section>
 
   <section>
@@ -115,19 +120,19 @@
       <li><strong>Din mailudbyder</strong> har din postkasse og håndterer hver besked, appen sender og læser, efter sin egen privatlivspolitik.</li>
       <li><strong>Den, der driver din claude-email-tjeneste,</strong> modtager dine kommandoer og afgør, hvad der sker med dem, som beskrevet ovenfor.</li>
     </ul>
-    <p>Appen har ingen analyse, ingen reklamer og ingen fejlrapportering, og bruger ikke Google Play-tjenester; dens build nævner ingen af dem. Dens biblioteker er AndroidX og Jetpack Compose til skærme og lokal lagring, Kotlin-biblioteker, krypteringsbiblioteket Tink, som følger med AndroidX' krypterede lagring, og Angus Mail, der laver IMAP- og SMTP-forbindelserne beskrevet ovenfor. Buildet indeholder intet andet netværksbibliotek.</p>
+    <p>Appen har ingen analyse, ingen reklamer og ingen fejlrapportering. Den bruger ikke Google Play-tjenester (Googles tilføjelsestjenester til Android), og dens build nævner ingen af dem. Dens biblioteker er AndroidX og Jetpack Compose til skærme og lokal lagring, Kotlin-biblioteker, Tink (et krypteringsbibliotek, der følger med AndroidX' krypterede lagring) og Angus Mail, der laver IMAP- og SMTP-forbindelserne beskrevet ovenfor. Buildet indeholder intet andet netværksbibliotek.</p>
     <p><strong>Websitet er noget andet.</strong> Politikken handler om appen. Websitet leveres af GitHub Pages, og forsiderne henter skrifttyper fra Google Fonts. Den her side henter ikke noget fra andre websteder.</p>
   </section>
 
   <section>
     <h2>Dine rettigheder</h2>
-    <p>Efter databeskyttelsesforordningen (GDPR) kan du bede om indsigt i og berigtigelse og sletning af dine data, bede os begrænse brugen af dem og gøre indsigelse. Appen sender ingenting til Cocode, så Cocode har ingen personoplysninger om dig fra appen, og der er hverken noget at udlevere, rette eller slette hos os. Det, appen gemmer på din telefon, kan du selv fjerne, som beskrevet ovenfor.</p>
-    <p>Din mail ligger hos din mailudbyder, og dine kommandoer hos den, der driver din claude-email-tjeneste. Dem skal du rette henvendelse til. Du kan også klage til <a href="https://www.datatilsynet.dk/">Datatilsynet</a>.</p>
+    <p>Efter databeskyttelsesforordningen (GDPR) kan du bede om indsigt i, berigtigelse af og sletning af dine data. Du kan bede os begrænse brugen af dem, og du kan gøre indsigelse. Appen sender ingenting til Cocode, så Cocode har ingen personoplysninger om dig fra appen. Der er hverken noget at udlevere, rette eller slette hos os. Det, appen gemmer på din telefon, kan du selv fjerne, som beskrevet ovenfor.</p>
+    <p>Din mail ligger hos din mailudbyder, og dine kommandoer hos den, der driver din claude-email-tjeneste. Henvend dig til dem for at bruge dine rettigheder. Du kan også klage til <a href="https://www.datatilsynet.dk/">Datatilsynet</a>.</p>
   </section>
 
   <section>
     <h2>Kontakt</h2>
-    <p>Cocode (Babak Bandpey), <a href="mailto:bb@cocode.dk">bb@cocode.dk</a>. Spørgsmål om appen eller politikken kan også sendes som <a href="https://github.com/cocodedk/Claude-Email-App/issues">issue på GitHub</a>. En sikkerhedsfejl skal du ikke melde i et offentligt issue, men i repositoriets private formular "Report a vulnerability" under fanen <a href="https://github.com/cocodedk/Claude-Email-App/security">Security</a>.</p>
+    <p>Cocode (Babak Bandpey), <a href="mailto:bb@cocode.dk">bb@cocode.dk</a>. Du kan også sende spørgsmål om appen eller politikken som <a href="https://github.com/cocodedk/Claude-Email-App/issues">issue på GitHub</a>. En sikkerhedsfejl skal du ikke melde i et offentligt issue, men i repositoriets private formular "Report a vulnerability" under fanen <a href="https://github.com/cocodedk/Claude-Email-App/security">Security</a>.</p>
   </section>
 
   <section>
