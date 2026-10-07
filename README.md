@@ -3,7 +3,7 @@
 ![CI](https://github.com/cocodedk/Claude-Email-App/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 
-Android email client for the `claude-email` backend. Claude Email pairs a standard IMAP/SMTP transport with Android Keystore credential storage and a command-and-reply interaction model built for operators who send structured requests and wait for structured answers. It is not a general-purpose inbox: it targets focused workflows where envelopes flow between trusted peers, credentials stay on-device, and the UI stays out of the way.
+Android email client for the `claude-email` backend. Claude Email pairs a standard IMAP/SMTP transport with Android Keystore credential storage and a command-and-reply interaction model built for operators who send structured requests and wait for structured answers. It is not a general-purpose inbox: it targets focused workflows where envelopes flow between trusted peers and the UI stays out of the way.
 
 ## Website
 
@@ -24,18 +24,17 @@ Install on any Android device running API 24 or newer.
 
 - **IMAP/SMTP transport** — standards-based mail delivery powered by Angus Mail, no proprietary relay required.
 - **Android Keystore credentials** — account secrets are encrypted at rest by the platform keystore, never in plain preferences.
-- **Command-and-reply UX** — the UI is built around sending an envelope and reading the structured response, not browsing threads.
-- **Shared-secret auth** — envelopes are authenticated end-to-end with a shared secret in addition to transport security.
-- **Offline queue** — outbound envelopes are persisted and retried when connectivity returns.
-- **Inbox notifications** — opt-in device notifications for incoming replies, backed by a foreground IMAP IDLE service so updates land without polling overhead.
+- **Command-and-reply UX** — the UI is built around sending a command and reading the agent's replies, grouped into conversations.
+- **Shared-secret auth** — commands carry the shared secret you set in the app, for the claude-email service to check.
+- **Inbox notifications** — device notifications for incoming replies, on by default and switchable under Settings. A foreground IMAP IDLE service keeps a connection open so they work in the background.
 - **Quick-reply chips** — when an agent asks a question, the app surfaces backend-suggested chips above the composer; one tap auto-sends the answer.
-- **Live progress** — `kind=progress` envelopes render as inline labels and a progress bar so long-running tasks show their state without you opening the message.
-- **Projects view** — list of registered projects with their live agent status, so you can route a new command to a project that already has a worker attached.
-- **Dark-first UI** — Material 3 with a dark-first palette and typography tuned for focused operator work.
+- **Live progress** — `kind=progress` envelopes render in the conversation as a label and, when the task reports a fraction, a progress bar.
+- **Projects view** — the projects the claude-email service reports, with agent and task status; tap one to start a command for it.
+- **Dark-first UI** — Material 3 with a dark palette and typography tuned for focused operator work.
 
 ## Privacy
 
-Credentials are encrypted at rest by the Android Keystore, never kept in plain preferences, and they never sync and never leave the phone. Outbound messages wait in a local queue on the device until connectivity returns, and inbox notifications are opt-in.
+Your mail password and the shared secret are stored encrypted on the device (Android Keystore), never in plain preferences. The password is sent only to your own mail server, to sign in. The shared secret is included in the commands you send to the claude-email service. Reply notifications are on by default and can be switched off in Settings.
 
 ## Build
 
@@ -66,19 +65,19 @@ For integration tests that hit a real IMAP/SMTP account, copy `.env.example` to 
 app/src/main/java/com/cocode/claudeemailapp/
 ├── MainActivity.kt
 ├── app/         Compose screens + ViewModels
-├── data/        Encrypted credential storage + pending queue
+├── data/        Encrypted credential storage + tracking of sent commands
 ├── mail/        IMAP/SMTP (Angus Mail)
 ├── protocol/    claude-email envelope builders
 └── ui/theme/    Colour + typography tokens
 ```
 
-| Area            | Choice                                  |
-| --------------- | --------------------------------------- |
-| Language        | Kotlin 2.3.21                           |
-| UI              | Jetpack Compose + Material 3            |
-| Mail transport  | Angus Mail (IMAP + SMTP)                |
-| Storage         | Android Keystore + encrypted datastore  |
-| Testing         | JUnit + AndroidX instrumented tests     |
+| Area            | Choice                                        |
+| --------------- | --------------------------------------------- |
+| Language        | Kotlin 2.3.21                                 |
+| UI              | Jetpack Compose + Material 3                  |
+| Mail transport  | Angus Mail (IMAP + SMTP)                      |
+| Storage         | Android Keystore + EncryptedSharedPreferences |
+| Testing         | JUnit + AndroidX instrumented tests           |
 
 ## Contributing
 
