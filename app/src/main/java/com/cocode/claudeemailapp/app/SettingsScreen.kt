@@ -175,7 +175,7 @@ private fun ColumnScope.NotificationsToggle(enabled: Boolean, onChange: (Boolean
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(modifier = Modifier.padding(end = 12.dp)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
             Text(
                 text = stringResource(R.string.settings_notify_title),
                 style = MaterialTheme.typography.bodyLarge

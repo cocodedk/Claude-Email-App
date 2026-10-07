@@ -300,12 +300,13 @@
     <string name="about_check_updates">See the latest version</string>
     <string name="about_update_note">This opens a web page in your browser. The app never checks for updates by itself.</string>
     <string name="about_what_title">What the app does</string>
-    <string name="about_what_body">Claude Email App sends your commands by email to a claude-email service and shows you its replies, grouped into conversations. The service is the program that receives your commands, starts an agent (a helper program) for the project you name, and replies when the work is done. You enter your own mailbox and the service\'s address in Setup.</string>
+    <string name="about_what_body">Claude Email App sends your commands by email to a claude-email service and shows you its replies, grouped into conversations. The service is the program that receives your commands, has an agent (a helper program) do the work in the project you name, and replies when it is done. You enter your own mailbox and the service\'s address in Setup.</string>
     <string name="about_privacy_title">Privacy</string>
     <string name="about_privacy_nothing_to_cocode">Cocode receives nothing from this app. It has no account, no ads, no analytics and no crash reporting.</string>
     <string name="about_privacy_servers">The app connects only to your mail provider\'s two servers that you enter in Setup, one to receive mail and one to send it.</string>
     <string name="about_privacy_stored">Your sign-in details, including the mail password and the shared secret, are stored encrypted on this phone.</string>
     <string name="about_privacy_commands">Your commands leave the phone as ordinary email to the service address you enter.</string>
+    <string name="about_privacy_browser">The buttons on this screen hand a web address to your phone\'s browser. The app itself loads nothing from those sites.</string>
     <string name="about_privacy_link">Read the privacy policy</string>
     <string name="about_links_title">Links</string>
     <string name="about_website">Open the website</string>

@@ -85,6 +85,7 @@ fun AboutScreen(
             AboutBody(R.string.about_privacy_servers)
             AboutBody(R.string.about_privacy_stored)
             AboutBody(R.string.about_privacy_commands)
+            AboutBody(R.string.about_privacy_browser)
             if (showPrivacyLink) {
                 LinkButton(R.string.about_privacy_link, "about_privacy") { open(AboutLink.Privacy) }
                 if (failedLink == AboutLink.Privacy) AboutNote(R.string.about_no_browser)

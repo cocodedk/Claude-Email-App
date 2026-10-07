@@ -19,16 +19,19 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.cocode.claudeemailapp.app.EnvelopeErrorBanner
 import com.cocode.claudeemailapp.app.PendingSummary
+import com.cocode.claudeemailapp.app.SettingsScreen
 import com.cocode.claudeemailapp.app.ProjectStatePills
 import com.cocode.claudeemailapp.app.steering.SteeringBar
 import com.cocode.claudeemailapp.app.steering.SteeringBarController
 import com.cocode.claudeemailapp.app.steering.SteeringBarState
+import com.cocode.claudeemailapp.data.MailCredentials
 import com.cocode.claudeemailapp.data.PendingCommand
 import com.cocode.claudeemailapp.data.PendingStatus
 import com.cocode.claudeemailapp.data.ProjectSummary
@@ -168,4 +171,27 @@ class NarrowScreenLayoutTest {
     @Test fun steeringChips_fit_atNormalText() = checkSteeringChips(1f)
     @Test fun steeringChips_fit_at1_3xText() = checkSteeringChips(1.3f)
     @Test fun steeringChips_fit_at2xText() = checkSteeringChips(2f)
+
+    // --- Settings: the notification text beside its switch -------------------------------------
+
+    private fun checkNotificationRow(fontScale: Float) {
+        render(fontScale, width = 360.dp) {
+            SettingsScreen(
+                credentials = MailCredentials("d", "me@ex", "pw", "imap.ex", 993, "smtp.ex", 465, false, "svc@ex", "s"),
+                syncIntervalMs = 60_000L, onSyncIntervalChange = {},
+                notificationsEnabled = true, onNotificationsEnabledChange = {},
+                onBack = {}, onSignOut = {}, onEdit = {}, onOpenDiagnostics = {}
+            )
+        }
+        composeRule.onNodeWithTag("settings_screen").performScrollToNode(hasTestTag("settings_notifications_toggle"))
+        val text = composeRule.onNodeWithText("Show a notification on this phone", substring = true).getUnclippedBoundsInRoot()
+        val toggle = composeRule.onNodeWithTag("settings_notifications_toggle").getUnclippedBoundsInRoot()
+        assertTrue("text ends at ${text.right}, switch starts at ${toggle.left}", text.right <= toggle.left)
+        // The switch keeps its own width; the text must not squeeze it to nothing at the row's edge.
+        assertTrue("switch is ${toggle.right - toggle.left} wide", toggle.right - toggle.left >= 48.dp)
+    }
+
+    @Test fun notificationText_clearsTheSwitch_atNormalText() = checkNotificationRow(1f)
+    @Test fun notificationText_clearsTheSwitch_at1_3xText() = checkNotificationRow(1.3f)
+    @Test fun notificationText_clearsTheSwitch_at2xText() = checkNotificationRow(2f)
 }
