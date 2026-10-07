@@ -181,16 +181,20 @@ private fun agentPill(status: String?, c: ColorScheme): Pair<String, Color>? = w
 
 @Composable
 private fun taskPill(p: ProjectSummary, c: ColorScheme): Pair<String, Color>? {
-    val taskRef = p.runningTaskId?.let { " · #$it" } ?: ""
     return when (p.taskState) {
-        TaskStateValues.WORKING -> stringResource(R.string.projects_task_working) + taskRef to c.primary
-        TaskStateValues.WAITING -> stringResource(R.string.projects_task_waiting) + taskRef to c.secondary
-        TaskStateValues.COMPLETED -> stringResource(R.string.projects_task_completed) + taskRef to c.tertiary
-        TaskStateValues.ERROR -> stringResource(R.string.projects_task_error) + taskRef to c.error
+        TaskStateValues.WORKING -> withTaskRef(stringResource(R.string.projects_task_working), p) to c.primary
+        TaskStateValues.WAITING -> withTaskRef(stringResource(R.string.projects_task_waiting), p) to c.secondary
+        TaskStateValues.COMPLETED -> withTaskRef(stringResource(R.string.projects_task_completed), p) to c.tertiary
+        TaskStateValues.ERROR -> withTaskRef(stringResource(R.string.projects_task_error), p) to c.error
         null -> v1FallbackPill(p, c)
-        else -> stringResource(R.string.projects_task_other, p.taskState) + taskRef to c.outline
+        else -> withTaskRef(stringResource(R.string.projects_task_other, p.taskState), p) to c.outline
     }
 }
+
+/** Adds the running task's number to a pill label when the project reports one. */
+@Composable
+private fun withTaskRef(label: String, p: ProjectSummary): String =
+    p.runningTaskId?.let { stringResource(R.string.projects_task_with_ref, label, it) } ?: label
 
 @Composable
 private fun v1FallbackPill(p: ProjectSummary, c: ColorScheme): Pair<String, Color>? = when {

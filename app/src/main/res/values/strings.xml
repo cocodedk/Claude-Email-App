@@ -245,6 +245,7 @@
     <string name="projects_agent_stale">agent has not checked in recently</string>
     <string name="projects_agent_offline">agent offline</string>
     <string name="projects_agent_other">agent %1$s</string>
+    <string name="projects_task_with_ref">%1$s · #%2$s</string>
     <string name="projects_task_working">working</string>
     <string name="projects_task_waiting">waiting</string>
     <string name="projects_task_completed">completed</string>
